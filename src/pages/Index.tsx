@@ -1,18 +1,47 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 import logo from "@/assets/logo-elia-balance.svg";
 import LoginScreen from "@/components/LoginScreen";
+import HomeScreen from "@/components/HomeScreen";
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
   const wipedAreaRef = useRef<Set<string>>(new Set());
+
+  // Check auth state
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Initialize fog canvas
   useEffect(() => {
+    if (user) return; // Don't show splash if already logged in
+    
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -51,17 +80,17 @@ const Index = () => {
     window.addEventListener("resize", resizeCanvas);
 
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, []);
+  }, [user]);
 
   // Transition to login after reveal animation
   useEffect(() => {
-    if (revealed) {
+    if (revealed && !user) {
       const timer = setTimeout(() => {
         setShowLogin(true);
       }, 1200);
       return () => clearTimeout(timer);
     }
-  }, [revealed]);
+  }, [revealed, user]);
 
   const getCoordinates = (e: React.TouchEvent | React.MouseEvent) => {
     const canvas = canvasRef.current;
@@ -159,6 +188,29 @@ const Index = () => {
   const handleEnd = () => {
     setIsDrawing(false);
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: '#A799B7' }}
+      >
+        <motion.img
+          src={logo}
+          alt="Elia Balance"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="w-48 h-auto"
+        />
+      </div>
+    );
+  }
+
+  // Show home screen if user is logged in
+  if (user) {
+    return <HomeScreen user={user} />;
+  }
 
   return (
     <div 
