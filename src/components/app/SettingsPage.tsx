@@ -6,14 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { LogOut, User as UserIcon, Mail, Activity } from "lucide-react";
 import { toast } from "sonner";
+import { usePlatform } from "@/hooks/use-platform";
 
 interface SettingsPageProps {
   user: User;
 }
 
 const SettingsPage = ({ user }: SettingsPageProps) => {
+  const { isIOS, isAndroid, isWeb } = usePlatform();
   const [googleFitEnabled, setGoogleFitEnabled] = useState(false);
   const [appleHealthEnabled, setAppleHealthEnabled] = useState(false);
+  
+  // Show Google Fit on Android or Web, Apple Health on iOS or Web
+  const showGoogleFit = isAndroid || isWeb;
+  const showAppleHealth = isIOS || isWeb;
 
   const handleGoogleFitToggle = (enabled: boolean) => {
     setGoogleFitEnabled(enabled);
@@ -75,27 +81,31 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           </h2>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-white/90 text-sm font-medium">Google Fit</span>
-                <span className="text-white/50 text-xs">Синхронизация шагов с Android</span>
+            {showGoogleFit && (
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-white/90 text-sm font-medium">Google Fit</span>
+                  <span className="text-white/50 text-xs">Синхронизация шагов с Android</span>
+                </div>
+                <Switch
+                  checked={googleFitEnabled}
+                  onCheckedChange={handleGoogleFitToggle}
+                />
               </div>
-              <Switch
-                checked={googleFitEnabled}
-                onCheckedChange={handleGoogleFitToggle}
-              />
-            </div>
+            )}
             
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-white/90 text-sm font-medium">Apple Health</span>
-                <span className="text-white/50 text-xs">Синхронизация шагов с iPhone</span>
+            {showAppleHealth && (
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-white/90 text-sm font-medium">Apple Health</span>
+                  <span className="text-white/50 text-xs">Синхронизация шагов с iPhone</span>
+                </div>
+                <Switch
+                  checked={appleHealthEnabled}
+                  onCheckedChange={handleAppleHealthToggle}
+                />
               </div>
-              <Switch
-                checked={appleHealthEnabled}
-                onCheckedChange={handleAppleHealthToggle}
-              />
-            </div>
+            )}
           </div>
         </div>
 
