@@ -15,6 +15,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [canvasInitialized, setCanvasInitialized] = useState(false);
   const wipedAreaRef = useRef<Set<string>>(new Set());
 
   // Check auth state
@@ -38,9 +39,10 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Initialize fog canvas
+  // Initialize fog canvas - only once when not logged in
   useEffect(() => {
-    if (user) return; // Don't show splash if already logged in
+    // Skip if already initialized or user is logged in
+    if (canvasInitialized || user || loading) return;
     
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -48,7 +50,7 @@ const Index = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const resizeCanvas = () => {
+    const initCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
@@ -71,16 +73,20 @@ const Index = () => {
       }
       
       ctx.putImageData(imageData, 0, 0);
-      
-      // Reset wiped area tracking
-      wipedAreaRef.current.clear();
+      setCanvasInitialized(true);
     };
 
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    initCanvas();
 
-    return () => window.removeEventListener("resize", resizeCanvas);
-  }, [user]);
+    const handleResize = () => {
+      if (!revealed) {
+        initCanvas();
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [user, loading, canvasInitialized, revealed]);
 
   // Transition to login after reveal animation
   useEffect(() => {
