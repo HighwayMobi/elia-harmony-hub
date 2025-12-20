@@ -27,7 +27,6 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             )}
           >
             <Icon className="w-6 h-6" />
-            <span className="text-xs mt-1 font-medium">{label}</span>
           </button>
         ))}
       </div>
