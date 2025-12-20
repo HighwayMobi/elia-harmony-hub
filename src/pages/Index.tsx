@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Hand, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import logo from "@/assets/logo-elia-balance.svg";
 
 const Index = () => {
@@ -171,7 +171,7 @@ const Index = () => {
             className="flex items-center gap-2"
           >
             <ChevronLeft className="w-5 h-5 text-white/50" />
-            <Hand className="w-8 h-8 text-white/70" />
+            <Pointer className="w-8 h-8 text-white/70" />
             <ChevronRight className="w-5 h-5 text-white/50" />
           </motion.div>
         </motion.div>
