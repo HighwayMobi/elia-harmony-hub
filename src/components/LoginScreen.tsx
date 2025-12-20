@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo-elia-balance.svg";
 
-const LoginScreen = forwardRef<HTMLDivElement>((_, ref) => {
+const LoginScreen = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -147,7 +147,6 @@ const LoginScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
   return (
     <motion.div
-      ref={ref}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
@@ -299,8 +298,6 @@ const LoginScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </motion.div>
     </motion.div>
   );
-});
-
-LoginScreen.displayName = "LoginScreen";
+};
 
 export default LoginScreen;
