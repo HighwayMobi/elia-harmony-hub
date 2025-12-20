@@ -9,6 +9,7 @@ const Index = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const wipedAreaRef = useRef<Set<string>>(new Set());
 
   // Initialize fog canvas
   useEffect(() => {
@@ -41,6 +42,9 @@ const Index = () => {
       }
       
       ctx.putImageData(imageData, 0, 0);
+      
+      // Reset wiped area tracking
+      wipedAreaRef.current.clear();
     };
 
     resizeCanvas();
@@ -88,11 +92,6 @@ const Index = () => {
     const coords = getCoordinates(e);
     if (!coords) return;
 
-    // Check if wiping near the logo center (middle of screen)
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const logoRadius = 120; // Approximate logo area
-
     ctx.globalCompositeOperation = "destination-out";
     
     // Create radial gradient for soft edges
@@ -109,14 +108,45 @@ const Index = () => {
     ctx.arc(coords.x, coords.y, 50, 0, Math.PI * 2);
     ctx.fill();
 
-    // Check if user is wiping in the logo area
-    const distanceFromCenter = Math.sqrt(
-      Math.pow(coords.x - centerX, 2) + Math.pow(coords.y - centerY, 2)
-    );
+    // Track wiped cells in logo area
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const logoWidth = 280;
+    const logoHeight = 140;
+    
+    // Define logo bounding box
+    const logoLeft = centerX - logoWidth / 2;
+    const logoRight = centerX + logoWidth / 2;
+    const logoTop = centerY - logoHeight / 2;
+    const logoBottom = centerY + logoHeight / 2;
 
-    if (distanceFromCenter < logoRadius) {
-      // User is wiping the logo - trigger reveal immediately
-      setRevealed(true);
+    // Check if touch is within logo area
+    if (coords.x >= logoLeft && coords.x <= logoRight && 
+        coords.y >= logoTop && coords.y <= logoBottom) {
+      // Divide logo into grid cells (20x10 grid)
+      const cellWidth = logoWidth / 20;
+      const cellHeight = logoHeight / 10;
+      
+      // Mark cells around the touch point as wiped
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const cellX = Math.floor((coords.x - logoLeft + dx * 25) / cellWidth);
+          const cellY = Math.floor((coords.y - logoTop + dy * 25) / cellHeight);
+          
+          if (cellX >= 0 && cellX < 20 && cellY >= 0 && cellY < 10) {
+            wipedAreaRef.current.add(`${cellX},${cellY}`);
+          }
+        }
+      }
+
+      // Check if enough of logo is wiped (70% of cells)
+      const totalCells = 20 * 10;
+      const wipedCells = wipedAreaRef.current.size;
+      const wipedPercent = wipedCells / totalCells;
+
+      if (wipedPercent >= 0.7) {
+        setRevealed(true);
+      }
     }
   };
 
