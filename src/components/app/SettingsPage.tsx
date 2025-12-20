@@ -24,27 +24,27 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const handleGoogleFitToggle = (enabled: boolean) => {
     setGoogleFitEnabled(enabled);
     if (enabled) {
-      toast.success("Google Fit подключен");
+      toast.success("Google Fit conectado");
     } else {
-      toast.info("Google Fit отключен");
+      toast.info("Google Fit desconectado");
     }
   };
 
   const handleAppleHealthToggle = (enabled: boolean) => {
     setAppleHealthEnabled(enabled);
     if (enabled) {
-      toast.success("Apple Health подключен");
+      toast.success("Apple Health conectado");
     } else {
-      toast.info("Apple Health отключен");
+      toast.info("Apple Health desconectado");
     }
   };
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      toast.error("Ошибка при выходе");
+      toast.error("Error al cerrar sesión");
     } else {
-      toast.success("Вы вышли из аккаунта");
+      toast.success("Sesión cerrada");
     }
   };
 
@@ -77,7 +77,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-4">
           <h2 className="text-white/90 font-medium mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5" />
-            Подсчет шагов
+            Conteo de pasos
           </h2>
           
           <div className="space-y-4">
@@ -85,7 +85,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-white/90 text-sm font-medium">Google Fit</span>
-                  <span className="text-white/50 text-xs">Синхронизация шагов с Android</span>
+                  <span className="text-white/50 text-xs">Sincronización de pasos con Android</span>
                 </div>
                 <Switch
                   checked={googleFitEnabled}
@@ -98,7 +98,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-white/90 text-sm font-medium">Apple Health</span>
-                  <span className="text-white/50 text-xs">Синхронизация шагов с iPhone</span>
+                  <span className="text-white/50 text-xs">Sincronización de pasos con iPhone</span>
                 </div>
                 <Switch
                   checked={appleHealthEnabled}
