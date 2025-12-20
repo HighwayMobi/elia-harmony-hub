@@ -107,6 +107,44 @@ const LoginScreen = () => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) {
+        toast.error("Error al iniciar sesión con Google");
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "apple",
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) {
+        toast.error("Error al iniciar sesión con Apple");
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -202,6 +240,7 @@ const LoginScreen = () => {
             type="button"
             variant="outline"
             disabled={loading}
+            onClick={handleGoogleLogin}
             className="w-full h-12 bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -229,6 +268,7 @@ const LoginScreen = () => {
             type="button"
             variant="outline"
             disabled={loading}
+            onClick={handleAppleLogin}
             className="w-full h-12 bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
