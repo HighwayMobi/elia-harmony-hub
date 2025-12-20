@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import logo from "@/assets/logo-elia-balance.svg";
+import LoginScreen from "@/components/LoginScreen";
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Initialize fog canvas
   useEffect(() => {
@@ -46,6 +48,16 @@ const Index = () => {
 
     return () => window.removeEventListener("resize", resizeCanvas);
   }, []);
+
+  // Transition to login after reveal animation
+  useEffect(() => {
+    if (revealed) {
+      const timer = setTimeout(() => {
+        setShowLogin(true);
+      }, 1500); // Wait for logo animation to complete
+      return () => clearTimeout(timer);
+    }
+  }, [revealed]);
 
   const getCoordinates = (e: React.TouchEvent | React.MouseEvent) => {
     const canvas = canvasRef.current;
@@ -126,56 +138,80 @@ const Index = () => {
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{ backgroundColor: '#A799B7' }}
     >
-      {/* Clear content underneath - SVG logo */}
-      <div className="z-0">
-        <motion.img
-          src={logo}
-          alt="Elia Balance"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="w-64 md:w-80 h-auto"
-        />
-      </div>
-
-      {/* Fog overlay canvas */}
-      <canvas
-        ref={canvasRef}
-        className={`absolute inset-0 z-10 touch-none transition-opacity duration-1000 ${
-          revealed ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-        onMouseDown={handleStart}
-        onMouseMove={draw}
-        onMouseUp={handleEnd}
-        onMouseLeave={handleEnd}
-        onTouchStart={handleStart}
-        onTouchMove={draw}
-        onTouchEnd={handleEnd}
-      />
-
-      {/* Animated swipe hint icon */}
-      {!revealed && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.5 }}
-          className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
-        >
+      <AnimatePresence mode="wait">
+        {!showLogin ? (
           <motion.div
-            animate={{ x: [-15, 15, -15] }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-            className="flex items-center gap-2"
+            key="splash"
+            className="flex items-center justify-center w-full h-full absolute inset-0"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <ChevronLeft className="w-5 h-5 text-white/50" />
-            <Pointer className="w-8 h-8 text-white/70" />
-            <ChevronRight className="w-5 h-5 text-white/50" />
+            {/* Logo with zoom animation after reveal */}
+            <motion.div 
+              className="z-0"
+              animate={revealed ? {
+                scale: [1, 1.15, 30],
+                opacity: [1, 1, 0],
+              } : {}}
+              transition={{
+                duration: 1.5,
+                times: [0, 0.4, 1],
+                ease: "easeInOut"
+              }}
+            >
+              <motion.img
+                src={logo}
+                alt="Elia Balance"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="w-64 md:w-80 h-auto"
+              />
+            </motion.div>
+
+            {/* Fog overlay canvas */}
+            <canvas
+              ref={canvasRef}
+              className={`absolute inset-0 z-10 touch-none transition-opacity duration-1000 ${
+                revealed ? "opacity-0 pointer-events-none" : "opacity-100"
+              }`}
+              onMouseDown={handleStart}
+              onMouseMove={draw}
+              onMouseUp={handleEnd}
+              onMouseLeave={handleEnd}
+              onTouchStart={handleStart}
+              onTouchMove={draw}
+              onTouchEnd={handleEnd}
+            />
+
+            {/* Animated swipe hint icon */}
+            {!revealed && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5, duration: 0.5 }}
+                className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
+              >
+                <motion.div
+                  animate={{ x: [-15, 15, -15] }}
+                  transition={{ 
+                    duration: 1.5, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-5 h-5 text-white/50" />
+                  <Pointer className="w-8 h-8 text-white/70" />
+                  <ChevronRight className="w-5 h-5 text-white/50" />
+                </motion.div>
+              </motion.div>
+            )}
           </motion.div>
-        </motion.div>
-      )}
+        ) : (
+          <LoginScreen key="login" />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
