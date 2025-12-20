@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import logo from "@/assets/logo-elia-balance.svg";
 
 interface Droplet {
   id: number;
@@ -30,10 +31,10 @@ const Index = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Draw fog overlay with gradient
+      // Draw fog overlay with gradient matching brand color #A799B7
       const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, "rgba(200, 185, 215, 0.9)");
-      gradient.addColorStop(1, "rgba(170, 155, 190, 0.85)");
+      gradient.addColorStop(0, "rgba(175, 165, 195, 0.92)");
+      gradient.addColorStop(1, "rgba(155, 140, 175, 0.88)");
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
@@ -284,29 +285,18 @@ const Index = () => {
   return (
     <div 
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ backgroundColor: '#b8a9c9' }}
+      style={{ backgroundColor: '#A799B7' }}
     >
-      {/* Clear content underneath */}
-      <div className="text-center z-0">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 
-            className="text-4xl md:text-5xl tracking-[0.35em] font-light"
-            style={{ color: '#ffffff' }}
-          >
-            ELIA
-          </h1>
-          <div className="w-16 h-px bg-white/60 mx-auto my-3" />
-          <h2 
-            className="text-lg md:text-xl tracking-[0.45em] font-light"
-            style={{ color: '#ffffff' }}
-          >
-            BALANCE
-          </h2>
-        </motion.div>
+      {/* Clear content underneath - SVG logo */}
+      <div className="z-0">
+        <motion.img
+          src={logo}
+          alt="Elia Balance"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-64 md:w-80 h-auto"
+        />
       </div>
 
       {/* Fog overlay canvas */}
