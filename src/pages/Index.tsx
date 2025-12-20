@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import logo from "@/assets/logo-elia-balance.svg";
 import LoginScreen from "@/components/LoginScreen";
-import HomeScreen from "@/components/HomeScreen";
+import AppShell from "@/components/app/AppShell";
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -207,9 +207,9 @@ const Index = () => {
     );
   }
 
-  // Show home screen if user is logged in
+  // Show app if user is logged in
   if (user) {
-    return <HomeScreen user={user} />;
+    return <AppShell user={user} />;
   }
 
   return (
