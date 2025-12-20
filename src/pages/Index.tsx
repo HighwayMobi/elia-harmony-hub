@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { Hand, ChevronLeft, ChevronRight } from "lucide-react";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface Droplet {
@@ -322,16 +323,28 @@ const Index = () => {
         }`}
       />
 
-      {/* Hint text */}
+      {/* Animated swipe hint icon */}
       {!revealed && (
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.5 }}
-          className="absolute bottom-20 left-0 right-0 text-center text-white/70 text-sm z-30 pointer-events-none"
+          className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
         >
-          Проведите пальцем, чтобы протереть стекло
-        </motion.p>
+          <motion.div
+            animate={{ x: [-15, 15, -15] }}
+            transition={{ 
+              duration: 1.5, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="w-5 h-5 text-white/50" />
+            <Hand className="w-8 h-8 text-white/70" />
+            <ChevronRight className="w-5 h-5 text-white/50" />
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
