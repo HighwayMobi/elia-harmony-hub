@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, User as UserIcon, Mail } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { LogOut, User as UserIcon, Mail, Activity } from "lucide-react";
 import { toast } from "sonner";
 
 interface SettingsPageProps {
@@ -10,12 +12,33 @@ interface SettingsPageProps {
 }
 
 const SettingsPage = ({ user }: SettingsPageProps) => {
+  const [googleFitEnabled, setGoogleFitEnabled] = useState(false);
+  const [appleHealthEnabled, setAppleHealthEnabled] = useState(false);
+
+  const handleGoogleFitToggle = (enabled: boolean) => {
+    setGoogleFitEnabled(enabled);
+    if (enabled) {
+      toast.success("Google Fit подключен");
+    } else {
+      toast.info("Google Fit отключен");
+    }
+  };
+
+  const handleAppleHealthToggle = (enabled: boolean) => {
+    setAppleHealthEnabled(enabled);
+    if (enabled) {
+      toast.success("Apple Health подключен");
+    } else {
+      toast.info("Apple Health отключен");
+    }
+  };
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      toast.error("Error al cerrar sesión");
+      toast.error("Ошибка при выходе");
     } else {
-      toast.success("Sesión cerrada");
+      toast.success("Вы вышли из аккаунта");
     }
   };
 
@@ -41,6 +64,38 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           <div className="flex items-center gap-3 text-white/70">
             <Mail className="w-4 h-4" />
             <span className="text-sm">{user.email}</span>
+          </div>
+        </div>
+
+        {/* Health integrations section */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-4">
+          <h2 className="text-white/90 font-medium mb-4 flex items-center gap-2">
+            <Activity className="w-5 h-5" />
+            Подсчет шагов
+          </h2>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-white/90 text-sm font-medium">Google Fit</span>
+                <span className="text-white/50 text-xs">Синхронизация шагов с Android</span>
+              </div>
+              <Switch
+                checked={googleFitEnabled}
+                onCheckedChange={handleGoogleFitToggle}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-white/90 text-sm font-medium">Apple Health</span>
+                <span className="text-white/50 text-xs">Синхронизация шагов с iPhone</span>
+              </div>
+              <Switch
+                checked={appleHealthEnabled}
+                onCheckedChange={handleAppleHealthToggle}
+              />
+            </div>
           </div>
         </div>
 
