@@ -2,7 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import logo from "@/assets/logo-elia-balance.svg";
 
 const LoginScreen = () => {
@@ -10,11 +12,99 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateForm = () => {
+    if (!email.trim()) {
+      toast.error("Por favor ingresa tu correo electrónico");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Por favor ingresa un correo electrónico válido");
+      return false;
+    }
+    if (!password) {
+      toast.error("Por favor ingresa tu contraseña");
+      return false;
+    }
+    if (password.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication
-    console.log(isLogin ? "Login" : "Sign up", { email, password });
+    
+    if (!validateForm()) return;
+
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+
+        if (error) {
+          if (error.message === "Invalid login credentials") {
+            toast.error("Correo o contraseña incorrectos");
+          } else {
+            toast.error(error.message);
+          }
+        } else {
+          toast.success("¡Bienvenido!");
+        }
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
+
+        if (error) {
+          if (error.message.includes("already registered")) {
+            toast.error("Este correo ya está registrado");
+          } else {
+            toast.error(error.message);
+          }
+        } else {
+          toast.success("¡Cuenta creada exitosamente!");
+        }
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      toast.error("Por favor ingresa tu correo electrónico");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/`,
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Te enviamos un correo para restablecer tu contraseña");
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,6 +138,7 @@ const LoginScreen = () => {
               placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
               className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20"
             />
             
@@ -57,6 +148,7 @@ const LoginScreen = () => {
                 placeholder="Contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
                 className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pr-12"
               />
               <button
@@ -76,6 +168,8 @@ const LoginScreen = () => {
           {isLogin && (
             <button
               type="button"
+              onClick={handleForgotPassword}
+              disabled={loading}
               className="text-sm text-white/70 hover:text-white transition-colors"
             >
               ¿Olvidaste tu contraseña?
@@ -84,9 +178,14 @@ const LoginScreen = () => {
 
           <Button
             type="submit"
-            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all"
+            disabled={loading}
+            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
           >
-            {isLogin ? "Iniciar sesión" : "Registrarse"}
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              isLogin ? "Iniciar sesión" : "Registrarse"
+            )}
           </Button>
         </form>
 
@@ -102,6 +201,7 @@ const LoginScreen = () => {
           <Button
             type="button"
             variant="outline"
+            disabled={loading}
             className="w-full h-12 bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -128,6 +228,7 @@ const LoginScreen = () => {
           <Button
             type="button"
             variant="outline"
+            disabled={loading}
             className="w-full h-12 bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -148,6 +249,7 @@ const LoginScreen = () => {
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
+            disabled={loading}
             className="text-white font-medium hover:underline"
           >
             {isLogin ? "Regístrate" : "Inicia sesión"}
