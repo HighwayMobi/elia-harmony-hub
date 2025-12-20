@@ -54,7 +54,7 @@ const Index = () => {
     if (revealed) {
       const timer = setTimeout(() => {
         setShowLogin(true);
-      }, 1500); // Wait for logo animation to complete
+      }, 1200);
       return () => clearTimeout(timer);
     }
   }, [revealed]);
@@ -79,7 +79,7 @@ const Index = () => {
   };
 
   const draw = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDrawing) return;
+    if (!isDrawing || revealed) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
@@ -87,6 +87,11 @@ const Index = () => {
 
     const coords = getCoordinates(e);
     if (!coords) return;
+
+    // Check if wiping near the logo center (middle of screen)
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const logoRadius = 120; // Approximate logo area
 
     ctx.globalCompositeOperation = "destination-out";
     
@@ -104,27 +109,19 @@ const Index = () => {
     ctx.arc(coords.x, coords.y, 50, 0, Math.PI * 2);
     ctx.fill();
 
-    checkRevealProgress(ctx, canvas);
-  };
+    // Check if user is wiping in the logo area
+    const distanceFromCenter = Math.sqrt(
+      Math.pow(coords.x - centerX, 2) + Math.pow(coords.y - centerY, 2)
+    );
 
-  const checkRevealProgress = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    let transparentPixels = 0;
-    
-    for (let i = 3; i < data.length; i += 400) {
-      if (data[i] < 128) transparentPixels++;
-    }
-    
-    const totalSampled = data.length / 400;
-    const revealedPercent = transparentPixels / totalSampled;
-    
-    if (revealedPercent > 0.4 && !revealed) {
+    if (distanceFromCenter < logoRadius) {
+      // User is wiping the logo - trigger reveal immediately
       setRevealed(true);
     }
   };
 
   const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
+    if (revealed) return;
     setIsDrawing(true);
     draw(e);
   };
@@ -144,18 +141,18 @@ const Index = () => {
             key="splash"
             className="flex items-center justify-center w-full h-full absolute inset-0"
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
           >
             {/* Logo with zoom animation after reveal */}
             <motion.div 
               className="z-0"
               animate={revealed ? {
-                scale: [1, 1.15, 30],
+                scale: [1, 1.1, 20],
                 opacity: [1, 1, 0],
               } : {}}
               transition={{
-                duration: 1.5,
-                times: [0, 0.4, 1],
+                duration: 1.2,
+                times: [0, 0.3, 1],
                 ease: "easeInOut"
               }}
             >
@@ -172,7 +169,7 @@ const Index = () => {
             {/* Fog overlay canvas */}
             <canvas
               ref={canvasRef}
-              className={`absolute inset-0 z-10 touch-none transition-opacity duration-1000 ${
+              className={`absolute inset-0 z-10 touch-none transition-opacity duration-300 ${
                 revealed ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
               onMouseDown={handleStart}
@@ -184,29 +181,32 @@ const Index = () => {
               onTouchEnd={handleEnd}
             />
 
-            {/* Animated swipe hint icon */}
-            {!revealed && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.5, duration: 0.5 }}
-                className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
-              >
+            {/* Animated swipe hint icon - hidden immediately on reveal */}
+            <AnimatePresence>
+              {!revealed && (
                 <motion.div
-                  animate={{ x: [-15, 15, -15] }}
-                  transition={{ 
-                    duration: 1.5, 
-                    repeat: Infinity, 
-                    ease: "easeInOut" 
-                  }}
-                  className="flex items-center gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 1.5, duration: 0.3 }}
+                  className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
                 >
-                  <ChevronLeft className="w-5 h-5 text-white/50" />
-                  <Pointer className="w-8 h-8 text-white/70" />
-                  <ChevronRight className="w-5 h-5 text-white/50" />
+                  <motion.div
+                    animate={{ x: [-15, 15, -15] }}
+                    transition={{ 
+                      duration: 1.5, 
+                      repeat: Infinity, 
+                      ease: "easeInOut" 
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-white/50" />
+                    <Pointer className="w-8 h-8 text-white/70" />
+                    <ChevronRight className="w-5 h-5 text-white/50" />
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
+              )}
+            </AnimatePresence>
           </motion.div>
         ) : (
           <LoginScreen key="login" />
