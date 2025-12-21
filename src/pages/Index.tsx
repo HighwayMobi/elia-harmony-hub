@@ -39,6 +39,16 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Reset states when user logs out
+  useEffect(() => {
+    if (!user && !loading) {
+      setRevealed(false);
+      setShowLogin(false);
+      setCanvasInitialized(false);
+      wipedAreaRef.current = new Set();
+    }
+  }, [user, loading]);
+
   // Initialize fog canvas - only once when not logged in
   useEffect(() => {
     // Skip if already initialized or user is logged in
