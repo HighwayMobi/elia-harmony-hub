@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activity_records: {
+        Row: {
+          activity_type: string
+          calories_burned: number | null
+          created_at: string
+          distance_meters: number | null
+          duration_minutes: number | null
+          end_time: string | null
+          heart_rate_avg: number | null
+          id: string
+          notes: string | null
+          source: string | null
+          start_time: string
+          steps: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          calories_burned?: number | null
+          created_at?: string
+          distance_meters?: number | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          heart_rate_avg?: number | null
+          id?: string
+          notes?: string | null
+          source?: string | null
+          start_time: string
+          steps?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          calories_burned?: number | null
+          created_at?: string
+          distance_meters?: number | null
+          duration_minutes?: number | null
+          end_time?: string | null
+          heart_rate_avg?: number | null
+          id?: string
+          notes?: string | null
+          source?: string | null
+          start_time?: string
+          steps?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sleep_records: {
+        Row: {
+          created_at: string
+          duration_minutes: number | null
+          end_time: string
+          id: string
+          notes: string | null
+          quality_rating: number | null
+          source: string | null
+          start_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number | null
+          end_time: string
+          id?: string
+          notes?: string | null
+          quality_rating?: number | null
+          source?: string | null
+          start_time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number | null
+          end_time?: string
+          id?: string
+          notes?: string | null
+          quality_rating?: number | null
+          source?: string | null
+          start_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
