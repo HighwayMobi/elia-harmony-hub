@@ -1,14 +1,15 @@
-import { Home, Settings } from "lucide-react";
+import { Home, Activity, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
-  activeTab: "home" | "settings";
-  onTabChange: (tab: "home" | "settings") => void;
+  activeTab: "home" | "tracking" | "settings";
+  onTabChange: (tab: "home" | "tracking" | "settings") => void;
 }
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   const tabs = [
     { id: "home" as const, icon: Home, label: "Home" },
+    { id: "tracking" as const, icon: Activity, label: "Tracking" },
     { id: "settings" as const, icon: Settings, label: "Settings" },
   ];
 
