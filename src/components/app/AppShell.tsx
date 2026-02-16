@@ -2,6 +2,7 @@ import { useState } from "react";
 import { User } from "@supabase/supabase-js";
 import BottomNav from "./BottomNav";
 import HomePage from "./HomePage";
+import TrackingPage from "./TrackingPage";
 import SettingsPage from "./SettingsPage";
 
 interface AppShellProps {
@@ -9,7 +10,7 @@ interface AppShellProps {
 }
 
 const AppShell = ({ user }: AppShellProps) => {
-  const [activeTab, setActiveTab] = useState<"home" | "settings">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "tracking" | "settings">("home");
 
   return (
     <div 
@@ -17,6 +18,7 @@ const AppShell = ({ user }: AppShellProps) => {
       style={{ backgroundColor: '#A799B7' }}
     >
       {activeTab === "home" && <HomePage user={user} />}
+      {activeTab === "tracking" && <TrackingPage user={user} />}
       {activeTab === "settings" && <SettingsPage user={user} />}
       
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
