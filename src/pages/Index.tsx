@@ -64,25 +64,76 @@ const Index = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Draw fog overlay with gradient matching brand color #A799B7
-      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      gradient.addColorStop(0, "rgba(175, 165, 195, 0.92)");
-      gradient.addColorStop(1, "rgba(155, 140, 175, 0.88)");
-      ctx.fillStyle = gradient;
+      // Draw frosted glass base
+      ctx.fillStyle = "rgba(180, 170, 200, 0.85)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Add noise texture for realistic fog
+      // Add subtle glass texture
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
-      
       for (let i = 0; i < data.length; i += 4) {
-        const noise = (Math.random() - 0.5) * 25;
+        const noise = (Math.random() - 0.5) * 12;
         data[i] = Math.min(255, Math.max(0, data[i] + noise));
         data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
         data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
       }
-      
       ctx.putImageData(imageData, 0, 0);
+
+      // Draw water droplets
+      const dropletCount = 120 + Math.floor(Math.random() * 80);
+      for (let i = 0; i < dropletCount; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = 2 + Math.random() * 12;
+        
+        // Droplet body
+        const dropGrad = ctx.createRadialGradient(
+          x - radius * 0.3, y - radius * 0.3, radius * 0.1,
+          x, y, radius
+        );
+        dropGrad.addColorStop(0, "rgba(220, 225, 235, 0.7)");
+        dropGrad.addColorStop(0.5, "rgba(190, 200, 215, 0.5)");
+        dropGrad.addColorStop(1, "rgba(160, 170, 190, 0.3)");
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = dropGrad;
+        ctx.fill();
+        
+        // Highlight reflection
+        ctx.beginPath();
+        ctx.arc(x - radius * 0.25, y - radius * 0.25, radius * 0.35, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.fill();
+        
+        // Shadow beneath droplet
+        ctx.beginPath();
+        ctx.arc(x + radius * 0.1, y + radius * 0.15, radius * 0.9, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(130, 120, 150, 0.15)";
+        ctx.fill();
+      }
+
+      // Add some larger "streak" droplets (water trails)
+      for (let i = 0; i < 8; i++) {
+        const x = Math.random() * canvas.width;
+        const startY = Math.random() * canvas.height * 0.4;
+        const length = 40 + Math.random() * 100;
+        const width = 3 + Math.random() * 4;
+        
+        ctx.beginPath();
+        ctx.moveTo(x, startY);
+        ctx.quadraticCurveTo(
+          x + (Math.random() - 0.5) * 15,
+          startY + length * 0.5,
+          x + (Math.random() - 0.5) * 8,
+          startY + length
+        );
+        ctx.lineWidth = width;
+        ctx.strokeStyle = "rgba(200, 210, 225, 0.4)";
+        ctx.lineCap = "round";
+        ctx.stroke();
+      }
+      
       setCanvasInitialized(true);
     };
 
