@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,21 +7,12 @@ import logo from "@/assets/logo-elia-balance.svg";
 import LoginScreen from "@/components/LoginScreen";
 import AppShell from "@/components/app/AppShell";
 
-interface AnimDrop {
-  x: number;
-  y: number;
-  size: number;
-  speed: number;
-  wobbleAmp: number;
-  wobbleFreq: number;
-  phase: number;
-}
 
-const WIPE_RADIUS = 50;
+
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const dropsCanvasRef = useRef<HTMLCanvasElement>(null);
+  
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -30,85 +21,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [canvasInitialized, setCanvasInitialized] = useState(false);
   const wipedAreaRef = useRef<Set<string>>(new Set());
-  const wipedCirclesRef = useRef<{ x: number; y: number }[]>([]);
-  const animDropsRef = useRef<AnimDrop[]>([]);
-  const animFrameRef = useRef<number>(0);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const noiseSourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-
-  const startWipeSound = useCallback(() => {
-    try {
-      if (!audioCtxRef.current) {
-        audioCtxRef.current = new AudioContext();
-      }
-      const ctx = audioCtxRef.current;
-      
-      // Create noise buffer
-      const bufferSize = ctx.sampleRate * 2;
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.5;
-      }
-
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-
-      // Bandpass filter for squeaky glass sound
-      const bandpass = ctx.createBiquadFilter();
-      bandpass.type = "bandpass";
-      bandpass.frequency.value = 3200;
-      bandpass.Q.value = 2.5;
-
-      // High shelf for brightness
-      const highShelf = ctx.createBiquadFilter();
-      highShelf.type = "highshelf";
-      highShelf.frequency.value = 4000;
-      highShelf.gain.value = 6;
-
-      // LFO for squeaky modulation
-      const lfo = ctx.createOscillator();
-      const lfoGain = ctx.createGain();
-      lfo.frequency.value = 8 + Math.random() * 6;
-      lfoGain.gain.value = 800;
-      lfo.connect(lfoGain);
-      lfoGain.connect(bandpass.frequency);
-      lfo.start();
-
-      // Master gain
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.1);
-
-      source.connect(bandpass);
-      bandpass.connect(highShelf);
-      highShelf.connect(gain);
-      gain.connect(ctx.destination);
-      source.start();
-
-      noiseSourceRef.current = source;
-      gainNodeRef.current = gain;
-    } catch {
-      // Audio not supported
-    }
-  }, []);
-
-  const stopWipeSound = useCallback(() => {
-    try {
-      if (gainNodeRef.current && audioCtxRef.current) {
-        const ctx = audioCtxRef.current;
-        gainNodeRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
-        const src = noiseSourceRef.current;
-        setTimeout(() => {
-          try { src?.stop(); } catch {}
-        }, 200);
-      }
-      noiseSourceRef.current = null;
-      gainNodeRef.current = null;
-    } catch {}
-  }, []);
+  
 
   // Check auth state
   useEffect(() => {
@@ -152,157 +65,28 @@ const Index = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const drawDroplet = (x: number, y: number, radius: number) => {
-      if (!ctx) return;
-      
-      // Shadow under droplet
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(x + radius * 0.15, y + radius * 0.2, radius * 0.95, radius * 0.85, 0, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(100, 90, 120, ${0.25 * Math.min(1, radius / 8)})`;
-      ctx.filter = `blur(${Math.max(1, radius * 0.3)}px)`;
-      ctx.fill();
-      ctx.restore();
-
-      // Droplet body with lens distortion
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      const bodyGrad = ctx.createRadialGradient(
-        x - radius * 0.35, y - radius * 0.35, 0,
-        x, y, radius
-      );
-      bodyGrad.addColorStop(0, `rgba(210, 215, 230, ${0.08 + Math.random() * 0.06})`);
-      bodyGrad.addColorStop(0.4, `rgba(195, 200, 220, ${0.12 + Math.random() * 0.05})`);
-      bodyGrad.addColorStop(0.75, `rgba(175, 180, 205, 0.18)`);
-      bodyGrad.addColorStop(1, `rgba(150, 155, 185, 0.25)`);
-      ctx.fillStyle = bodyGrad;
-      ctx.fill();
-      ctx.restore();
-
-      // Edge ring (meniscus)
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(140, 135, 165, ${0.2 + Math.random() * 0.1})`;
-      ctx.lineWidth = Math.max(0.5, radius * 0.08);
-      ctx.stroke();
-      ctx.restore();
-
-      // Primary highlight (top-left)
-      ctx.save();
-      ctx.beginPath();
-      const hlX = x - radius * 0.3;
-      const hlY = y - radius * 0.3;
-      const hlR = radius * (0.25 + Math.random() * 0.1);
-      const hlGrad = ctx.createRadialGradient(hlX, hlY, 0, hlX, hlY, hlR);
-      hlGrad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
-      hlGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.4)");
-      hlGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = hlGrad;
-      ctx.arc(hlX, hlY, hlR, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-
-      // Secondary caustic highlight
-      if (radius > 4) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(x + radius * 0.2, y + radius * 0.25, radius * 0.12, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.random() * 0.2})`;
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Bottom refraction glow
-      if (radius > 6) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(x, y + radius * 0.4, radius * 0.5, radius * 0.15, 0, 0, Math.PI * 2);
-        const refGrad = ctx.createRadialGradient(x, y + radius * 0.4, 0, x, y + radius * 0.4, radius * 0.5);
-        refGrad.addColorStop(0, "rgba(230, 235, 245, 0.15)");
-        refGrad.addColorStop(1, "rgba(230, 235, 245, 0)");
-        ctx.fillStyle = refGrad;
-        ctx.fill();
-        ctx.restore();
-      }
-    };
 
     const initCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Glass base
-      const baseGrad = ctx.createLinearGradient(0, 0, canvas.width * 0.3, canvas.height);
-      baseGrad.addColorStop(0, "rgba(175, 165, 195, 0.92)");
-      baseGrad.addColorStop(0.5, "rgba(170, 162, 190, 0.90)");
-      baseGrad.addColorStop(1, "rgba(165, 155, 185, 0.88)");
-      ctx.fillStyle = baseGrad;
+      // Foggy glass overlay
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, "rgba(175, 165, 195, 0.92)");
+      gradient.addColorStop(1, "rgba(155, 140, 175, 0.88)");
+      ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Fine glass noise
+      // Noise texture for realistic fog
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
       for (let i = 0; i < data.length; i += 4) {
-        const noise = (Math.random() - 0.5) * 8;
+        const noise = (Math.random() - 0.5) * 25;
         data[i] = Math.min(255, Math.max(0, data[i] + noise));
         data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
         data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
       }
       ctx.putImageData(imageData, 0, 0);
-
-      // Micro-droplets (condensation mist)
-      for (let i = 0; i < 600; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        const r = 0.5 + Math.random() * 2;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(210, 215, 230, ${0.15 + Math.random() * 0.15})`;
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.random() * 0.3})`;
-        ctx.fill();
-      }
-
-      // Medium droplets
-      for (let i = 0; i < 60; i++) {
-        drawDroplet(Math.random() * canvas.width, Math.random() * canvas.height, 3 + Math.random() * 7);
-      }
-
-      // Large droplets
-      for (let i = 0; i < 20; i++) {
-        drawDroplet(Math.random() * canvas.width, Math.random() * canvas.height, 8 + Math.random() * 16);
-      }
-
-      // Water streaks
-      for (let i = 0; i < 6; i++) {
-        let cx = Math.random() * canvas.width;
-        let cy = Math.random() * canvas.height * 0.3;
-        const segments = 5 + Math.floor(Math.random() * 8);
-        const trailWidth = 2 + Math.random() * 3;
-        
-        for (let s = 0; s < segments; s++) {
-          const nx = cx + (Math.random() - 0.5) * 8;
-          const ny = cy + 10 + Math.random() * 20;
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(cx, cy);
-          ctx.lineTo(nx, ny);
-          ctx.strokeStyle = `rgba(195, 200, 218, ${0.2 + Math.random() * 0.1})`;
-          ctx.lineWidth = trailWidth * (1 - s / segments * 0.5);
-          ctx.lineCap = "round";
-          ctx.stroke();
-          ctx.restore();
-          if (Math.random() > 0.4) {
-            drawDroplet(nx + (Math.random() - 0.5) * 4, ny, 1.5 + Math.random() * 3);
-          }
-          cx = nx;
-          cy = ny;
-        }
-        drawDroplet(cx, cy, 3 + Math.random() * 5);
-      }
       
       setCanvasInitialized(true);
     };
@@ -319,134 +103,6 @@ const Index = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [user, loading, canvasInitialized, revealed]);
 
-  // Animated dripping droplets on separate canvas
-  useEffect(() => {
-    if (user || loading || revealed) return;
-
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-
-    // Initialize animated drops
-    const createDrop = (): AnimDrop => ({
-      x: Math.random() * w,
-      y: -10 - Math.random() * h * 0.3,
-      size: 3 + Math.random() * 10,
-      speed: 0.3 + Math.random() * 0.8,
-      wobbleAmp: (Math.random() - 0.5) * 0.4,
-      wobbleFreq: 0.005 + Math.random() * 0.01,
-      phase: Math.random() * Math.PI * 2,
-    });
-
-    animDropsRef.current = Array.from({ length: 15 }, createDrop);
-    // Stagger initial positions
-    animDropsRef.current.forEach((d, i) => {
-      d.y = -10 - i * (h / 15) * Math.random();
-    });
-
-    const isInWipedArea = (x: number, y: number): boolean => {
-      const circles = wipedCirclesRef.current;
-      for (let i = 0; i < circles.length; i++) {
-        const dx = x - circles[i].x;
-        const dy = y - circles[i].y;
-        if (dx * dx + dy * dy < WIPE_RADIUS * WIPE_RADIUS) return true;
-      }
-      return false;
-    };
-
-    const drawAnimDroplet = (ctx: CanvasRenderingContext2D, d: AnimDrop) => {
-      const { x, y, size } = d;
-      
-      // Shadow
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(x + size * 0.1, y + size * 0.15, size * 0.9, size * 0.8, 0, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(100, 90, 120, ${0.2 * Math.min(1, size / 8)})`;
-      ctx.filter = `blur(${Math.max(1, size * 0.25)}px)`;
-      ctx.fill();
-      ctx.restore();
-
-      // Body
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(x, y, size * 0.45, size * 0.6, 0, 0, Math.PI * 2);
-      const bg = ctx.createRadialGradient(x - size * 0.15, y - size * 0.2, 0, x, y, size * 0.6);
-      bg.addColorStop(0, "rgba(215, 220, 235, 0.12)");
-      bg.addColorStop(0.5, "rgba(195, 200, 220, 0.18)");
-      bg.addColorStop(1, "rgba(160, 165, 190, 0.25)");
-      ctx.fillStyle = bg;
-      ctx.fill();
-      // Edge
-      ctx.strokeStyle = "rgba(140, 135, 165, 0.2)";
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-      ctx.restore();
-
-      // Highlight
-      ctx.save();
-      ctx.beginPath();
-      const hlX = x - size * 0.12;
-      const hlY = y - size * 0.2;
-      ctx.arc(hlX, hlY, size * 0.15, 0, Math.PI * 2);
-      const hlg = ctx.createRadialGradient(hlX, hlY, 0, hlX, hlY, size * 0.15);
-      hlg.addColorStop(0, "rgba(255,255,255,0.8)");
-      hlg.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = hlg;
-      ctx.fill();
-      ctx.restore();
-
-      // Trail above droplet
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(x, y - size * 0.6);
-      ctx.lineTo(x, y - size * 0.6 - size * 2);
-      ctx.strokeStyle = `rgba(200, 210, 225, 0.15)`;
-      ctx.lineWidth = size * 0.3;
-      ctx.lineCap = "round";
-      ctx.stroke();
-      ctx.restore();
-    };
-
-    let lastTime = 0;
-    const animate = (time: number) => {
-      const dropsCanvas = dropsCanvasRef.current;
-      if (!dropsCanvas) return;
-      const dCtx = dropsCanvas.getContext("2d");
-      if (!dCtx) return;
-
-      if (dropsCanvas.width !== w || dropsCanvas.height !== h) {
-        dropsCanvas.width = w;
-        dropsCanvas.height = h;
-      }
-
-      const dt = lastTime ? (time - lastTime) / 16 : 1;
-      lastTime = time;
-
-      dCtx.clearRect(0, 0, w, h);
-
-      animDropsRef.current.forEach((d) => {
-        d.y += d.speed * dt;
-        d.x += Math.sin(d.y * d.wobbleFreq + d.phase) * d.wobbleAmp * dt;
-
-        // Reset when off screen
-        if (d.y > h + 20) {
-          d.x = Math.random() * w;
-          d.y = -10 - Math.random() * 30;
-          d.size = 3 + Math.random() * 10;
-          d.speed = 0.3 + Math.random() * 0.8;
-        }
-
-        // Only draw if NOT in wiped area
-        if (!isInWipedArea(d.x, d.y)) {
-          drawAnimDroplet(dCtx, d);
-        }
-      });
-
-      animFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    animFrameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, [user, loading, revealed]);
 
   // Transition to login after reveal animation
   useEffect(() => {
@@ -503,8 +159,6 @@ const Index = () => {
     ctx.arc(coords.x, coords.y, 50, 0, Math.PI * 2);
     ctx.fill();
 
-    // Track wiped position for animated drops
-    wipedCirclesRef.current.push({ x: coords.x, y: coords.y });
 
     // Track wiped cells in logo area
     const centerX = canvas.width / 2;
@@ -551,13 +205,11 @@ const Index = () => {
   const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
     if (revealed) return;
     setIsDrawing(true);
-    startWipeSound();
     draw(e);
   };
 
   const handleEnd = () => {
     setIsDrawing(false);
-    stopWipeSound();
   };
 
   // Show loading state
@@ -634,13 +286,6 @@ const Index = () => {
               onTouchEnd={handleEnd}
             />
 
-            {/* Animated dripping droplets canvas */}
-            <canvas
-              ref={dropsCanvasRef}
-              className={`absolute inset-0 z-20 pointer-events-none transition-opacity duration-300 ${
-                revealed ? "opacity-0" : "opacity-100"
-              }`}
-            />
 
             {/* Animated swipe hint icon - hidden immediately on reveal */}
             <AnimatePresence>
