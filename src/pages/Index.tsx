@@ -33,6 +33,82 @@ const Index = () => {
   const wipedCirclesRef = useRef<{ x: number; y: number }[]>([]);
   const animDropsRef = useRef<AnimDrop[]>([]);
   const animFrameRef = useRef<number>(0);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const noiseSourceRef = useRef<AudioBufferSourceNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+
+  const startWipeSound = useCallback(() => {
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioContext();
+      }
+      const ctx = audioCtxRef.current;
+      
+      // Create noise buffer
+      const bufferSize = ctx.sampleRate * 2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.5;
+      }
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = true;
+
+      // Bandpass filter for squeaky glass sound
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.value = 3200;
+      bandpass.Q.value = 2.5;
+
+      // High shelf for brightness
+      const highShelf = ctx.createBiquadFilter();
+      highShelf.type = "highshelf";
+      highShelf.frequency.value = 4000;
+      highShelf.gain.value = 6;
+
+      // LFO for squeaky modulation
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.frequency.value = 8 + Math.random() * 6;
+      lfoGain.gain.value = 800;
+      lfo.connect(lfoGain);
+      lfoGain.connect(bandpass.frequency);
+      lfo.start();
+
+      // Master gain
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 0.1);
+
+      source.connect(bandpass);
+      bandpass.connect(highShelf);
+      highShelf.connect(gain);
+      gain.connect(ctx.destination);
+      source.start();
+
+      noiseSourceRef.current = source;
+      gainNodeRef.current = gain;
+    } catch {
+      // Audio not supported
+    }
+  }, []);
+
+  const stopWipeSound = useCallback(() => {
+    try {
+      if (gainNodeRef.current && audioCtxRef.current) {
+        const ctx = audioCtxRef.current;
+        gainNodeRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+        const src = noiseSourceRef.current;
+        setTimeout(() => {
+          try { src?.stop(); } catch {}
+        }, 200);
+      }
+      noiseSourceRef.current = null;
+      gainNodeRef.current = null;
+    } catch {}
+  }, []);
 
   // Check auth state
   useEffect(() => {
@@ -475,11 +551,13 @@ const Index = () => {
   const handleStart = (e: React.TouchEvent | React.MouseEvent) => {
     if (revealed) return;
     setIsDrawing(true);
+    startWipeSound();
     draw(e);
   };
 
   const handleEnd = () => {
     setIsDrawing(false);
+    stopWipeSound();
   };
 
   // Show loading state
