@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,86 +7,21 @@ import logo from "@/assets/logo-elia-balance.svg";
 import LoginScreen from "@/components/LoginScreen";
 import AppShell from "@/components/app/AppShell";
 
-// Animated dripping droplets overlay
-const DrippingDroplets = () => {
-  const droplets = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      left: 5 + Math.random() * 90,
-      size: 4 + Math.random() * 10,
-      delay: Math.random() * 8,
-      duration: 6 + Math.random() * 10,
-      startY: -5 - Math.random() * 10,
-      wobble: (Math.random() - 0.5) * 3,
-    }));
-  }, []);
+interface AnimDrop {
+  x: number;
+  y: number;
+  size: number;
+  speed: number;
+  wobbleAmp: number;
+  wobbleFreq: number;
+  phase: number;
+}
 
-  return (
-    <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
-      {droplets.map((d) => (
-        <motion.div
-          key={d.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${d.left}%`,
-            width: d.size,
-            height: d.size * 1.3,
-            background: `radial-gradient(ellipse at 35% 30%, rgba(255,255,255,0.5) 0%, rgba(200,210,225,0.25) 40%, rgba(170,175,195,0.15) 100%)`,
-            boxShadow: `0 ${d.size * 0.3}px ${d.size * 0.6}px rgba(100,90,120,0.2), inset 0 -${d.size * 0.15}px ${d.size * 0.3}px rgba(255,255,255,0.15)`,
-            borderRadius: '45% 45% 50% 50%',
-          }}
-          initial={{ y: `${d.startY}vh`, opacity: 0, x: 0 }}
-          animate={{
-            y: ['0vh', '105vh'],
-            opacity: [0, 0.8, 0.8, 0.6, 0],
-            x: [0, d.wobble, -d.wobble * 0.5, d.wobble * 0.3, 0],
-          }}
-          transition={{
-            duration: d.duration,
-            delay: d.delay,
-            repeat: Infinity,
-            ease: 'linear',
-            times: [0, 0.05, 0.7, 0.95, 1],
-          }}
-        >
-          {/* Highlight */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              top: '15%',
-              left: '20%',
-              width: '35%',
-              height: '30%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.7) 0%, transparent 100%)',
-            }}
-          />
-          {/* Trail */}
-          <motion.div
-            className="absolute"
-            style={{
-              bottom: '100%',
-              left: '30%',
-              width: '40%',
-              height: d.size * 3,
-              background: `linear-gradient(to top, rgba(200,210,225,0.2), transparent)`,
-              borderRadius: '2px',
-            }}
-            animate={{ height: [0, d.size * 3, d.size * 1.5] }}
-            transition={{
-              duration: d.duration * 0.3,
-              delay: d.delay,
-              repeat: Infinity,
-              repeatDelay: d.duration * 0.7,
-            }}
-          />
-        </motion.div>
-      ))}
-    </div>
-  );
-};
+const WIPE_RADIUS = 50;
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dropsCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
@@ -95,6 +30,9 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [canvasInitialized, setCanvasInitialized] = useState(false);
   const wipedAreaRef = useRef<Set<string>>(new Set());
+  const wipedCirclesRef = useRef<{ x: number; y: number }[]>([]);
+  const animDropsRef = useRef<AnimDrop[]>([]);
+  const animFrameRef = useRef<number>(0);
 
   // Check auth state
   useEffect(() => {
@@ -305,6 +243,135 @@ const Index = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [user, loading, canvasInitialized, revealed]);
 
+  // Animated dripping droplets on separate canvas
+  useEffect(() => {
+    if (user || loading || revealed) return;
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    // Initialize animated drops
+    const createDrop = (): AnimDrop => ({
+      x: Math.random() * w,
+      y: -10 - Math.random() * h * 0.3,
+      size: 3 + Math.random() * 10,
+      speed: 0.3 + Math.random() * 0.8,
+      wobbleAmp: (Math.random() - 0.5) * 0.4,
+      wobbleFreq: 0.005 + Math.random() * 0.01,
+      phase: Math.random() * Math.PI * 2,
+    });
+
+    animDropsRef.current = Array.from({ length: 15 }, createDrop);
+    // Stagger initial positions
+    animDropsRef.current.forEach((d, i) => {
+      d.y = -10 - i * (h / 15) * Math.random();
+    });
+
+    const isInWipedArea = (x: number, y: number): boolean => {
+      const circles = wipedCirclesRef.current;
+      for (let i = 0; i < circles.length; i++) {
+        const dx = x - circles[i].x;
+        const dy = y - circles[i].y;
+        if (dx * dx + dy * dy < WIPE_RADIUS * WIPE_RADIUS) return true;
+      }
+      return false;
+    };
+
+    const drawAnimDroplet = (ctx: CanvasRenderingContext2D, d: AnimDrop) => {
+      const { x, y, size } = d;
+      
+      // Shadow
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(x + size * 0.1, y + size * 0.15, size * 0.9, size * 0.8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(100, 90, 120, ${0.2 * Math.min(1, size / 8)})`;
+      ctx.filter = `blur(${Math.max(1, size * 0.25)}px)`;
+      ctx.fill();
+      ctx.restore();
+
+      // Body
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(x, y, size * 0.45, size * 0.6, 0, 0, Math.PI * 2);
+      const bg = ctx.createRadialGradient(x - size * 0.15, y - size * 0.2, 0, x, y, size * 0.6);
+      bg.addColorStop(0, "rgba(215, 220, 235, 0.12)");
+      bg.addColorStop(0.5, "rgba(195, 200, 220, 0.18)");
+      bg.addColorStop(1, "rgba(160, 165, 190, 0.25)");
+      ctx.fillStyle = bg;
+      ctx.fill();
+      // Edge
+      ctx.strokeStyle = "rgba(140, 135, 165, 0.2)";
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // Highlight
+      ctx.save();
+      ctx.beginPath();
+      const hlX = x - size * 0.12;
+      const hlY = y - size * 0.2;
+      ctx.arc(hlX, hlY, size * 0.15, 0, Math.PI * 2);
+      const hlg = ctx.createRadialGradient(hlX, hlY, 0, hlX, hlY, size * 0.15);
+      hlg.addColorStop(0, "rgba(255,255,255,0.8)");
+      hlg.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = hlg;
+      ctx.fill();
+      ctx.restore();
+
+      // Trail above droplet
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(x, y - size * 0.6);
+      ctx.lineTo(x, y - size * 0.6 - size * 2);
+      ctx.strokeStyle = `rgba(200, 210, 225, 0.15)`;
+      ctx.lineWidth = size * 0.3;
+      ctx.lineCap = "round";
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    let lastTime = 0;
+    const animate = (time: number) => {
+      const dropsCanvas = dropsCanvasRef.current;
+      if (!dropsCanvas) return;
+      const dCtx = dropsCanvas.getContext("2d");
+      if (!dCtx) return;
+
+      if (dropsCanvas.width !== w || dropsCanvas.height !== h) {
+        dropsCanvas.width = w;
+        dropsCanvas.height = h;
+      }
+
+      const dt = lastTime ? (time - lastTime) / 16 : 1;
+      lastTime = time;
+
+      dCtx.clearRect(0, 0, w, h);
+
+      animDropsRef.current.forEach((d) => {
+        d.y += d.speed * dt;
+        d.x += Math.sin(d.y * d.wobbleFreq + d.phase) * d.wobbleAmp * dt;
+
+        // Reset when off screen
+        if (d.y > h + 20) {
+          d.x = Math.random() * w;
+          d.y = -10 - Math.random() * 30;
+          d.size = 3 + Math.random() * 10;
+          d.speed = 0.3 + Math.random() * 0.8;
+        }
+
+        // Only draw if NOT in wiped area
+        if (!isInWipedArea(d.x, d.y)) {
+          drawAnimDroplet(dCtx, d);
+        }
+      });
+
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animFrameRef.current);
+  }, [user, loading, revealed]);
+
   // Transition to login after reveal animation
   useEffect(() => {
     if (revealed && !user) {
@@ -359,6 +426,9 @@ const Index = () => {
     ctx.beginPath();
     ctx.arc(coords.x, coords.y, 50, 0, Math.PI * 2);
     ctx.fill();
+
+    // Track wiped position for animated drops
+    wipedCirclesRef.current.push({ x: coords.x, y: coords.y });
 
     // Track wiped cells in logo area
     const centerX = canvas.width / 2;
@@ -486,8 +556,13 @@ const Index = () => {
               onTouchEnd={handleEnd}
             />
 
-            {/* Animated dripping droplets */}
-            {!revealed && <DrippingDroplets />}
+            {/* Animated dripping droplets canvas */}
+            <canvas
+              ref={dropsCanvasRef}
+              className={`absolute inset-0 z-20 pointer-events-none transition-opacity duration-300 ${
+                revealed ? "opacity-0" : "opacity-100"
+              }`}
+            />
 
             {/* Animated swipe hint icon - hidden immediately on reveal */}
             <AnimatePresence>
