@@ -60,78 +60,156 @@ const Index = () => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const drawDroplet = (x: number, y: number, radius: number) => {
+      if (!ctx) return;
+      
+      // Shadow under droplet
+      ctx.save();
+      ctx.beginPath();
+      ctx.ellipse(x + radius * 0.15, y + radius * 0.2, radius * 0.95, radius * 0.85, 0, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(100, 90, 120, ${0.25 * Math.min(1, radius / 8)})`;
+      ctx.filter = `blur(${Math.max(1, radius * 0.3)}px)`;
+      ctx.fill();
+      ctx.restore();
+
+      // Droplet body with lens distortion
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      const bodyGrad = ctx.createRadialGradient(
+        x - radius * 0.35, y - radius * 0.35, 0,
+        x, y, radius
+      );
+      bodyGrad.addColorStop(0, `rgba(210, 215, 230, ${0.08 + Math.random() * 0.06})`);
+      bodyGrad.addColorStop(0.4, `rgba(195, 200, 220, ${0.12 + Math.random() * 0.05})`);
+      bodyGrad.addColorStop(0.75, `rgba(175, 180, 205, 0.18)`);
+      bodyGrad.addColorStop(1, `rgba(150, 155, 185, 0.25)`);
+      ctx.fillStyle = bodyGrad;
+      ctx.fill();
+      ctx.restore();
+
+      // Edge ring (meniscus)
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(140, 135, 165, ${0.2 + Math.random() * 0.1})`;
+      ctx.lineWidth = Math.max(0.5, radius * 0.08);
+      ctx.stroke();
+      ctx.restore();
+
+      // Primary highlight (top-left)
+      ctx.save();
+      ctx.beginPath();
+      const hlX = x - radius * 0.3;
+      const hlY = y - radius * 0.3;
+      const hlR = radius * (0.25 + Math.random() * 0.1);
+      const hlGrad = ctx.createRadialGradient(hlX, hlY, 0, hlX, hlY, hlR);
+      hlGrad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
+      hlGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.4)");
+      hlGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+      ctx.fillStyle = hlGrad;
+      ctx.arc(hlX, hlY, hlR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Secondary caustic highlight
+      if (radius > 4) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(x + radius * 0.2, y + radius * 0.25, radius * 0.12, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.random() * 0.2})`;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Bottom refraction glow
+      if (radius > 6) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(x, y + radius * 0.4, radius * 0.5, radius * 0.15, 0, 0, Math.PI * 2);
+        const refGrad = ctx.createRadialGradient(x, y + radius * 0.4, 0, x, y + radius * 0.4, radius * 0.5);
+        refGrad.addColorStop(0, "rgba(230, 235, 245, 0.15)");
+        refGrad.addColorStop(1, "rgba(230, 235, 245, 0)");
+        ctx.fillStyle = refGrad;
+        ctx.fill();
+        ctx.restore();
+      }
+    };
+
     const initCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       
-      // Draw frosted glass base
-      ctx.fillStyle = "rgba(180, 170, 200, 0.85)";
+      // Glass base
+      const baseGrad = ctx.createLinearGradient(0, 0, canvas.width * 0.3, canvas.height);
+      baseGrad.addColorStop(0, "rgba(175, 165, 195, 0.92)");
+      baseGrad.addColorStop(0.5, "rgba(170, 162, 190, 0.90)");
+      baseGrad.addColorStop(1, "rgba(165, 155, 185, 0.88)");
+      ctx.fillStyle = baseGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Add subtle glass texture
+      // Fine glass noise
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
       for (let i = 0; i < data.length; i += 4) {
-        const noise = (Math.random() - 0.5) * 12;
+        const noise = (Math.random() - 0.5) * 8;
         data[i] = Math.min(255, Math.max(0, data[i] + noise));
         data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
         data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
       }
       ctx.putImageData(imageData, 0, 0);
 
-      // Draw water droplets
-      const dropletCount = 120 + Math.floor(Math.random() * 80);
-      for (let i = 0; i < dropletCount; i++) {
+      // Micro-droplets (condensation mist)
+      for (let i = 0; i < 600; i++) {
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
-        const radius = 2 + Math.random() * 12;
-        
-        // Droplet body
-        const dropGrad = ctx.createRadialGradient(
-          x - radius * 0.3, y - radius * 0.3, radius * 0.1,
-          x, y, radius
-        );
-        dropGrad.addColorStop(0, "rgba(220, 225, 235, 0.7)");
-        dropGrad.addColorStop(0.5, "rgba(190, 200, 215, 0.5)");
-        dropGrad.addColorStop(1, "rgba(160, 170, 190, 0.3)");
-        
+        const r = 0.5 + Math.random() * 2;
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = dropGrad;
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(210, 215, 230, ${0.15 + Math.random() * 0.15})`;
         ctx.fill();
-        
-        // Highlight reflection
         ctx.beginPath();
-        ctx.arc(x - radius * 0.25, y - radius * 0.25, radius * 0.35, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-        ctx.fill();
-        
-        // Shadow beneath droplet
-        ctx.beginPath();
-        ctx.arc(x + radius * 0.1, y + radius * 0.15, radius * 0.9, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(130, 120, 150, 0.15)";
+        ctx.arc(x - r * 0.3, y - r * 0.3, r * 0.4, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.random() * 0.3})`;
         ctx.fill();
       }
 
-      // Add some larger "streak" droplets (water trails)
-      for (let i = 0; i < 8; i++) {
-        const x = Math.random() * canvas.width;
-        const startY = Math.random() * canvas.height * 0.4;
-        const length = 40 + Math.random() * 100;
-        const width = 3 + Math.random() * 4;
+      // Medium droplets
+      for (let i = 0; i < 60; i++) {
+        drawDroplet(Math.random() * canvas.width, Math.random() * canvas.height, 3 + Math.random() * 7);
+      }
+
+      // Large droplets
+      for (let i = 0; i < 20; i++) {
+        drawDroplet(Math.random() * canvas.width, Math.random() * canvas.height, 8 + Math.random() * 16);
+      }
+
+      // Water streaks
+      for (let i = 0; i < 6; i++) {
+        let cx = Math.random() * canvas.width;
+        let cy = Math.random() * canvas.height * 0.3;
+        const segments = 5 + Math.floor(Math.random() * 8);
+        const trailWidth = 2 + Math.random() * 3;
         
-        ctx.beginPath();
-        ctx.moveTo(x, startY);
-        ctx.quadraticCurveTo(
-          x + (Math.random() - 0.5) * 15,
-          startY + length * 0.5,
-          x + (Math.random() - 0.5) * 8,
-          startY + length
-        );
-        ctx.lineWidth = width;
-        ctx.strokeStyle = "rgba(200, 210, 225, 0.4)";
-        ctx.lineCap = "round";
-        ctx.stroke();
+        for (let s = 0; s < segments; s++) {
+          const nx = cx + (Math.random() - 0.5) * 8;
+          const ny = cy + 10 + Math.random() * 20;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(nx, ny);
+          ctx.strokeStyle = `rgba(195, 200, 218, ${0.2 + Math.random() * 0.1})`;
+          ctx.lineWidth = trailWidth * (1 - s / segments * 0.5);
+          ctx.lineCap = "round";
+          ctx.stroke();
+          ctx.restore();
+          if (Math.random() > 0.4) {
+            drawDroplet(nx + (Math.random() - 0.5) * 4, ny, 1.5 + Math.random() * 3);
+          }
+          cx = nx;
+          cy = ny;
+        }
+        drawDroplet(cx, cy, 3 + Math.random() * 5);
       }
       
       setCanvasInitialized(true);
