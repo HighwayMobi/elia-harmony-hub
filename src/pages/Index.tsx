@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,84 @@ import { User, Session } from "@supabase/supabase-js";
 import logo from "@/assets/logo-elia-balance.svg";
 import LoginScreen from "@/components/LoginScreen";
 import AppShell from "@/components/app/AppShell";
+
+// Animated dripping droplets overlay
+const DrippingDroplets = () => {
+  const droplets = useMemo(() => {
+    return Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      left: 5 + Math.random() * 90,
+      size: 4 + Math.random() * 10,
+      delay: Math.random() * 8,
+      duration: 6 + Math.random() * 10,
+      startY: -5 - Math.random() * 10,
+      wobble: (Math.random() - 0.5) * 3,
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0 z-20 pointer-events-none overflow-hidden">
+      {droplets.map((d) => (
+        <motion.div
+          key={d.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${d.left}%`,
+            width: d.size,
+            height: d.size * 1.3,
+            background: `radial-gradient(ellipse at 35% 30%, rgba(255,255,255,0.5) 0%, rgba(200,210,225,0.25) 40%, rgba(170,175,195,0.15) 100%)`,
+            boxShadow: `0 ${d.size * 0.3}px ${d.size * 0.6}px rgba(100,90,120,0.2), inset 0 -${d.size * 0.15}px ${d.size * 0.3}px rgba(255,255,255,0.15)`,
+            borderRadius: '45% 45% 50% 50%',
+          }}
+          initial={{ y: `${d.startY}vh`, opacity: 0, x: 0 }}
+          animate={{
+            y: ['0vh', '105vh'],
+            opacity: [0, 0.8, 0.8, 0.6, 0],
+            x: [0, d.wobble, -d.wobble * 0.5, d.wobble * 0.3, 0],
+          }}
+          transition={{
+            duration: d.duration,
+            delay: d.delay,
+            repeat: Infinity,
+            ease: 'linear',
+            times: [0, 0.05, 0.7, 0.95, 1],
+          }}
+        >
+          {/* Highlight */}
+          <div
+            className="absolute rounded-full"
+            style={{
+              top: '15%',
+              left: '20%',
+              width: '35%',
+              height: '30%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.7) 0%, transparent 100%)',
+            }}
+          />
+          {/* Trail */}
+          <motion.div
+            className="absolute"
+            style={{
+              bottom: '100%',
+              left: '30%',
+              width: '40%',
+              height: d.size * 3,
+              background: `linear-gradient(to top, rgba(200,210,225,0.2), transparent)`,
+              borderRadius: '2px',
+            }}
+            animate={{ height: [0, d.size * 3, d.size * 1.5] }}
+            transition={{
+              duration: d.duration * 0.3,
+              delay: d.delay,
+              repeat: Infinity,
+              repeatDelay: d.duration * 0.7,
+            }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
+};
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -407,6 +485,9 @@ const Index = () => {
               onTouchMove={draw}
               onTouchEnd={handleEnd}
             />
+
+            {/* Animated dripping droplets */}
+            {!revealed && <DrippingDroplets />}
 
             {/* Animated swipe hint icon - hidden immediately on reveal */}
             <AnimatePresence>
