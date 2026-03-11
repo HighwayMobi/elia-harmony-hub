@@ -12,6 +12,8 @@ import AppShell from "@/components/app/AppShell";
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fogAnimRef = useRef<number>(0);
+  const fogCanvasRef = useRef<HTMLCanvasElement>(null);
   
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
