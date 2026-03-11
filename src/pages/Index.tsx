@@ -339,6 +339,14 @@ const Index = () => {
               onTouchEnd={handleEnd}
             />
 
+            {/* Animated fog shimmer layer */}
+            <canvas
+              ref={fogCanvasRef}
+              className={`absolute inset-0 z-20 pointer-events-none transition-opacity duration-300 ${
+                revealed ? "opacity-0" : "opacity-100"
+              }`}
+            />
+
 
             {/* Animated swipe hint icon - hidden immediately on reveal */}
             <AnimatePresence>
