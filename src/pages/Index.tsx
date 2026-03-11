@@ -12,6 +12,8 @@ import AppShell from "@/components/app/AppShell";
 
 const Index = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fogAnimRef = useRef<number>(0);
+  const fogCanvasRef = useRef<HTMLCanvasElement>(null);
   
   const [isDrawing, setIsDrawing] = useState(false);
   const [revealed, setRevealed] = useState(false);
@@ -103,6 +105,57 @@ const Index = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [user, loading, canvasInitialized, revealed]);
 
+  // Animated fog shimmer overlay
+  useEffect(() => {
+    if (user || loading || revealed) {
+      if (fogAnimRef.current) cancelAnimationFrame(fogAnimRef.current);
+      return;
+    }
+
+    const fogCanvas = fogCanvasRef.current;
+    if (!fogCanvas) return;
+
+    const ctx = fogCanvas.getContext("2d");
+    if (!ctx) return;
+
+    fogCanvas.width = window.innerWidth;
+    fogCanvas.height = window.innerHeight;
+
+    let time = 0;
+
+    const animate = () => {
+      time += 0.008;
+      ctx.clearRect(0, 0, fogCanvas.width, fogCanvas.height);
+
+      // Draw several soft, slowly moving fog patches
+      for (let i = 0; i < 5; i++) {
+        const phase = i * 1.3;
+        const cx = fogCanvas.width * (0.2 + 0.15 * i) + Math.sin(time * 0.7 + phase) * 40;
+        const cy = fogCanvas.height * (0.15 + 0.18 * i) + Math.cos(time * 0.5 + phase) * 30;
+        const radius = 180 + Math.sin(time * 0.9 + phase) * 40;
+        const alpha = 0.04 + Math.sin(time * 0.6 + phase) * 0.02;
+
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        grad.addColorStop(0, `rgba(200, 190, 215, ${alpha})`);
+        grad.addColorStop(1, "rgba(200, 190, 215, 0)");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+      }
+
+      // Global subtle pulse
+      const pulseAlpha = 0.02 + Math.sin(time * 0.4) * 0.015;
+      ctx.fillStyle = `rgba(175, 165, 195, ${pulseAlpha})`;
+      ctx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+
+      fogAnimRef.current = requestAnimationFrame(animate);
+    };
+
+    fogAnimRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (fogAnimRef.current) cancelAnimationFrame(fogAnimRef.current);
+    };
+  }, [user, loading, revealed]);
 
   // Transition to login after reveal animation
   useEffect(() => {
@@ -284,6 +337,14 @@ const Index = () => {
               onTouchStart={handleStart}
               onTouchMove={draw}
               onTouchEnd={handleEnd}
+            />
+
+            {/* Animated fog shimmer layer */}
+            <canvas
+              ref={fogCanvasRef}
+              className={`absolute inset-0 z-20 pointer-events-none transition-opacity duration-300 ${
+                revealed ? "opacity-0" : "opacity-100"
+              }`}
             />
 
 
