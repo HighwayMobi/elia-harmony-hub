@@ -256,40 +256,40 @@ const Index = () => {
     // Track wiped cells in logo area
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const logoWidth = 280;
-    const logoHeight = 140;
+    const logoWidth = 320;
+    const logoHeight = 180;
     
-    // Define logo bounding box
+    // Define logo bounding box (generous)
     const logoLeft = centerX - logoWidth / 2;
     const logoRight = centerX + logoWidth / 2;
     const logoTop = centerY - logoHeight / 2;
     const logoBottom = centerY + logoHeight / 2;
 
-    // Check if touch is within logo area
-    if (coords.x >= logoLeft && coords.x <= logoRight && 
-        coords.y >= logoTop && coords.y <= logoBottom) {
-      // Divide logo into grid cells (20x10 grid)
-      const cellWidth = logoWidth / 20;
-      const cellHeight = logoHeight / 10;
+    // Check if touch is within or near logo area
+    if (coords.x >= logoLeft - 30 && coords.x <= logoRight + 30 && 
+        coords.y >= logoTop - 30 && coords.y <= logoBottom + 30) {
+      // Divide logo into grid cells (10x6 grid for easier coverage)
+      const cellWidth = logoWidth / 10;
+      const cellHeight = logoHeight / 6;
       
       // Mark cells around the touch point as wiped
-      for (let dx = -2; dx <= 2; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-          const cellX = Math.floor((coords.x - logoLeft + dx * 25) / cellWidth);
-          const cellY = Math.floor((coords.y - logoTop + dy * 25) / cellHeight);
+      for (let dx = -3; dx <= 3; dx++) {
+        for (let dy = -2; dy <= 2; dy++) {
+          const cellX = Math.floor((coords.x - logoLeft + dx * 20) / cellWidth);
+          const cellY = Math.floor((coords.y - logoTop + dy * 20) / cellHeight);
           
-          if (cellX >= 0 && cellX < 20 && cellY >= 0 && cellY < 10) {
+          if (cellX >= 0 && cellX < 10 && cellY >= 0 && cellY < 6) {
             wipedAreaRef.current.add(`${cellX},${cellY}`);
           }
         }
       }
 
-      // Check if enough of logo is wiped (70% of cells)
-      const totalCells = 20 * 10;
+      // Check if enough of logo is wiped (50% of cells)
+      const totalCells = 10 * 6;
       const wipedCells = wipedAreaRef.current.size;
       const wipedPercent = wipedCells / totalCells;
 
-      if (wipedPercent >= 0.7) {
+      if (wipedPercent >= 0.5) {
         setRevealed(true);
       }
     }
