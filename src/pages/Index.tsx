@@ -395,6 +395,7 @@ const Index = () => {
               className={`absolute inset-0 z-10 touch-none transition-opacity duration-300 ${
                 revealed ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
+              style={{ filter: "blur(0.5px)" }}
               onMouseDown={handleStart}
               onMouseMove={draw}
               onMouseUp={handleEnd}
