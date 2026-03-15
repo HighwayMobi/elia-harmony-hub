@@ -4,6 +4,7 @@ import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import logo from "@/assets/logo-elia-balance.svg";
+import fogTexture from "@/assets/fog-texture.png";
 import LoginScreen from "@/components/LoginScreen";
 import AppShell from "@/components/app/AppShell";
 
