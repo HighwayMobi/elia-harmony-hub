@@ -4,6 +4,7 @@ import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
 import logo from "@/assets/logo-elia-balance.svg";
+import fogTexture from "@/assets/fog-texture.png";
 import LoginScreen from "@/components/LoginScreen";
 import AppShell from "@/components/app/AppShell";
 
@@ -74,88 +75,30 @@ const Index = () => {
       canvas.width = w;
       canvas.height = h;
 
-      // Simple value noise generator
-      const permutation = Array.from({ length: 512 }, () => Math.random());
-      const noise2D = (x: number, y: number, scale: number) => {
-        const sx = x / scale;
-        const sy = y / scale;
-        const ix = Math.floor(sx) & 255;
-        const iy = Math.floor(sy) & 255;
-        const fx = sx - Math.floor(sx);
-        const fy = sy - Math.floor(sy);
-        const sfx = fx * fx * (3 - 2 * fx);
-        const sfy = fy * fy * (3 - 2 * fy);
-        const a = permutation[(ix + iy * 17) & 511];
-        const b = permutation[(ix + 1 + iy * 17) & 511];
-        const c = permutation[(ix + (iy + 1) * 17) & 511];
-        const d = permutation[(ix + 1 + (iy + 1) * 17) & 511];
-        return a + sfx * (b - a) + sfy * (c - a) + sfx * sfy * (a - b - c + d);
-      };
-
-      // Base fog layer — semi-transparent white/lavender
-      const gradient = ctx.createLinearGradient(0, 0, 0, h);
-      gradient.addColorStop(0, "rgba(210, 200, 220, 0.93)");
-      gradient.addColorStop(0.3, "rgba(200, 195, 215, 0.90)");
-      gradient.addColorStop(0.7, "rgba(195, 185, 210, 0.92)");
-      gradient.addColorStop(1, "rgba(185, 175, 200, 0.88)");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, w, h);
-
-      // Multi-octave noise for realistic condensation texture
-      const imageData = ctx.getImageData(0, 0, w, h);
-      const data = imageData.data;
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const i = (y * w + x) * 4;
-          
-          // Layered noise at different scales
-          const n1 = noise2D(x, y, 120) * 0.5;
-          const n2 = noise2D(x, y, 50) * 0.25;
-          const n3 = noise2D(x, y, 20) * 0.15;
-          const n4 = (Math.random() - 0.5) * 0.1; // fine grain
-          const combined = n1 + n2 + n3 + n4;
-          
-          // Map noise to opacity variation (thicker/thinner fog patches)
-          const opacityShift = (combined - 0.4) * 80;
-          
-          // Slight color variation for condensation realism
-          const colorShift = (combined - 0.45) * 30;
-          
-          data[i] = Math.min(255, Math.max(0, data[i] + colorShift + 15)); // slightly whiter
-          data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + colorShift + 10));
-          data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + colorShift + 5));
-          data[i + 3] = Math.min(255, Math.max(0, data[i + 3] + opacityShift));
+      // Load fog texture image and draw it to cover the canvas
+      const img = new Image();
+      img.onload = () => {
+        // Cover the canvas with the fog image (like background-size: cover)
+        const imgRatio = img.width / img.height;
+        const canvasRatio = w / h;
+        let drawW, drawH, offsetX, offsetY;
+        
+        if (canvasRatio > imgRatio) {
+          drawW = w;
+          drawH = w / imgRatio;
+          offsetX = 0;
+          offsetY = (h - drawH) / 2;
+        } else {
+          drawH = h;
+          drawW = h * imgRatio;
+          offsetX = (w - drawW) / 2;
+          offsetY = 0;
         }
-      }
-      ctx.putImageData(imageData, 0, 0);
-
-      // Add soft radial condensation patches (thicker fog spots)
-      for (let i = 0; i < 12; i++) {
-        const cx = Math.random() * w;
-        const cy = Math.random() * h;
-        const r = 80 + Math.random() * 200;
-        const alpha = 0.04 + Math.random() * 0.08;
-        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-        grad.addColorStop(0, `rgba(220, 215, 230, ${alpha})`);
-        grad.addColorStop(0.6, `rgba(210, 205, 225, ${alpha * 0.5})`);
-        grad.addColorStop(1, "rgba(200, 195, 215, 0)");
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, w, h);
-      }
-
-      // Tiny condensation droplets scattered across
-      for (let i = 0; i < 300; i++) {
-        const dx = Math.random() * w;
-        const dy = Math.random() * h;
-        const dr = 1 + Math.random() * 3;
-        const da = 0.05 + Math.random() * 0.12;
-        ctx.beginPath();
-        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(230, 225, 240, ${da})`;
-        ctx.fill();
-      }
-
-      setCanvasInitialized(true);
+        
+        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+        setCanvasInitialized(true);
+      };
+      img.src = fogTexture;
     };
 
     initCanvas();
@@ -395,7 +338,7 @@ const Index = () => {
               className={`absolute inset-0 z-10 touch-none transition-opacity duration-300 ${
                 revealed ? "opacity-0 pointer-events-none" : "opacity-100"
               }`}
-              style={{ filter: "blur(0.5px)" }}
+              style={{ filter: "none" }}
               onMouseDown={handleStart}
               onMouseMove={draw}
               onMouseUp={handleEnd}
