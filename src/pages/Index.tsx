@@ -341,29 +341,6 @@ const Index = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Logo with zoom animation after reveal */}
-            <motion.div 
-              className="z-0"
-              animate={revealed ? {
-                scale: [1, 1.1, 20],
-                opacity: [1, 1, 0],
-              } : {}}
-              transition={{
-                duration: 1.2,
-                times: [0, 0.3, 1],
-                ease: "easeInOut"
-              }}
-            >
-              <motion.img
-                src={logo}
-                alt="Elia Balance"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="w-64 md:w-80 h-auto"
-              />
-            </motion.div>
-
             {/* Fog overlay canvas */}
             <canvas
               ref={canvasRef}
@@ -388,33 +365,56 @@ const Index = () => {
               }`}
             />
 
+            {/* Logo ABOVE fog + swipe hint directly below */}
+            <div className="z-30 pointer-events-none flex flex-col items-center gap-6">
+              {/* Logo with zoom animation after reveal */}
+              <motion.div
+                animate={revealed ? {
+                  scale: [1, 1.1, 20],
+                  opacity: [1, 1, 0],
+                } : {}}
+                transition={{
+                  duration: 1.2,
+                  times: [0, 0.3, 1],
+                  ease: "easeInOut"
+                }}
+              >
+                <motion.img
+                  src={logo}
+                  alt="Elia Balance"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-64 md:w-80 h-auto"
+                />
+              </motion.div>
 
-            {/* Animated swipe hint icon - hidden immediately on reveal */}
-            <AnimatePresence>
-              {!revealed && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 1.5, duration: 0.3 }}
-                  className="absolute bottom-20 left-0 right-0 flex items-center justify-center z-30 pointer-events-none"
-                >
+              {/* Animated swipe hint icon - right below logo */}
+              <AnimatePresence>
+                {!revealed && (
                   <motion.div
-                    animate={{ x: [-15, 15, -15] }}
-                    transition={{ 
-                      duration: 1.5, 
-                      repeat: Infinity, 
-                      ease: "easeInOut" 
-                    }}
-                    className="flex items-center gap-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 1.5, duration: 0.3 }}
                   >
-                    <ChevronLeft className="w-5 h-5 text-white/50" />
-                    <Pointer className="w-8 h-8 text-white/70" />
-                    <ChevronRight className="w-5 h-5 text-white/50" />
+                    <motion.div
+                      animate={{ x: [-15, 15, -15] }}
+                      transition={{ 
+                        duration: 1.5, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      }}
+                      className="flex items-center gap-2"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-white/50" />
+                      <Pointer className="w-8 h-8 text-white/70" />
+                      <ChevronRight className="w-5 h-5 text-white/50" />
+                    </motion.div>
                   </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         ) : (
           <LoginScreen key="login" />
