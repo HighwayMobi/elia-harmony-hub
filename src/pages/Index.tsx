@@ -75,10 +75,36 @@ const Index = () => {
       canvas.width = w;
       canvas.height = h;
 
-      // Load fog texture image and draw it to cover the canvas
+      // First fill with purple frosted glass base
+      ctx.fillStyle = 'rgba(167, 153, 183, 0.92)';
+      ctx.fillRect(0, 0, w, h);
+
+      // Add subtle condensation noise
+      for (let i = 0; i < 8; i++) {
+        const cx = Math.random() * w;
+        const cy = Math.random() * h;
+        const r = 100 + Math.random() * 200;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        grad.addColorStop(0, `rgba(200, 190, 215, ${0.15 + Math.random() * 0.1})`);
+        grad.addColorStop(1, 'rgba(200, 190, 215, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // Add tiny condensation droplets
+      for (let i = 0; i < 200; i++) {
+        const dx = Math.random() * w;
+        const dy = Math.random() * h;
+        const dr = 1 + Math.random() * 2.5;
+        ctx.beginPath();
+        ctx.arc(dx, dy, dr, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(220, 215, 230, ${0.1 + Math.random() * 0.15})`;
+        ctx.fill();
+      }
+
+      // Load fog texture as transparent overlay for realism
       const img = new Image();
       img.onload = () => {
-        // Cover the canvas with the fog image (like background-size: cover)
         const imgRatio = img.width / img.height;
         const canvasRatio = w / h;
         let drawW, drawH, offsetX, offsetY;
@@ -95,7 +121,13 @@ const Index = () => {
           offsetY = 0;
         }
         
+        // Draw texture with low opacity as overlay
+        ctx.globalAlpha = 0.25;
+        ctx.globalCompositeOperation = 'overlay';
         ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+        ctx.globalAlpha = 1.0;
+        ctx.globalCompositeOperation = 'source-over';
+        
         setCanvasInitialized(true);
       };
       img.src = fogTexture;
