@@ -2,7 +2,14 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Eye, EyeOff, Loader2, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo-elia-balance.svg";
@@ -14,71 +21,71 @@ const LoginScreen = () => {
   const [method, setMethod] = useState<LoginMethod>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const validateEmailForm = () => {
-    if (!email.trim()) {
-      toast.error("Por favor ingresa tu correo electrónico");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Por favor ingresa un correo electrónico válido");
-      return false;
-    }
-    if (!password) {
-      toast.error("Por favor ingresa tu contraseña");
-      return false;
-    }
-    if (password.length < 6) {
-      toast.error("La contraseña debe tener al menos 6 caracteres");
-      return false;
-    }
-    return true;
-  };
-
-  const validatePhone = () => {
-    if (!/^[67]\d{8}$/.test(phone)) {
-      toast.error("Introduce un móvil válido (9 dígitos, empieza por 6 o 7)");
-      return false;
-    }
-    return true;
-  };
+  // Forgot password dialog state
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotTab, setForgotTab] = useState<LoginMethod>("email");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotPhone, setForgotPhone] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const formatPhoneDisplay = (digits: string) => {
-    // 612 345 678
     const a = digits.slice(0, 3);
     const b = digits.slice(3, 6);
     const c = digits.slice(6, 9);
     return [a, b, c].filter(Boolean).join(" ");
   };
 
-  const handlePhoneChange = (raw: string) => {
+  const sanitizePhone = (raw: string) => {
     let digits = raw.replace(/\D/g, "");
-    // First digit must be 6 or 7
-    if (digits.length > 0 && !/[67]/.test(digits[0])) {
-      digits = "";
-    }
-    setPhone(digits.slice(0, 9));
+    if (digits.length > 0 && !/[67]/.test(digits[0])) digits = "";
+    return digits.slice(0, 9);
   };
+
+  const validateEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+  const validatePhone = (value: string) => /^[67]\d{8}$/.test(value);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateEmailForm()) return;
+
+    // Validation
+    if (method === "email") {
+      if (!validateEmail(email)) {
+        toast.error("Por favor ingresa un correo válido");
+        return;
+      }
+    } else {
+      if (!validatePhone(phone)) {
+        toast.error("Móvil no válido (9 dígitos, empieza por 6 o 7)");
+        return;
+      }
+    }
+    if (password.length < 6) {
+      toast.error("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
 
     setLoading(true);
     try {
+      const credentials =
+        method === "email"
+          ? { email: email.trim(), password }
+          : { phone: `+34${phone}`, password };
+
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
+        const { error } = await supabase.auth.signInWithPassword(credentials as any);
         if (error) {
           if (error.message === "Invalid login credentials") {
-            toast.error("Correo o contraseña incorrectos");
+            toast.error(
+              method === "email"
+                ? "Correo o contraseña incorrectos"
+                : "Móvil o contraseña incorrectos"
+            );
           } else {
             toast.error(error.message);
           }
@@ -86,14 +93,19 @@ const LoginScreen = () => {
           toast.success("¡Bienvenido!");
         }
       } else {
-        const { error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/` },
-        });
+        const signUpPayload =
+          method === "email"
+            ? {
+                email: email.trim(),
+                password,
+                options: { emailRedirectTo: `${window.location.origin}/` },
+              }
+            : { phone: `+34${phone}`, password };
+
+        const { error } = await supabase.auth.signUp(signUpPayload as any);
         if (error) {
           if (error.message.includes("already registered")) {
-            toast.error("Este correo ya está registrado");
+            toast.error("Esta cuenta ya está registrada");
           } else {
             toast.error(error.message);
           }
@@ -108,68 +120,45 @@ const LoginScreen = () => {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validatePhone()) return;
-    setLoading(true);
+  const handleForgotSubmit = async () => {
+    if (forgotTab === "email") {
+      if (!validateEmail(forgotEmail)) {
+        toast.error("Correo no válido");
+        return;
+      }
+    } else {
+      if (!validatePhone(forgotPhone)) {
+        toast.error("Móvil no válido");
+        return;
+      }
+    }
+
+    setForgotLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        phone: `+34${phone}`,
-      });
-      if (error) {
-        toast.error(error.message);
+      if (forgotTab === "email") {
+        const { error } = await supabase.auth.resetPasswordForEmail(
+          forgotEmail.trim(),
+          { redirectTo: `${window.location.origin}/` }
+        );
+        if (error) toast.error(error.message);
+        else {
+          toast.success("Te enviamos un correo para restablecer tu contraseña");
+          setForgotOpen(false);
+        }
       } else {
-        setOtpSent(true);
-        toast.success("Código enviado por SMS");
+        const { error } = await supabase.auth.signInWithOtp({
+          phone: `+34${forgotPhone}`,
+        });
+        if (error) toast.error(error.message);
+        else {
+          toast.success("Te enviamos un código por SMS");
+          setForgotOpen(false);
+        }
       }
     } catch {
       toast.error("Ocurrió un error. Intenta de nuevo.");
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otp.trim() || otp.trim().length < 4) {
-      toast.error("Ingresa el código recibido");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.verifyOtp({
-        phone: `+34${phone}`,
-        token: otp.trim(),
-        type: "sms",
-      });
-      if (error) {
-        toast.error("Código incorrecto");
-      } else {
-        toast.success("¡Bienvenido!");
-      }
-    } catch {
-      toast.error("Ocurrió un error. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!email.trim()) {
-      toast.error("Por favor ingresa tu correo electrónico");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/`,
-      });
-      if (error) toast.error(error.message);
-      else toast.success("Te enviamos un correo para restablecer tu contraseña");
-    } catch {
-      toast.error("Ocurrió un error. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
+      setForgotLoading(false);
     }
   };
 
@@ -229,34 +218,33 @@ const LoginScreen = () => {
         <div className="flex bg-white/15 rounded-xl p-1 mb-5">
           <button
             type="button"
-            onClick={() => {
-              setMethod("email");
-              setOtpSent(false);
-            }}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
+            onClick={() => setMethod("email")}
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "email"
                 ? "bg-white/90 text-[#A799B7]"
                 : "text-white/80 hover:text-white"
             }`}
           >
+            <Mail className="w-4 h-4" />
             Email
           </button>
           <button
             type="button"
             onClick={() => setMethod("phone")}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "phone"
                 ? "bg-white/90 text-[#A799B7]"
                 : "text-white/80 hover:text-white"
             }`}
           >
+            <Phone className="w-4 h-4" />
             Mi móvil
           </button>
         </div>
 
-        {method === "email" ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-3">
+            {method === "email" ? (
               <Input
                 type="email"
                 placeholder="Correo electrónico"
@@ -265,112 +253,77 @@ const LoginScreen = () => {
                 disabled={loading}
                 className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20"
               />
+            ) : (
               <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none">
+                  +34
+                </span>
                 <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="600 000 000"
+                  value={formatPhoneDisplay(phone)}
+                  onChange={(e) => setPhone(sanitizePhone(e.target.value))}
                   disabled={loading}
-                  className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pr-12"
+                  maxLength={11}
+                  className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pl-14 tracking-wide"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
               </div>
-            </div>
-
-            {isLogin && (
-              <button
-                type="button"
-                onClick={handleForgotPassword}
-                disabled={loading}
-                className="text-sm text-white/70 hover:text-white transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
             )}
 
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : isLogin ? (
-                "Iniciar sesión"
-              ) : (
-                "Registrarse"
-              )}
-            </Button>
-          </form>
-        ) : (
-          <form
-            onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
-            className="space-y-4"
-          >
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none">
-                +34
-              </span>
               <Input
-                type="tel"
-                inputMode="numeric"
-                placeholder="600 000 000"
-                value={formatPhoneDisplay(phone)}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                disabled={loading || otpSent}
-                maxLength={11}
-                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pl-14 tracking-wide"
-              />
-            </div>
-
-            {otpSent && (
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="Código de verificación"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 tracking-widest text-center"
+                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pr-12"
               />
-            )}
-
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : otpSent ? (
-                "Verificar código"
-              ) : (
-                "Enviar código SMS"
-              )}
-            </Button>
-
-            {otpSent && (
               <button
                 type="button"
-                onClick={() => {
-                  setOtpSent(false);
-                  setOtp("");
-                }}
-                disabled={loading}
-                className="text-sm text-white/70 hover:text-white transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
               >
-                Cambiar número
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
               </button>
+            </div>
+          </div>
+
+          {isLogin && (
+            <button
+              type="button"
+              onClick={() => {
+                setForgotTab(method);
+                setForgotEmail(email);
+                setForgotPhone(phone);
+                setForgotOpen(true);
+              }}
+              disabled={loading}
+              className="text-sm text-white/70 hover:text-white transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : isLogin ? (
+              "Iniciar sesión"
+            ) : (
+              "Registrarse"
             )}
-          </form>
-        )}
+          </Button>
+        </form>
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
@@ -411,25 +364,118 @@ const LoginScreen = () => {
           </Button>
         </div>
 
-        {method === "email" && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="text-center mt-6 text-white/70"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-center mt-6 text-white/70"
+        >
+          {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
+          <button
+            type="button"
+            onClick={() => setIsLogin(!isLogin)}
+            disabled={loading}
+            className="text-white font-medium hover:underline"
           >
-            {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
-            <button
-              type="button"
-              onClick={() => setIsLogin(!isLogin)}
-              disabled={loading}
-              className="text-white font-medium hover:underline"
-            >
-              {isLogin ? "Regístrate" : "Inicia sesión"}
-            </button>
-          </motion.p>
-        )}
+            {isLogin ? "Regístrate" : "Inicia sesión"}
+          </button>
+        </motion.p>
       </motion.div>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Recuperar contraseña</DialogTitle>
+            <DialogDescription>
+              Elige cómo quieres recibir las instrucciones para restablecer tu
+              contraseña.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            {/* Tabs */}
+            <div className="flex rounded-xl bg-muted p-1">
+              <button
+                type="button"
+                onClick={() => setForgotTab("email")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                  forgotTab === "email"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Mail className="h-4 w-4" />
+                Email
+              </button>
+              <button
+                type="button"
+                onClick={() => setForgotTab("phone")}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
+                  forgotTab === "phone"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Phone className="h-4 w-4" />
+                Mi móvil
+              </button>
+            </div>
+
+            <p className="text-sm text-muted-foreground">
+              {forgotTab === "email"
+                ? "Te enviaremos un enlace al correo para restablecer la contraseña."
+                : "Te enviaremos un código por SMS para acceder y cambiar tu contraseña."}
+            </p>
+
+            {forgotTab === "email" ? (
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="email"
+                  placeholder="mail@ejemplo.com"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  disabled={forgotLoading}
+                  className="pl-10 h-12 rounded-xl"
+                />
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <div className="flex items-center gap-1 rounded-xl border bg-muted px-3 text-sm font-medium">
+                  <span>🇪🇸</span>
+                  <span>+34</span>
+                </div>
+                <Input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="600 000 000"
+                  value={formatPhoneDisplay(forgotPhone)}
+                  onChange={(e) =>
+                    setForgotPhone(sanitizePhone(e.target.value))
+                  }
+                  disabled={forgotLoading}
+                  maxLength={11}
+                  className="flex-1 h-12 rounded-xl tracking-wide"
+                />
+              </div>
+            )}
+
+            <Button
+              type="button"
+              onClick={handleForgotSubmit}
+              disabled={forgotLoading}
+              className="w-full h-12 rounded-xl"
+            >
+              {forgotLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                "Enviar instrucciones"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };
