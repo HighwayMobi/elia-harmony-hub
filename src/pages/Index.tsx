@@ -59,8 +59,8 @@ const Index = () => {
 
   // Initialize fog canvas - only once when not logged in
   useEffect(() => {
-    // Skip if already initialized or user is logged in
-    if (canvasInitialized || user || loading) return;
+    // Skip if user is logged in or still loading
+    if (user || loading || revealed) return;
     
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -70,8 +70,17 @@ const Index = () => {
 
 
     const initCanvas = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const parent = canvas.parentElement;
+      const w = Math.max(
+        window.innerWidth,
+        parent?.clientWidth ?? 0,
+        document.documentElement.clientWidth
+      );
+      const h = Math.max(
+        window.innerHeight,
+        parent?.clientHeight ?? 0,
+        document.documentElement.clientHeight
+      );
       canvas.width = w;
       canvas.height = h;
 
@@ -158,8 +167,9 @@ const Index = () => {
     const ctx = fogCanvas.getContext("2d");
     if (!ctx) return;
 
-    fogCanvas.width = window.innerWidth;
-    fogCanvas.height = window.innerHeight;
+    const fogParent = fogCanvas.parentElement;
+    fogCanvas.width = Math.max(window.innerWidth, fogParent?.clientWidth ?? 0, document.documentElement.clientWidth);
+    fogCanvas.height = Math.max(window.innerHeight, fogParent?.clientHeight ?? 0, document.documentElement.clientHeight);
 
     let time = 0;
 
