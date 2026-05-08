@@ -113,9 +113,8 @@ const LoginScreen = () => {
     if (!validatePhone()) return;
     setLoading(true);
     try {
-      const normalized = phone.trim().replace(/[\s\-()]/g, "");
       const { error } = await supabase.auth.signInWithOtp({
-        phone: normalized.startsWith("+") ? normalized : `+${normalized}`,
+        phone: `+34${phone}`,
       });
       if (error) {
         toast.error(error.message);
