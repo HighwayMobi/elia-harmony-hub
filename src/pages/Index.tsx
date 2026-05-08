@@ -70,8 +70,17 @@ const Index = () => {
 
 
     const initCanvas = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      const parent = canvas.parentElement;
+      const w = Math.max(
+        window.innerWidth,
+        parent?.clientWidth ?? 0,
+        document.documentElement.clientWidth
+      );
+      const h = Math.max(
+        window.innerHeight,
+        parent?.clientHeight ?? 0,
+        document.documentElement.clientHeight
+      );
       canvas.width = w;
       canvas.height = h;
 
