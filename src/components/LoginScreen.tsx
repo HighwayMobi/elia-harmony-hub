@@ -384,10 +384,12 @@ const LoginScreen = () => {
 
       {/* Forgot Password Dialog */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:text-white/70 [&>button]:hover:text-white">
           <DialogHeader>
-            <DialogTitle>Recuperar contraseña</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-white text-xl">
+              Recuperar contraseña
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
               Elige cómo quieres recibir las instrucciones para restablecer tu
               contraseña.
             </DialogDescription>
@@ -395,14 +397,14 @@ const LoginScreen = () => {
 
           <div className="space-y-4 pt-2">
             {/* Tabs */}
-            <div className="flex rounded-xl bg-muted p-1">
+            <div className="flex rounded-xl bg-white/15 p-1">
               <button
                 type="button"
                 onClick={() => setForgotTab("email")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "email"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-white/90 text-[#A799B7] shadow-sm"
+                    : "text-white/80 hover:text-white"
                 }`}
               >
                 <Mail className="h-4 w-4" />
@@ -413,8 +415,8 @@ const LoginScreen = () => {
                 onClick={() => setForgotTab("phone")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "phone"
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-white/90 text-[#A799B7] shadow-sm"
+                    : "text-white/80 hover:text-white"
                 }`}
               >
                 <Phone className="h-4 w-4" />
@@ -422,7 +424,7 @@ const LoginScreen = () => {
               </button>
             </div>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-white/70">
               {forgotTab === "email"
                 ? "Te enviaremos un enlace al correo para restablecer la contraseña."
                 : "Te enviaremos un código por SMS para acceder y cambiar tu contraseña."}
@@ -430,22 +432,21 @@ const LoginScreen = () => {
 
             {forgotTab === "email" ? (
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/60 z-10" />
                 <Input
                   type="email"
                   placeholder="mail@ejemplo.com"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   disabled={forgotLoading}
-                  className="pl-10 h-12 rounded-xl"
+                  className="pl-10 h-12 rounded-xl bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/20"
                 />
               </div>
             ) : (
-              <div className="flex gap-2">
-                <div className="flex items-center gap-1 rounded-xl border bg-muted px-3 text-sm font-medium">
-                  <span>🇪🇸</span>
-                  <span>+34</span>
-                </div>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none flex items-center gap-1">
+                  <span>🇪🇸</span> +34
+                </span>
                 <Input
                   type="tel"
                   inputMode="numeric"
@@ -456,7 +457,7 @@ const LoginScreen = () => {
                   }
                   disabled={forgotLoading}
                   maxLength={11}
-                  className="flex-1 h-12 rounded-xl tracking-wide"
+                  className="h-12 rounded-xl bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/20 pl-20 tracking-wide"
                 />
               </div>
             )}
@@ -465,7 +466,7 @@ const LoginScreen = () => {
               type="button"
               onClick={handleForgotSubmit}
               disabled={forgotLoading}
-              className="w-full h-12 rounded-xl"
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
             >
               {forgotLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
