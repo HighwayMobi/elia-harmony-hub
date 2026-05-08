@@ -59,8 +59,8 @@ const Index = () => {
 
   // Initialize fog canvas - only once when not logged in
   useEffect(() => {
-    // Skip if already initialized or user is logged in
-    if (canvasInitialized || user || loading) return;
+    // Skip if user is logged in or still loading
+    if (user || loading || revealed) return;
     
     const canvas = canvasRef.current;
     if (!canvas) return;
