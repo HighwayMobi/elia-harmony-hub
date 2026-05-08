@@ -41,16 +41,28 @@ const LoginScreen = () => {
   };
 
   const validatePhone = () => {
-    const cleaned = phone.trim();
-    if (!cleaned) {
-      toast.error("Por favor ingresa tu número de móvil");
-      return false;
-    }
-    if (!/^\+?[0-9\s\-()]{7,20}$/.test(cleaned)) {
-      toast.error("Número de móvil no válido");
+    if (!/^[67]\d{8}$/.test(phone)) {
+      toast.error("Introduce un móvil válido (9 dígitos, empieza por 6 o 7)");
       return false;
     }
     return true;
+  };
+
+  const formatPhoneDisplay = (digits: string) => {
+    // 612 345 678
+    const a = digits.slice(0, 3);
+    const b = digits.slice(3, 6);
+    const c = digits.slice(6, 9);
+    return [a, b, c].filter(Boolean).join(" ");
+  };
+
+  const handlePhoneChange = (raw: string) => {
+    let digits = raw.replace(/\D/g, "");
+    // First digit must be 6 or 7
+    if (digits.length > 0 && !/[67]/.test(digits[0])) {
+      digits = "";
+    }
+    setPhone(digits.slice(0, 9));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,9 +113,8 @@ const LoginScreen = () => {
     if (!validatePhone()) return;
     setLoading(true);
     try {
-      const normalized = phone.trim().replace(/[\s\-()]/g, "");
       const { error } = await supabase.auth.signInWithOtp({
-        phone: normalized.startsWith("+") ? normalized : `+${normalized}`,
+        phone: `+34${phone}`,
       });
       if (error) {
         toast.error(error.message);
@@ -126,9 +137,8 @@ const LoginScreen = () => {
     }
     setLoading(true);
     try {
-      const normalized = phone.trim().replace(/[\s\-()]/g, "");
       const { error } = await supabase.auth.verifyOtp({
-        phone: normalized.startsWith("+") ? normalized : `+${normalized}`,
+        phone: `+34${phone}`,
         token: otp.trim(),
         type: "sms",
       });
@@ -304,14 +314,21 @@ const LoginScreen = () => {
             onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
             className="space-y-4"
           >
-            <Input
-              type="tel"
-              placeholder="+34 600 000 000"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={loading || otpSent}
-              className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none">
+                +34
+              </span>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                placeholder="600 000 000"
+                value={formatPhoneDisplay(phone)}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                disabled={loading || otpSent}
+                maxLength={11}
+                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pl-14 tracking-wide"
+              />
+            </div>
 
             {otpSent && (
               <Input
