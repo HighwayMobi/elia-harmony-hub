@@ -41,16 +41,28 @@ const LoginScreen = () => {
   };
 
   const validatePhone = () => {
-    const cleaned = phone.trim();
-    if (!cleaned) {
-      toast.error("Por favor ingresa tu número de móvil");
-      return false;
-    }
-    if (!/^\+?[0-9\s\-()]{7,20}$/.test(cleaned)) {
-      toast.error("Número de móvil no válido");
+    if (!/^[67]\d{8}$/.test(phone)) {
+      toast.error("Introduce un móvil válido (9 dígitos, empieza por 6 o 7)");
       return false;
     }
     return true;
+  };
+
+  const formatPhoneDisplay = (digits: string) => {
+    // 612 345 678
+    const a = digits.slice(0, 3);
+    const b = digits.slice(3, 6);
+    const c = digits.slice(6, 9);
+    return [a, b, c].filter(Boolean).join(" ");
+  };
+
+  const handlePhoneChange = (raw: string) => {
+    let digits = raw.replace(/\D/g, "");
+    // First digit must be 6 or 7
+    if (digits.length > 0 && !/[67]/.test(digits[0])) {
+      digits = "";
+    }
+    setPhone(digits.slice(0, 9));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
