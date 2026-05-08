@@ -444,8 +444,8 @@ const LoginScreen = () => {
               </div>
             ) : (
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none flex items-center gap-1">
-                  <span>🇪🇸</span> +34
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none">
+                  +34
                 </span>
                 <Input
                   type="tel"
@@ -457,7 +457,7 @@ const LoginScreen = () => {
                   }
                   disabled={forgotLoading}
                   maxLength={11}
-                  className="h-12 rounded-xl bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/20 pl-20 tracking-wide"
+                  className="h-12 rounded-xl bg-white/20 border-white/30 text-white placeholder:text-white/60 focus:border-white/50 focus:ring-white/20 pl-14 tracking-wide"
                 />
               </div>
             )}
