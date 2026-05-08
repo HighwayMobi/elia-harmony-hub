@@ -135,26 +135,39 @@ const LoginScreen = () => {
 
     setForgotLoading(true);
     try {
-      if (forgotTab === "email") {
-        const { error } = await supabase.auth.resetPasswordForEmail(
-          forgotEmail.trim(),
-          { redirectTo: `${window.location.origin}/` }
-        );
-        if (error) toast.error(error.message);
-        else {
-          toast.success("Te enviamos un correo para restablecer tu contraseña");
-          setForgotOpen(false);
+      const body =
+        forgotTab === "email"
+          ? { email: forgotEmail.trim() }
+          : { phone: `+34${forgotPhone}` };
+
+      const response = await fetch(
+        "https://platform.factorytele.com/api/v1/pub/auth/otp/request",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         }
-      } else {
-        const { error } = await supabase.auth.signInWithOtp({
-          phone: `+34${forgotPhone}`,
-        });
-        if (error) toast.error(error.message);
-        else {
-          toast.success("Te enviamos un código por SMS");
-          setForgotOpen(false);
+      );
+
+      if (!response.ok) {
+        let message = "No se pudo enviar el código. Intenta de nuevo.";
+        try {
+          const data = await response.json();
+          if (data?.message) message = data.message;
+          else if (data?.error) message = data.error;
+        } catch {
+          // ignore
         }
+        toast.error(message);
+        return;
       }
+
+      toast.success(
+        forgotTab === "email"
+          ? "Te enviamos un código a tu correo"
+          : "Te enviamos un código por SMS"
+      );
+      setForgotOpen(false);
     } catch {
       toast.error("Ocurrió un error. Intenta de nuevo.");
     } finally {
