@@ -167,8 +167,9 @@ const Index = () => {
     const ctx = fogCanvas.getContext("2d");
     if (!ctx) return;
 
-    fogCanvas.width = window.innerWidth;
-    fogCanvas.height = window.innerHeight;
+    const fogParent = fogCanvas.parentElement;
+    fogCanvas.width = Math.max(window.innerWidth, fogParent?.clientWidth ?? 0, document.documentElement.clientWidth);
+    fogCanvas.height = Math.max(window.innerHeight, fogParent?.clientHeight ?? 0, document.documentElement.clientHeight);
 
     let time = 0;
 
