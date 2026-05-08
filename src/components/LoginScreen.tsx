@@ -140,24 +140,17 @@ const LoginScreen = () => {
           ? { email: forgotEmail.trim() }
           : { phone: `+34${forgotPhone}` };
 
-      const response = await fetch(
-        "https://platform.factorytele.com/api/v1/pub/auth/otp/request",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("request-otp", {
+        body,
+      });
 
-      if (!response.ok) {
-        let message = "No se pudo enviar el código. Intenta de nuevo.";
-        try {
-          const data = await response.json();
-          if (data?.message) message = data.message;
-          else if (data?.error) message = data.error;
-        } catch {
-          // ignore
-        }
+      if (error || !data?.ok) {
+        const upstream = (data as any)?.data;
+        const message =
+          upstream?.message ||
+          upstream?.error ||
+          error?.message ||
+          "No se pudo enviar el código. Intenta de nuevo.";
         toast.error(message);
         return;
       }
