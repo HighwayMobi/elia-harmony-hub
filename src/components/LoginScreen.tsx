@@ -477,7 +477,7 @@ const LoginScreen = () => {
               {forgotLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                "Enviar instrucciones"
+                "Enviar código"
               )}
             </Button>
           </div>
