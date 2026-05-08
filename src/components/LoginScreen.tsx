@@ -314,14 +314,21 @@ const LoginScreen = () => {
             onSubmit={otpSent ? handleVerifyOtp : handleSendOtp}
             className="space-y-4"
           >
-            <Input
-              type="tel"
-              placeholder="+34 600 000 000"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={loading || otpSent}
-              className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20"
-            />
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/80 font-medium pointer-events-none select-none">
+                +34
+              </span>
+              <Input
+                type="tel"
+                inputMode="numeric"
+                placeholder="600 000 000"
+                value={formatPhoneDisplay(phone)}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                disabled={loading || otpSent}
+                maxLength={11}
+                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pl-14 tracking-wide"
+              />
+            </div>
 
             {otpSent && (
               <Input
