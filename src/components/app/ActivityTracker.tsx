@@ -95,21 +95,21 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
       {!showForm ? (
         <Button
           onClick={() => setShowForm(true)}
-          className="w-full bg-white/10 hover:bg-white/20 text-white border-0 h-12 rounded-2xl"
+          className="w-full bg-white hover:bg-[#A36BFF]/15 text-[#2F2A33] border-0 h-12 rounded-2xl"
         >
           <Plus className="w-5 h-5 mr-2" />
           Registrar actividad
         </Button>
       ) : (
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 space-y-4">
-          <h3 className="text-white/90 font-medium flex items-center gap-2">
+        <div className="bg-white backdrop-blur-sm rounded-2xl p-5 space-y-4">
+          <h3 className="text-[#2F2A33] font-medium flex items-center gap-2">
             <Footprints className="w-4 h-4" /> Nueva actividad
           </h3>
 
           <div className="space-y-2">
-            <label className="text-white/60 text-xs">Tipo de actividad</label>
+            <label className="text-[#2F2A33]/60 text-xs">Tipo de actividad</label>
             <Select value={activityType} onValueChange={setActivityType}>
-              <SelectTrigger className="bg-white/10 border-white/20 text-white">
+              <SelectTrigger className="bg-white border-[#A36BFF]/20 text-[#2F2A33]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -123,56 +123,56 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-white/60 text-xs">Fecha y hora</label>
+            <label className="text-[#2F2A33]/60 text-xs">Fecha y hora</label>
             <Input
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="bg-white/10 border-white/20 text-white"
+              className="bg-white border-[#A36BFF]/20 text-[#2F2A33]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-white/60 text-xs">Duración (min)</label>
+              <label className="text-[#2F2A33]/60 text-xs">Duración (min)</label>
               <Input
                 type="number"
                 value={durationMin}
                 onChange={(e) => setDurationMin(e.target.value)}
                 placeholder="30"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/30"
+                className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-white/60 text-xs">Pasos</label>
+              <label className="text-[#2F2A33]/60 text-xs">Pasos</label>
               <Input
                 type="number"
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
                 placeholder="0"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/30"
+                className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-white/60 text-xs">Calorías (opcional)</label>
+            <label className="text-[#2F2A33]/60 text-xs">Calorías (opcional)</label>
             <Input
               type="number"
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
               placeholder="0"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/30"
+              className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-white/60 text-xs">Notas (opcional)</label>
+            <label className="text-[#2F2A33]/60 text-xs">Notas (opcional)</label>
             <Input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Detalles de la actividad"
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/30"
+              className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
             />
           </div>
 
@@ -180,14 +180,14 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
             <Button
               onClick={() => setShowForm(false)}
               variant="ghost"
-              className="flex-1 text-white/60 hover:text-white hover:bg-white/10"
+              className="flex-1 text-[#2F2A33]/60 hover:text-[#A36BFF] hover:bg-[#A36BFF]/10"
             >
               Cancelar
             </Button>
             <Button
               onClick={() => addMutation.mutate()}
               disabled={!startTime || !activityType || addMutation.isPending}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-0"
+              className="flex-1 bg-[#A36BFF]/10 hover:bg-[#A36BFF]/20 text-[#2F2A33] border-0"
             >
               Guardar
             </Button>
@@ -197,19 +197,19 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
 
       {/* Records list */}
       {isLoading ? (
-        <p className="text-white/40 text-center text-sm">Cargando...</p>
+        <p className="text-[#2F2A33]/40 text-center text-sm">Cargando...</p>
       ) : records && records.length > 0 ? (
         <div className="space-y-3">
           {records.map((r) => (
-            <div key={r.id} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
+            <div key={r.id} className="bg-white backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <p className="text-white/90 text-sm font-medium">
+                <p className="text-[#2F2A33] text-sm font-medium">
                   {getActivityLabel(r.activity_type)}
                 </p>
-                <p className="text-white/50 text-xs">
+                <p className="text-[#2F2A33]/50 text-xs">
                   {format(new Date(r.start_time), "d MMM yyyy, HH:mm", { locale: es })}
                 </p>
-                <div className="flex gap-3 mt-1 text-white/50 text-xs">
+                <div className="flex gap-3 mt-1 text-[#2F2A33]/50 text-xs">
                   {r.duration_minutes && (
                     <span className="flex items-center gap-1">
                       <Timer className="w-3 h-3" />
@@ -232,7 +232,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
               </div>
               <button
                 onClick={() => deleteMutation.mutate(r.id)}
-                className="text-white/30 hover:text-white/60 p-2"
+                className="text-[#2F2A33]/30 hover:text-[#2F2A33]/80 p-2"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -240,7 +240,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
           ))}
         </div>
       ) : (
-        <p className="text-white/40 text-center text-sm py-8">
+        <p className="text-[#2F2A33]/40 text-center text-sm py-8">
           No hay registros de actividad
         </p>
       )}

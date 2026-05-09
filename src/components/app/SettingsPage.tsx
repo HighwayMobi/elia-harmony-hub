@@ -139,24 +139,24 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
       className="flex-1 px-6 py-6 pb-24"
     >
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-light text-white mb-6">Configuración</h1>
+        <h1 className="text-2xl font-light text-[#2F2A33] mb-6">Configuración</h1>
 
         {/* Profile section */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-4">
-          <h2 className="text-white/90 font-medium mb-4 flex items-center gap-2">
+        <div className="bg-white backdrop-blur-sm rounded-2xl p-6 mb-4">
+          <h2 className="text-[#2F2A33] font-medium mb-4 flex items-center gap-2">
             <UserIcon className="w-5 h-5" />
             Perfil
           </h2>
 
           {profileLoading ? (
-            <div className="flex items-center gap-2 text-white/70 text-sm">
+            <div className="flex items-center gap-2 text-[#2F2A33]/70 text-sm">
               <Loader2 className="w-4 h-4 animate-spin" />
               Cargando perfil...
             </div>
           ) : profileError ? (
-            <div className="text-white/70 text-sm">{profileError}</div>
+            <div className="text-[#2F2A33]/70 text-sm">{profileError}</div>
           ) : profile ? (
-            <div className="space-y-3 text-white/80 text-sm">
+            <div className="space-y-3 text-[#2F2A33]/80 text-sm">
               {(() => {
                 const raw = profile.avatar_url || profile.line_avatar_url;
                 if (!raw) return null;
@@ -209,17 +209,17 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {profile.status && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-white/15 text-white/90 capitalize">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33] capitalize">
                       {profile.status}
                     </span>
                   )}
                   {profile.payment_model && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-white/15 text-white/90">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33]">
                       {profile.payment_model}
                     </span>
                   )}
                   {profile.type && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-white/15 text-white/90 uppercase">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33] uppercase">
                       {profile.type}
                     </span>
                   )}
@@ -227,7 +227,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-3 text-white/70">
+            <div className="flex items-center gap-3 text-[#2F2A33]/70">
               <Mail className="w-4 h-4" />
               <span className="text-sm">{user.email}</span>
             </div>
@@ -235,8 +235,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         </div>
 
         {/* Health integrations section */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-4">
-          <h2 className="text-white/90 font-medium mb-4 flex items-center gap-2">
+        <div className="bg-white backdrop-blur-sm rounded-2xl p-6 mb-4">
+          <h2 className="text-[#2F2A33] font-medium mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Conteo de pasos
           </h2>
@@ -245,8 +245,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
             {showGoogleFit && (
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-white/90 text-sm font-medium">Google Fit</span>
-                  <span className="text-white/50 text-xs">Sincronización de pasos con Android</span>
+                  <span className="text-[#2F2A33] text-sm font-medium">Google Fit</span>
+                  <span className="text-[#2F2A33]/50 text-xs">Sincronización de pasos con Android</span>
                 </div>
                 <Switch checked={googleFitEnabled} onCheckedChange={handleGoogleFitToggle} />
               </div>
@@ -255,8 +255,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
             {showAppleHealth && (
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-white/90 text-sm font-medium">Apple Health</span>
-                  <span className="text-white/50 text-xs">Sincronización de pasos con iPhone</span>
+                  <span className="text-[#2F2A33] text-sm font-medium">Apple Health</span>
+                  <span className="text-[#2F2A33]/50 text-xs">Sincronización de pasos con iPhone</span>
                 </div>
                 <Switch checked={appleHealthEnabled} onCheckedChange={handleAppleHealthToggle} />
               </div>
@@ -268,7 +268,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full bg-white/10 hover:bg-white/20 text-white border-0 h-14 rounded-2xl"
+          className="w-full bg-white hover:bg-[#A36BFF]/15 text-[#2F2A33] border-0 h-14 rounded-2xl"
         >
           <LogOut className="w-5 h-5 mr-2" />
           Cerrar sesión
