@@ -157,6 +157,45 @@ const LoginScreen = () => {
     }
   };
 
+  const handleSetPasswordSubmit = async () => {
+    if (newPassword.length < 8) {
+      toast.error("La contraseña debe tener al menos 8 caracteres");
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      toast.error("Las contraseñas no coinciden");
+      return;
+    }
+    if (!pendingToken) {
+      toast.error("Sesión no válida. Inicia sesión de nuevo.");
+      setSetPwdOpen(false);
+      return;
+    }
+    setSetPwdLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("set-password", {
+        body: { password: newPassword, token: pendingToken },
+      });
+      if (error || !data?.ok) {
+        const upstream = (data as any)?.data;
+        const message =
+          upstream?.message ||
+          upstream?.error ||
+          error?.message ||
+          "No se pudo establecer la contraseña";
+        toast.error(message);
+        return;
+      }
+      if (pendingSession) setFTSession(pendingSession);
+      setSetPwdOpen(false);
+      toast.success("Contraseña establecida. ¡Bienvenido!");
+    } catch {
+      toast.error("Ocurrió un error. Intenta de nuevo.");
+    } finally {
+      setSetPwdLoading(false);
+    }
+  };
+
   const handleForgotSubmit = async () => {
     if (forgotTab === "email") {
       if (!validateEmail(forgotEmail)) {
