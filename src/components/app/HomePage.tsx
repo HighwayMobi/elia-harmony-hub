@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getFTSession, setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import { ftPost, ftUpload } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -85,24 +86,10 @@ const HomePage = ({ user }: HomePageProps) => {
   // Cargar perfil desde API FactoryTele
   const loadProfile = async () => {
     const ft = getFTSession();
-    const token = ft?.token;
-    if (!token) return;
+    if (!ft?.token) return;
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const authToken = sessionData.session?.access_token;
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-profile`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authToken ? `Bearer ${authToken}` : "",
-          },
-          body: JSON.stringify({ token }),
-        }
-      );
-      const json = await res.json().catch(() => ({}));
-      if (json.ok && json.data?.data) {
+      const { data: json } = await ftPost<any>("get-profile");
+      if (json?.ok && json.data?.data) {
         const apiProfile = json.data.data;
         const fullName = [apiProfile.first_name, apiProfile.last_name]
           .filter(Boolean)
@@ -158,23 +145,10 @@ const HomePage = ({ user }: HomePageProps) => {
     const localPreview = URL.createObjectURL(file);
     setAvatarUrl(localPreview);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const authToken = sessionData.session?.access_token;
       const form = new FormData();
-      form.append("token", token);
       form.append("avatar", file, file.name);
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: authToken ? `Bearer ${authToken}` : "",
-          },
-          body: form,
-        }
-      );
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.ok) {
+      const { data: json } = await ftUpload<any>("upload-avatar", form);
+      if (!json?.ok) {
         throw new Error(json?.data?.message || json?.error || "Error al subir");
       }
       toast({ title: "Avatar actualizado" });

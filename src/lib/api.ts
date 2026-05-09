@@ -82,6 +82,25 @@ const is401 = (error: AxiosError): boolean => {
   return false;
 };
 
+// Replace `token` field on a request body, supporting JSON, JSON-string, and FormData.
+const replaceTokenInBody = (config: AxiosRequestConfig, newToken: string) => {
+  const data = config.data;
+  if (!data) return;
+  if (typeof FormData !== "undefined" && data instanceof FormData) {
+    if (data.has("token")) data.set("token", newToken);
+    return;
+  }
+  try {
+    const parsed = typeof data === "string" ? JSON.parse(data) : data;
+    if (parsed && typeof parsed === "object" && "token" in parsed) {
+      parsed.token = newToken;
+      config.data = typeof data === "string" ? JSON.stringify(parsed) : parsed;
+    }
+  } catch {
+    // ignore non-JSON
+  }
+};
+
 api.interceptors.response.use(
   // Also flag a successful HTTP 200 from edge fn that contains an inner 401
   (response) => {
@@ -119,24 +138,7 @@ api.interceptors.response.use(
         redirectToLogin();
         return Promise.reject(error);
       }
-      // Replace the token in body if present
-      if (originalConfig.data) {
-        try {
-          const parsed =
-            typeof originalConfig.data === "string"
-              ? JSON.parse(originalConfig.data)
-              : originalConfig.data;
-          if (parsed && typeof parsed === "object" && "token" in parsed) {
-            parsed.token = newToken;
-            originalConfig.data =
-              typeof originalConfig.data === "string"
-                ? JSON.stringify(parsed)
-                : parsed;
-          }
-        } catch {
-          // ignore — non-JSON body (e.g. FormData)
-        }
-      }
+      replaceTokenInBody(originalConfig, newToken);
       return api.request(originalConfig);
     }
 
@@ -148,23 +150,7 @@ api.interceptors.response.use(
           reject(error);
           return;
         }
-        if (originalConfig.data) {
-          try {
-            const parsed =
-              typeof originalConfig.data === "string"
-                ? JSON.parse(originalConfig.data)
-                : originalConfig.data;
-            if (parsed && typeof parsed === "object" && "token" in parsed) {
-              parsed.token = newToken;
-              originalConfig.data =
-                typeof originalConfig.data === "string"
-                  ? JSON.stringify(parsed)
-                  : parsed;
-            }
-          } catch {
-            // ignore
-          }
-        }
+        replaceTokenInBody(originalConfig, newToken);
         resolve(api.request(originalConfig));
       });
     });
@@ -175,4 +161,11 @@ api.interceptors.response.use(
 export const ftPost = <T = any>(path: string, body: Record<string, any> = {}) => {
   const ft = getFTSession();
   return api.post<T>(path, { ...body, token: ft?.token });
+};
+
+// Helper for multipart uploads. Auto-injects token field into the FormData.
+export const ftUpload = <T = any>(path: string, form: FormData) => {
+  const ft = getFTSession();
+  if (ft?.token && !form.has("token")) form.append("token", ft.token);
+  return api.post<T>(path, form);
 };
