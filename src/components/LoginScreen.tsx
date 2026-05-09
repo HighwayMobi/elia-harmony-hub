@@ -33,6 +33,15 @@ const LoginScreen = () => {
   const [forgotPhone, setForgotPhone] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
 
+  // Set-password dialog (shown when has_password === false)
+  const [setPwdOpen, setSetPwdOpen] = useState(false);
+  const [pendingToken, setPendingToken] = useState<string | null>(null);
+  const [pendingSession, setPendingSession] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [setPwdLoading, setSetPwdLoading] = useState(false);
+
   const formatPhoneDisplay = (digits: string) => {
     const a = digits.slice(0, 3);
     const b = digits.slice(3, 6);
