@@ -23,8 +23,8 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             className={cn(
               "flex flex-col items-center justify-center flex-1 h-full transition-colors",
               activeTab === id
-                ? "text-white"
-                : "text-white/50 hover:text-white/80"
+                ? "text-[#A36BFF]"
+                : "text-[#A36BFF]/50 hover:text-[#A36BFF]/80"
             )}
           >
             <Icon className="w-6 h-6" />
