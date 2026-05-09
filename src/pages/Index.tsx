@@ -341,9 +341,17 @@ const Index = () => {
     );
   }
 
-  // Show app if user is logged in
+  // Show app if user is logged in (Supabase or FactoryTele)
   if (user) {
     return <AppShell user={user} />;
+  }
+  if (ftSession) {
+    const syntheticUser = {
+      id: ftSession.user?.id ?? "ft-user",
+      email: ftSession.email ?? ftSession.user?.email ?? "",
+      phone: ftSession.phone ?? ftSession.user?.phone ?? "",
+    } as unknown as User;
+    return <AppShell user={syntheticUser} />;
   }
 
   return (
