@@ -17,7 +17,13 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getFTSession } from "@/lib/ft-auth";
+import { getFTSession, setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
