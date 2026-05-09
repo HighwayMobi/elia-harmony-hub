@@ -115,14 +115,17 @@ const LoginScreen = () => {
           toast.error(message);
         } else {
           // Edge fn returns { ok, status, data: <upstream body> }
-          // upstream body shape: { success, data: { token, refresh_token, has_password, ... } }
+          // upstream body shape (new): { token, refresh_token, has_password, auth_type, lines, ... }
           const upstreamBody = (data as any).data || {};
-          const inner = upstreamBody.data || upstreamBody;
+          // Backwards compatibility: still accept old data.data nesting
+          const inner = upstreamBody.token ? upstreamBody : (upstreamBody.data || upstreamBody);
           const token =
             inner.token || inner.accessToken || inner.access_token;
           const hasPassword = inner.has_password;
+          const authType = inner.auth_type;
+          const lines: FactoryTeleLine[] = Array.isArray(inner.lines) ? inner.lines : [];
 
-          const sessionPayload = {
+          const sessionPayload: any = {
             token,
             email: method === "email" ? email.trim() : undefined,
             phone: method === "phone" ? `+34${phone}` : undefined,
@@ -137,6 +140,20 @@ const LoginScreen = () => {
             setNewPassword("");
             setNewPasswordConfirm("");
             setSetPwdOpen(true);
+          } else if (authType === "client" && lines.length > 0) {
+            if (lines.length === 1) {
+              setFTSession({
+                ...sessionPayload,
+                line_id: lines[0].id,
+                line: lines[0],
+              });
+              toast.success("¡Bienvenido!");
+            } else {
+              setAvailableLines(lines);
+              setSelectedLineId(String(lines[0].id));
+              setPendingLineSession(sessionPayload);
+              setLineOpen(true);
+            }
           } else {
             setFTSession(sessionPayload);
             toast.success("¡Bienvenido!");
