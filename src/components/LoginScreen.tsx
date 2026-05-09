@@ -79,18 +79,32 @@ const LoginScreen = () => {
           : { phone: `+34${phone}`, password };
 
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword(credentials as any);
-        if (error) {
-          if (error.message === "Invalid login credentials") {
-            toast.error(
-              method === "email"
-                ? "Correo o contraseña incorrectos"
-                : "Móvil o contraseña incorrectos"
-            );
-          } else {
-            toast.error(error.message);
-          }
+        const loginBody =
+          method === "email"
+            ? { email: email.trim(), password }
+            : { phone: `+34${phone}`, password };
+
+        const { data, error } = await supabase.functions.invoke("login", {
+          body: loginBody,
+        });
+
+        if (error || !data?.ok) {
+          const upstream = (data as any)?.data;
+          const message =
+            upstream?.message ||
+            upstream?.error ||
+            error?.message ||
+            "Credenciales incorrectas";
+          toast.error(message);
         } else {
+          const upstream = (data as any).data || {};
+          setFTSession({
+            token: upstream.token || upstream.accessToken || upstream.access_token,
+            email: method === "email" ? email.trim() : undefined,
+            phone: method === "phone" ? `+34${phone}` : undefined,
+            user: upstream.user,
+            raw: upstream,
+          });
           toast.success("¡Bienvenido!");
         }
       } else {
