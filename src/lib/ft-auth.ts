@@ -15,6 +15,7 @@ export type FactoryTeleLine = {
 
 export type FactoryTeleSession = {
   token?: string;
+  refresh_token?: string;
   email?: string;
   phone?: string;
   user?: any;
