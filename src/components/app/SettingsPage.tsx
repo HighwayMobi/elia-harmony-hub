@@ -63,7 +63,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         if (!data?.ok) {
           setProfileError(data?.data?.message ?? "No se pudo cargar el perfil");
         } else {
-          setProfile(data.data as Profile);
+          const payload = (data.data?.data ?? data.data) as Profile;
+          setProfile(payload);
         }
       } catch (e: any) {
         setProfileError(e?.message ?? "Error al cargar el perfil");
