@@ -145,23 +145,10 @@ const HomePage = ({ user }: HomePageProps) => {
     const localPreview = URL.createObjectURL(file);
     setAvatarUrl(localPreview);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const authToken = sessionData.session?.access_token;
       const form = new FormData();
-      form.append("token", token);
       form.append("avatar", file, file.name);
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: authToken ? `Bearer ${authToken}` : "",
-          },
-          body: form,
-        }
-      );
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || !json.ok) {
+      const { data: json } = await ftUpload<any>("upload-avatar", form);
+      if (!json?.ok) {
         throw new Error(json?.data?.message || json?.error || "Error al subir");
       }
       toast({ title: "Avatar actualizado" });
