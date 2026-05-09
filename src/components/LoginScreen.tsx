@@ -489,6 +489,78 @@ const LoginScreen = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Mandatory Set Password Dialog */}
+      <Dialog
+        open={setPwdOpen}
+        onOpenChange={(open) => {
+          // Block closing — user must set a password
+          if (!open) return;
+          setSetPwdOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:hidden"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              Establece una contraseña
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
+              Para continuar, crea una contraseña segura para tu cuenta.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 pt-2">
+            <div className="relative">
+              <Input
+                type={showNewPassword ? "text" : "password"}
+                placeholder="Nueva contraseña"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={setPwdLoading}
+                className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20 pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPassword((v) => !v)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
+              >
+                {showNewPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+
+            <Input
+              type={showNewPassword ? "text" : "password"}
+              placeholder="Confirmar contraseña"
+              value={newPasswordConfirm}
+              onChange={(e) => setNewPasswordConfirm(e.target.value)}
+              disabled={setPwdLoading}
+              className="h-12 bg-white/20 border-white/30 text-white placeholder:text-white/60 rounded-xl focus:border-white/50 focus:ring-white/20"
+            />
+
+            <Button
+              type="button"
+              onClick={handleSetPasswordSubmit}
+              disabled={setPwdLoading}
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+            >
+              {setPwdLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                "ESTABLECER NUEVA CONTRASEÑA"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };
