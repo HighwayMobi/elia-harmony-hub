@@ -167,37 +167,6 @@ const LoginScreen = () => {
       setForgotLoading(false);
     }
   };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) toast.error("Error al iniciar sesión con Google");
-    } catch {
-      toast.error("Ocurrió un error. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAppleLogin = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "apple",
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) toast.error("Error al iniciar sesión con Apple");
-    } catch {
-      toast.error("Ocurrió un error. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0 }}
