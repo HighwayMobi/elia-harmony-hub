@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { getFTSession, onFTSessionChange, FactoryTeleSession } from "@/lib/ft-auth";
 import logo from "@/assets/logo-elia-balance.svg";
 import fogTexture from "@/assets/fog-texture.png";
 import LoginScreen from "@/components/LoginScreen";
