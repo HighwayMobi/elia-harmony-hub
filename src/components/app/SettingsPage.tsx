@@ -157,15 +157,22 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
             <div className="text-white/70 text-sm">{profileError}</div>
           ) : profile ? (
             <div className="space-y-3 text-white/80 text-sm">
-              {(profile.avatar_url || profile.line_avatar_url) && (
-                <div className="flex justify-center mb-2">
-                  <img
-                    src={profile.avatar_url || profile.line_avatar_url}
-                    alt="Avatar"
-                    className="h-20 w-20 rounded-full object-cover ring-2 ring-white/40"
-                  />
-                </div>
-              )}
+              {(() => {
+                const raw = profile.avatar_url || profile.line_avatar_url;
+                if (!raw) return null;
+                const src = /^https?:\/\//i.test(raw)
+                  ? raw
+                  : `https://platform.factorytele.com${raw.startsWith("/") ? "" : "/"}${raw}`;
+                return (
+                  <div className="flex justify-center mb-2">
+                    <img
+                      src={src}
+                      alt="Avatar"
+                      className="h-20 w-20 rounded-full object-cover ring-2 ring-white/40"
+                    />
+                  </div>
+                );
+              })()}
               {fullName && (
                 <div className="flex items-center gap-3">
                   <UserIcon className="w-4 h-4 shrink-0" />
