@@ -25,8 +25,11 @@ interface HomePageProps {
 }
 
 interface ProfileData {
-  name?: string;
+  name: string;
   phone?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   [key: string]: any;
 }
 
