@@ -85,24 +85,10 @@ const HomePage = ({ user }: HomePageProps) => {
   // Cargar perfil desde API FactoryTele
   const loadProfile = async () => {
     const ft = getFTSession();
-    const token = ft?.token;
-    if (!token) return;
+    if (!ft?.token) return;
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const authToken = sessionData.session?.access_token;
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-profile`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authToken ? `Bearer ${authToken}` : "",
-          },
-          body: JSON.stringify({ token }),
-        }
-      );
-      const json = await res.json().catch(() => ({}));
-      if (json.ok && json.data?.data) {
+      const { data: json } = await ftPost<any>("get-profile");
+      if (json?.ok && json.data?.data) {
         const apiProfile = json.data.data;
         const fullName = [apiProfile.first_name, apiProfile.last_name]
           .filter(Boolean)
