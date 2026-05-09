@@ -339,7 +339,7 @@ const Index = () => {
     return (
       <div 
         className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: '#F5E6D3' }}
+        style={{ backgroundColor: '#FFF6E8' }}
       >
         <motion.img
           src={logo}
@@ -368,7 +368,7 @@ const Index = () => {
   return (
     <div 
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ backgroundColor: '#F5E6D3' }}
+      style={{ backgroundColor: '#FFF6E8' }}
     >
       <AnimatePresence mode="wait">
         {!showLogin ? (
