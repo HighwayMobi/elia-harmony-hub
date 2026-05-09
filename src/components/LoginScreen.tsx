@@ -101,15 +101,33 @@ const LoginScreen = () => {
             "Credenciales incorrectas";
           toast.error(message);
         } else {
-          const upstream = (data as any).data || {};
-          setFTSession({
-            token: upstream.token || upstream.accessToken || upstream.access_token,
+          // Edge fn returns { ok, status, data: <upstream body> }
+          // upstream body shape: { success, data: { token, refresh_token, has_password, ... } }
+          const upstreamBody = (data as any).data || {};
+          const inner = upstreamBody.data || upstreamBody;
+          const token =
+            inner.token || inner.accessToken || inner.access_token;
+          const hasPassword = inner.has_password;
+
+          const sessionPayload = {
+            token,
             email: method === "email" ? email.trim() : undefined,
             phone: method === "phone" ? `+34${phone}` : undefined,
-            user: upstream.user,
-            raw: upstream,
-          });
-          toast.success("¡Bienvenido!");
+            user: inner.user,
+            raw: inner,
+          };
+
+          if (hasPassword === false) {
+            // Force user to set a password before entering the app
+            setPendingToken(token);
+            setPendingSession(sessionPayload);
+            setNewPassword("");
+            setNewPasswordConfirm("");
+            setSetPwdOpen(true);
+          } else {
+            setFTSession(sessionPayload);
+            toast.success("¡Bienvenido!");
+          }
         }
       } else {
         const signUpPayload =
