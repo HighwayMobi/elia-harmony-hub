@@ -99,9 +99,21 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error("Error al cerrar sesión");
-    } else {
-      toast.success("Sesión cerrada");
+      return;
     }
+    // Limpiar todo el caché del navegador para volver al splash inicial con gotas
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+      if ("caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch (e) {
+      console.warn("cache clear error", e);
+    }
+    // Recarga completa para garantizar splash limpio
+    window.location.replace("/");
   };
 
   const fullName = profile
