@@ -197,7 +197,7 @@ const HomePage = ({ user }: HomePageProps) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="relative h-14 w-14 rounded-full overflow-hidden bg-[#A36BFF]/20 ring-2 ring-[#A36BFF]/40 flex items-center justify-center group shrink-0"
+              className="relative h-14 w-14 rounded-full overflow-hidden bg-white/40 ring-2 ring-white/60 flex items-center justify-center group shrink-0"
               aria-label="Cambiar avatar"
             >
               {avatarUrl ? (
@@ -206,11 +206,11 @@ const HomePage = ({ user }: HomePageProps) => {
                 <UserRound className="h-7 w-7 text-[#A36BFF]" />
               )}
               <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera className="h-5 w-5 text-[#A36BFF]" />
+                <Camera className="h-5 w-5 text-white" />
               </span>
               {uploading && (
                 <span className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <RefreshCw className="h-5 w-5 text-[#A36BFF] animate-spin" />
+                  <RefreshCw className="h-5 w-5 text-white animate-spin" />
                 </span>
               )}
             </button>
@@ -238,17 +238,17 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
 
           {/* Plan card */}
-          <div className="rounded-2xl bg-[#A36BFF] shadow-lg overflow-hidden">
+          <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/15">
-                  <Signal className="h-4 w-4 text-[#F5E6D3]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
+                  <Signal className="h-4 w-4 text-[#A36BFF]" />
                 </div>
                 <span className="text-base font-semibold text-gray-900">
                   {MOCK.plan}
                 </span>
               </div>
-              <button className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-[#A36BFF]">
+              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#A36BFF]">
                 Cambiar
               </button>
             </div>
@@ -256,16 +256,16 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
               <div>
                 <span className="text-sm text-gray-500">Saldo</span>
-                <span className="ml-2 text-sm font-bold text-[#F5E6D3]">
+                <span className="ml-2 text-sm font-bold text-[#A36BFF]">
                   €{fmt(MOCK.balance)}
                 </span>
                 <br />
                 <span className="text-xs text-gray-500">Cuota mensual</span>
-                <span className="ml-1 text-xs font-semibold text-[#F5E6D3]">
+                <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
                   €{fmt(MOCK.monthlyFee)}
                 </span>
               </div>
-              <button className="rounded-xl bg-[#F5E6D3] px-6 py-2.5 text-sm font-semibold text-[#A36BFF] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#A36BFF] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
                 Recargar
               </button>
             </div>
@@ -276,7 +276,7 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
 
           {/* Data + minutes */}
-          <div className="rounded-2xl bg-[#A36BFF] shadow-lg overflow-hidden">
+          <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wifi className="h-4 w-4 text-gray-500" />
@@ -284,7 +284,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Gb disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#F5E6D3]">
+              <span className="text-sm font-bold text-[#A36BFF]">
                 {MOCK.dataRemaining} Gb de {MOCK.dataTotal} Gb
               </span>
             </div>
@@ -295,17 +295,17 @@ const HomePage = ({ user }: HomePageProps) => {
                   Minutos disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#F5E6D3]">
+              <span className="text-sm font-bold text-[#A36BFF]">
                 {MOCK.minutesLimit ?? "Ilimitados"}
               </span>
             </div>
           </div>
 
           {/* Buy GB */}
-          <button className="w-full rounded-2xl bg-[#A36BFF] shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50">
+          <button className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/15">
-                <Plus className="h-4 w-4 text-[#F5E6D3]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
+                <Plus className="h-4 w-4 text-[#A36BFF]" />
               </div>
               <span className="text-base font-semibold text-gray-900">
                 Comprar Gb
@@ -315,14 +315,14 @@ const HomePage = ({ user }: HomePageProps) => {
           </button>
 
           {/* Finanzas */}
-          <div className="rounded-2xl bg-[#A36BFF] shadow-lg overflow-hidden">
+          <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
             <button
               onClick={() => setFinancesOpen(!financesOpen)}
               className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/15">
-                  <Clock className="h-4 w-4 text-[#F5E6D3]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
+                  <Clock className="h-4 w-4 text-[#A36BFF]" />
                 </div>
                 <span className="text-base font-semibold text-gray-900">
                   Finanzas
@@ -385,13 +385,13 @@ const HomePage = ({ user }: HomePageProps) => {
 
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-gray-900">Cuota del plan</span>
-                    <span className="text-sm font-semibold text-[#F5E6D3]">
+                    <span className="text-sm font-semibold text-[#A36BFF]">
                       - {fmt(MOCK.monthlyFee)}€
                     </span>
                   </div>
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-gray-900">Recarga de saldo</span>
-                    <span className="text-sm font-semibold text-[#F5E6D3]">+ 0.00€</span>
+                    <span className="text-sm font-semibold text-[#A36BFF]">+ 0.00€</span>
                   </div>
 
                   <div className="flex items-stretch bg-[#F5E6D3] text-[#A36BFF]">
