@@ -248,7 +248,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   {MOCK.plan}
                 </span>
               </div>
-              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#A36BFF]">
+              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#F5E6D3]">
                 Cambiar
               </button>
             </div>
@@ -265,7 +265,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   €{fmt(MOCK.monthlyFee)}
                 </span>
               </div>
-              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#A36BFF] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#F5E6D3] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
                 Recargar
               </button>
             </div>
