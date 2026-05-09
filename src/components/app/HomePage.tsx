@@ -196,7 +196,7 @@ const HomePage = ({ user }: HomePageProps) => {
             />
             <div className="min-w-0">
               <h1 className="text-base font-bold text-white tracking-wide truncate">
-                {MOCK.name}
+                {profile?.name || MOCK.name}
               </h1>
               <p className="text-sm text-white/80">{MOCK.phone}</p>
             </div>
