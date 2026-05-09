@@ -85,8 +85,16 @@ const HomePage = ({ user }: HomePageProps) => {
           }
         );
         const json = await res.json().catch(() => ({}));
-        if (json.ok && json.data) {
-          setProfile(json.data);
+        if (json.ok && json.data?.data) {
+          const apiProfile = json.data.data;
+          const fullName = [apiProfile.first_name, apiProfile.last_name]
+            .filter(Boolean)
+            .join(" ") || apiProfile.email || "Usuario";
+          setProfile({
+            name: fullName,
+            phone: apiProfile.phone,
+            ...apiProfile,
+          });
         }
       } catch (e) {
         console.warn("profile load error", e);
