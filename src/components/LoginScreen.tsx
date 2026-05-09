@@ -49,6 +49,12 @@ const LoginScreen = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [setPwdLoading, setSetPwdLoading] = useState(false);
 
+  // Line selection dialog (shown when auth_type === 'client' with multiple lines)
+  const [lineOpen, setLineOpen] = useState(false);
+  const [availableLines, setAvailableLines] = useState<FactoryTeleLine[]>([]);
+  const [selectedLineId, setSelectedLineId] = useState<string>("");
+  const [pendingLineSession, setPendingLineSession] = useState<any>(null);
+
   const formatPhoneDisplay = (digits: string) => {
     const a = digits.slice(0, 3);
     const b = digits.slice(3, 6);
