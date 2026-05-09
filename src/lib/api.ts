@@ -162,3 +162,10 @@ export const ftPost = <T = any>(path: string, body: Record<string, any> = {}) =>
   const ft = getFTSession();
   return api.post<T>(path, { ...body, token: ft?.token });
 };
+
+// Helper for multipart uploads. Auto-injects token field into the FormData.
+export const ftUpload = <T = any>(path: string, form: FormData) => {
+  const ft = getFTSession();
+  if (ft?.token && !form.has("token")) form.append("token", ft.token);
+  return api.post<T>(path, form);
+};
