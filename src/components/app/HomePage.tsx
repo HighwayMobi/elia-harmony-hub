@@ -94,13 +94,19 @@ const HomePage = ({ user }: HomePageProps) => {
           phone: apiProfile.phone,
           ...apiProfile,
         });
-        const url =
+        const raw =
           apiProfile.avatar_url ||
+          apiProfile.line_avatar_url ||
           apiProfile.avatar ||
           apiProfile.photo ||
           apiProfile.image ||
           null;
-        if (url) setAvatarUrl(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`);
+        if (raw) {
+          const absolute = /^https?:\/\//i.test(raw)
+            ? raw
+            : `https://platform.factorytele.com${raw.startsWith("/") ? "" : "/"}${raw}`;
+          setAvatarUrl(`${absolute}${absolute.includes("?") ? "&" : "?"}t=${Date.now()}`);
+        }
       }
     } catch (e) {
       console.warn("profile load error", e);
