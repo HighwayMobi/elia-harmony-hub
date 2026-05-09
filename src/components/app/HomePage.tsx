@@ -42,12 +42,67 @@ const MONTHS_ES = [
 ];
 
 const HomePage = ({ user }: HomePageProps) => {
+  const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [financeMonth, setFinanceMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+
+  // Cargar avatar existente
+  useEffect(() => {
+    const loadAvatar = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase.storage
+          .from("avatars")
+          .list(user.id, { limit: 1, sortBy: { column: "created_at", order: "desc" } });
+        if (error || !data || data.length === 0) return;
+        const { data: pub } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(`${user.id}/${data[0].name}`);
+        setAvatarUrl(`${pub.publicUrl}?t=${Date.now()}`);
+      } catch (e) {
+        console.warn("avatar load error", e);
+      }
+    };
+    loadAvatar();
+  }, [user?.id]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user?.id) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Archivo no válido", description: "Sube una imagen.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Archivo demasiado grande", description: "Máximo 5 MB.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      setAvatarUrl(`${pub.publicUrl}?t=${Date.now()}`);
+      toast({ title: "Avatar actualizado" });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Error al subir", description: err.message, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const handleRefresh = () => {
     setRefreshing(true);
