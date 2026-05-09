@@ -34,6 +34,8 @@ type Profile = {
   contact_person?: string;
   legal_address?: string;
   tax_id?: string;
+  avatar_url?: string;
+  line_avatar_url?: string;
 };
 
 const SettingsPage = ({ user }: SettingsPageProps) => {
