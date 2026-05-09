@@ -55,15 +55,15 @@ const Index = () => {
     };
   }, []);
 
-  // Reset states when user logs out
+  // Reset states when user logs out (covers both Supabase and FactoryTele sessions)
   useEffect(() => {
-    if (!user && !loading) {
+    if (!user && !ftSession && !loading) {
       setRevealed(false);
       setShowLogin(false);
       setCanvasInitialized(false);
       wipedAreaRef.current = new Set();
     }
-  }, [user, loading]);
+  }, [user, ftSession, loading]);
 
   // Initialize fog canvas - only once when not logged in
   useEffect(() => {
