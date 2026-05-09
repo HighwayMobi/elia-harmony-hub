@@ -48,11 +48,20 @@ Deno.serve(async (req) => {
     );
 
     const text = await upstream.text();
-    let data: unknown;
+    const requestId = upstream.headers.get("x-request-id") ?? undefined;
+    console.log("set-password upstream:", upstream.status, "req-id:", requestId, "body:", text);
+
+    let data: any;
     try {
       data = text ? JSON.parse(text) : {};
     } catch {
       data = { raw: text };
+    }
+    if (!upstream.ok && (!data || Object.keys(data).length === 0)) {
+      data = {
+        message: `Upstream error ${upstream.status} (empty body). Request id: ${requestId ?? "n/a"}`,
+        request_id: requestId,
+      };
     }
 
     return new Response(
