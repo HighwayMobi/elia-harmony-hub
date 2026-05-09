@@ -65,67 +65,56 @@ const HomePage = ({ user }: HomePageProps) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
 
   // Cargar perfil desde API FactoryTele
-  useEffect(() => {
-    const loadProfile = async () => {
-      const ft = getFTSession();
-      const token = ft?.token;
-      if (!token) return;
-      try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const authToken = sessionData.session?.access_token;
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-profile`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: authToken ? `Bearer ${authToken}` : "",
-            },
-            body: JSON.stringify({ token }),
-          }
-        );
-        const json = await res.json().catch(() => ({}));
-        if (json.ok && json.data?.data) {
-          const apiProfile = json.data.data;
-          const fullName = [apiProfile.first_name, apiProfile.last_name]
-            .filter(Boolean)
-            .join(" ") || apiProfile.email || "Usuario";
-          setProfile({
-            name: fullName,
-            phone: apiProfile.phone,
-            ...apiProfile,
-          });
+  const loadProfile = async () => {
+    const ft = getFTSession();
+    const token = ft?.token;
+    if (!token) return;
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const authToken = sessionData.session?.access_token;
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-profile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authToken ? `Bearer ${authToken}` : "",
+          },
+          body: JSON.stringify({ token }),
         }
-      } catch (e) {
-        console.warn("profile load error", e);
+      );
+      const json = await res.json().catch(() => ({}));
+      if (json.ok && json.data?.data) {
+        const apiProfile = json.data.data;
+        const fullName = [apiProfile.first_name, apiProfile.last_name]
+          .filter(Boolean)
+          .join(" ") || apiProfile.email || "Usuario";
+        setProfile({
+          name: fullName,
+          phone: apiProfile.phone,
+          ...apiProfile,
+        });
+        const url =
+          apiProfile.avatar_url ||
+          apiProfile.avatar ||
+          apiProfile.photo ||
+          apiProfile.image ||
+          null;
+        if (url) setAvatarUrl(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`);
       }
-    };
-    loadProfile();
-  }, []);
+    } catch (e) {
+      console.warn("profile load error", e);
+    }
+  };
 
-  // Cargar avatar existente
   useEffect(() => {
-    const loadAvatar = async () => {
-      if (!user?.id) return;
-      try {
-        const { data, error } = await supabase.storage
-          .from("avatars")
-          .list(user.id, { limit: 1, sortBy: { column: "created_at", order: "desc" } });
-        if (error || !data || data.length === 0) return;
-        const { data: pub } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(`${user.id}/${data[0].name}`);
-        setAvatarUrl(`${pub.publicUrl}?t=${Date.now()}`);
-      } catch (e) {
-        console.warn("avatar load error", e);
-      }
-    };
-    loadAvatar();
-  }, [user?.id]);
+    loadProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user?.id) return;
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast({ title: "Archivo no válido", description: "Sube una imagen.", variant: "destructive" });
       return;
@@ -134,17 +123,38 @@ const HomePage = ({ user }: HomePageProps) => {
       toast({ title: "Archivo demasiado grande", description: "Máximo 5 MB.", variant: "destructive" });
       return;
     }
+    const ft = getFTSession();
+    const token = ft?.token;
+    if (!token) {
+      toast({ title: "Sesión expirada", description: "Inicia sesión de nuevo.", variant: "destructive" });
+      return;
+    }
     setUploading(true);
+    // Vista previa local inmediata
+    const localPreview = URL.createObjectURL(file);
+    setAvatarUrl(localPreview);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage
-        .from("avatars")
-        .upload(path, file, { upsert: true, contentType: file.type });
-      if (error) throw error;
-      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
-      setAvatarUrl(`${pub.publicUrl}?t=${Date.now()}`);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const authToken = sessionData.session?.access_token;
+      const form = new FormData();
+      form.append("token", token);
+      form.append("avatar", file, file.name);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upload-avatar`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: authToken ? `Bearer ${authToken}` : "",
+          },
+          body: form,
+        }
+      );
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        throw new Error(json?.data?.message || json?.error || "Error al subir");
+      }
       toast({ title: "Avatar actualizado" });
+      await loadProfile();
     } catch (err: any) {
       console.error(err);
       toast({ title: "Error al subir", description: err.message, variant: "destructive" });
