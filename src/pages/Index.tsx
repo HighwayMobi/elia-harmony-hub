@@ -22,6 +22,7 @@ const Index = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [ftSession, setFtSession] = useState<FactoryTeleSession | null>(getFTSession());
   const [loading, setLoading] = useState(true);
   const [canvasInitialized, setCanvasInitialized] = useState(false);
   const wipedAreaRef = useRef<Set<string>>(new Set());
@@ -45,7 +46,13 @@ const Index = () => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // FactoryTele session listener
+    const offFT = onFTSessionChange(() => setFtSession(getFTSession()));
+
+    return () => {
+      subscription.unsubscribe();
+      offFT();
+    };
   }, []);
 
   // Reset states when user logs out
