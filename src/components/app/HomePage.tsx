@@ -127,8 +127,36 @@ const HomePage = ({ user }: HomePageProps) => {
         <div className="w-full max-w-md mx-auto space-y-4">
           {/* User row */}
           <div className="flex items-center gap-3 px-1 mb-1">
-            <div>
-              <h1 className="text-base font-bold text-white tracking-wide">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="relative h-14 w-14 rounded-full overflow-hidden bg-white/20 ring-2 ring-white/40 flex items-center justify-center group shrink-0"
+              aria-label="Cambiar avatar"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+              ) : (
+                <UserRound className="h-7 w-7 text-white" />
+              )}
+              <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Camera className="h-5 w-5 text-white" />
+              </span>
+              {uploading && (
+                <span className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <RefreshCw className="h-5 w-5 text-white animate-spin" />
+                </span>
+              )}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+            <div className="min-w-0">
+              <h1 className="text-base font-bold text-white tracking-wide truncate">
                 {MOCK.name}
               </h1>
               <p className="text-sm text-white/80">{MOCK.phone}</p>
