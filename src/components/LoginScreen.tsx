@@ -307,7 +307,7 @@ const LoginScreen = () => {
             onClick={() => setMethod("email")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "email"
-                ? "bg-white/90 text-[#A799B7]"
+                ? "bg-white/90 text-[#A36BFF]"
                 : "text-white/80 hover:text-white"
             }`}
           >
@@ -319,7 +319,7 @@ const LoginScreen = () => {
             onClick={() => setMethod("phone")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "phone"
-                ? "bg-white/90 text-[#A799B7]"
+                ? "bg-white/90 text-[#A36BFF]"
                 : "text-white/80 hover:text-white"
             }`}
           >
@@ -399,7 +399,7 @@ const LoginScreen = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A36BFF] font-medium rounded-xl transition-all disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -431,7 +431,7 @@ const LoginScreen = () => {
 
       {/* Forgot Password Dialog */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-        <DialogContent className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:text-white/70 [&>button]:hover:text-white">
+        <DialogContent className="sm:max-w-md border-0 rounded-3xl bg-[#A36BFF] text-white shadow-2xl [&>button]:text-white/70 [&>button]:hover:text-white">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">
               Recuperar contraseña
@@ -450,7 +450,7 @@ const LoginScreen = () => {
                 onClick={() => setForgotTab("email")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "email"
-                    ? "bg-white/90 text-[#A799B7] shadow-sm"
+                    ? "bg-white/90 text-[#A36BFF] shadow-sm"
                     : "text-white/80 hover:text-white"
                 }`}
               >
@@ -462,7 +462,7 @@ const LoginScreen = () => {
                 onClick={() => setForgotTab("phone")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "phone"
-                    ? "bg-white/90 text-[#A799B7] shadow-sm"
+                    ? "bg-white/90 text-[#A36BFF] shadow-sm"
                     : "text-white/80 hover:text-white"
                 }`}
               >
@@ -513,7 +513,7 @@ const LoginScreen = () => {
               type="button"
               onClick={handleForgotSubmit}
               disabled={forgotLoading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A36BFF] font-medium rounded-xl transition-all disabled:opacity-50"
             >
               {forgotLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -535,7 +535,7 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-3xl bg-[#A36BFF] text-white shadow-2xl [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
@@ -585,7 +585,7 @@ const LoginScreen = () => {
               type="button"
               onClick={handleSetPasswordSubmit}
               disabled={setPwdLoading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A36BFF] font-medium rounded-xl transition-all disabled:opacity-50"
             >
               {setPwdLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -606,7 +606,7 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-3xl bg-[#A36BFF] text-white shadow-2xl [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
@@ -652,7 +652,7 @@ const LoginScreen = () => {
                 setLineOpen(false);
                 toast.success("¡Bienvenido!");
               }}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all"
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A36BFF] font-medium rounded-xl transition-all"
             >
               CONTINUAR
             </Button>

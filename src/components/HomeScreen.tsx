@@ -23,7 +23,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
   return (
     <div 
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: '#A799B7' }}
+      style={{ backgroundColor: '#A36BFF' }}
     >
       {/* Header */}
       <motion.header

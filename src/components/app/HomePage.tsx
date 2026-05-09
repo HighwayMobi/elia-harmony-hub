@@ -241,14 +241,14 @@ const HomePage = ({ user }: HomePageProps) => {
           <div className="rounded-2xl bg-[#F5E6D3] shadow-lg overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/15">
-                  <Signal className="h-4 w-4 text-[#A799B7]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/15">
+                  <Signal className="h-4 w-4 text-[#A36BFF]" />
                 </div>
                 <span className="text-base font-semibold text-gray-900">
                   {MOCK.plan}
                 </span>
               </div>
-              <button className="rounded-xl border border-[#A799B7] px-5 py-2 text-sm font-semibold text-[#A799B7] transition-all hover:bg-[#A799B7] hover:text-[#F5E6D3]">
+              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#F5E6D3]">
                 Cambiar
               </button>
             </div>
@@ -256,21 +256,21 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
               <div>
                 <span className="text-sm text-gray-500">Saldo</span>
-                <span className="ml-2 text-sm font-bold text-[#A799B7]">
+                <span className="ml-2 text-sm font-bold text-[#A36BFF]">
                   €{fmt(MOCK.balance)}
                 </span>
                 <br />
                 <span className="text-xs text-gray-500">Cuota mensual</span>
-                <span className="ml-1 text-xs font-semibold text-[#A799B7]">
+                <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
                   €{fmt(MOCK.monthlyFee)}
                 </span>
               </div>
-              <button className="rounded-xl bg-[#A799B7] px-6 py-2.5 text-sm font-semibold text-[#F5E6D3] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#F5E6D3] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
                 Recargar
               </button>
             </div>
 
-            <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3]">
+            <div className="bg-[#A36BFF] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3]">
               Cuota mensual €{fmt(MOCK.monthlyFee)} del plan actual se cobrará el {MOCK.feeDate}
             </div>
           </div>
@@ -284,7 +284,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Gb disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#A799B7]">
+              <span className="text-sm font-bold text-[#A36BFF]">
                 {MOCK.dataRemaining} Gb de {MOCK.dataTotal} Gb
               </span>
             </div>
@@ -295,7 +295,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Minutos disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#A799B7]">
+              <span className="text-sm font-bold text-[#A36BFF]">
                 {MOCK.minutesLimit ?? "Ilimitados"}
               </span>
             </div>
@@ -304,8 +304,8 @@ const HomePage = ({ user }: HomePageProps) => {
           {/* Buy GB */}
           <button className="w-full rounded-2xl bg-[#F5E6D3] shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/15">
-                <Plus className="h-4 w-4 text-[#A799B7]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/15">
+                <Plus className="h-4 w-4 text-[#A36BFF]" />
               </div>
               <span className="text-base font-semibold text-gray-900">
                 Comprar Gb
@@ -321,8 +321,8 @@ const HomePage = ({ user }: HomePageProps) => {
               className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/15">
-                  <Clock className="h-4 w-4 text-[#A799B7]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/15">
+                  <Clock className="h-4 w-4 text-[#A36BFF]" />
                 </div>
                 <span className="text-base font-semibold text-gray-900">
                   Finanzas
@@ -385,16 +385,16 @@ const HomePage = ({ user }: HomePageProps) => {
 
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-gray-900">Cuota del plan</span>
-                    <span className="text-sm font-semibold text-[#A799B7]">
+                    <span className="text-sm font-semibold text-[#A36BFF]">
                       - {fmt(MOCK.monthlyFee)}€
                     </span>
                   </div>
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-gray-900">Recarga de saldo</span>
-                    <span className="text-sm font-semibold text-[#A799B7]">+ 0.00€</span>
+                    <span className="text-sm font-semibold text-[#A36BFF]">+ 0.00€</span>
                   </div>
 
-                  <div className="flex items-stretch bg-[#A799B7] text-[#F5E6D3]">
+                  <div className="flex items-stretch bg-[#A36BFF] text-[#F5E6D3]">
                     <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                       <span className="text-xs font-medium opacity-90">Gastado</span>
                       <span className="text-lg font-bold">{fmt(MOCK.monthlyFee)}€</span>
