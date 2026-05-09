@@ -30,11 +30,21 @@ const Index = () => {
 
   // Check auth state
   useEffect(() => {
+    const resetSplash = () => {
+      setRevealed(false);
+      setShowLogin(false);
+      setCanvasInitialized(false);
+      wipedAreaRef.current = new Set();
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, newSession) => {
+        if (event === "SIGNED_OUT") {
+          resetSplash();
+        }
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
         setLoading(false);
       }
     );
@@ -47,23 +57,19 @@ const Index = () => {
     });
 
     // FactoryTele session listener
-    const offFT = onFTSessionChange(() => setFtSession(getFTSession()));
+    const offFT = onFTSessionChange(() => {
+      const next = getFTSession();
+      if (!next) {
+        resetSplash();
+      }
+      setFtSession(next);
+    });
 
     return () => {
       subscription.unsubscribe();
       offFT();
     };
   }, []);
-
-  // Reset states when user logs out (covers both Supabase and FactoryTele sessions)
-  useEffect(() => {
-    if (!user && !ftSession && !loading) {
-      setRevealed(false);
-      setShowLogin(false);
-      setCanvasInitialized(false);
-      wipedAreaRef.current = new Set();
-    }
-  }, [user, ftSession, loading]);
 
   // Initialize fog canvas - only once when not logged in
   useEffect(() => {
