@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({ ok: upstream.ok, status: upstream.status, data }),
       {
-        status: upstream.ok ? 200 : upstream.status,
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
