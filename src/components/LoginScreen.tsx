@@ -132,6 +132,7 @@ const LoginScreen = () => {
 
           const sessionPayload: any = {
             token,
+            refresh_token: inner.refresh_token,
             email: method === "email" ? email.trim() : undefined,
             phone: method === "phone" ? `+34${phone}` : undefined,
             user: inner.user,
