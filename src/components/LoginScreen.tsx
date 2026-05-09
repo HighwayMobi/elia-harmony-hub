@@ -591,6 +591,69 @@ const LoginScreen = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Line selection Dialog */}
+      <Dialog
+        open={lineOpen}
+        onOpenChange={(open) => {
+          if (!open) return;
+          setLineOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:hidden"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              Selecciona una línea
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
+              Tu cuenta tiene varias líneas asociadas. Elige con cuál continuar.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 pt-2">
+            <Select value={selectedLineId} onValueChange={setSelectedLineId}>
+              <SelectTrigger className="h-12 bg-white/20 border-white/30 text-white rounded-xl">
+                <SelectValue placeholder="Selecciona una línea" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableLines.map((l) => (
+                  <SelectItem key={String(l.id)} value={String(l.id)}>
+                    {l.name || l.phone || l.number || `Línea ${l.id}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              type="button"
+              onClick={() => {
+                const line = availableLines.find(
+                  (l) => String(l.id) === selectedLineId
+                );
+                if (!line || !pendingLineSession) {
+                  toast.error("Selecciona una línea válida");
+                  return;
+                }
+                setFTSession({
+                  ...pendingLineSession,
+                  line_id: line.id,
+                  line,
+                });
+                setLineOpen(false);
+                toast.success("¡Bienvenido!");
+              }}
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all"
+            >
+              CONTINUAR
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };
