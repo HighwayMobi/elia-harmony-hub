@@ -98,6 +98,11 @@ const Index = () => {
       canvas.width = w;
       canvas.height = h;
 
+      // Reset composite mode (may be left as "destination-out" after a previous wipe)
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 1.0;
+      ctx.clearRect(0, 0, w, h);
+
       // First fill with purple frosted glass base
       ctx.fillStyle = 'rgba(167, 153, 183, 0.92)';
       ctx.fillRect(0, 0, w, h);
