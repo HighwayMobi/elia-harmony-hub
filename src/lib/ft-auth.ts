@@ -4,11 +4,19 @@
 const KEY = "factorytele_session";
 const EVENT = "factorytele-auth-change";
 
+export type FactoryTeleLine = {
+  id: string | number;
+  name?: string;
+  [key: string]: any;
+};
+
 export type FactoryTeleSession = {
   token?: string;
   email?: string;
   phone?: string;
   user?: any;
+  line_id?: string | number;
+  line?: FactoryTeleLine;
   raw?: any;
 };
 
