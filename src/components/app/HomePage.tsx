@@ -115,7 +115,7 @@ const HomePage = ({ user }: HomePageProps) => {
     <div className="flex-1 flex flex-col">
       {/* Header con logo */}
       <header className="px-6 py-4 flex items-center justify-center">
-        <img src={logo} alt="Elia Balance" className="w-20 h-auto opacity-90" />
+        <img src={logo} alt="Elia Balance" className="w-28 h-auto opacity-90" />
       </header>
 
       <motion.main
