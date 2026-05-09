@@ -73,11 +73,6 @@ const LoginScreen = () => {
 
     setLoading(true);
     try {
-      const credentials =
-        method === "email"
-          ? { email: email.trim(), password }
-          : { phone: `+34${phone}`, password };
-
       if (isLogin) {
         const loginBody =
           method === "email"
