@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Pointer, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
+import { getFTSession, onFTSessionChange, FactoryTeleSession } from "@/lib/ft-auth";
 import logo from "@/assets/logo-elia-balance.svg";
 import fogTexture from "@/assets/fog-texture.png";
 import LoginScreen from "@/components/LoginScreen";
@@ -21,6 +22,7 @@ const Index = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [ftSession, setFtSession] = useState<FactoryTeleSession | null>(getFTSession());
   const [loading, setLoading] = useState(true);
   const [canvasInitialized, setCanvasInitialized] = useState(false);
   const wipedAreaRef = useRef<Set<string>>(new Set());
@@ -44,7 +46,13 @@ const Index = () => {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // FactoryTele session listener
+    const offFT = onFTSessionChange(() => setFtSession(getFTSession()));
+
+    return () => {
+      subscription.unsubscribe();
+      offFT();
+    };
   }, []);
 
   // Reset states when user logs out
@@ -333,9 +341,17 @@ const Index = () => {
     );
   }
 
-  // Show app if user is logged in
+  // Show app if user is logged in (Supabase or FactoryTele)
   if (user) {
     return <AppShell user={user} />;
+  }
+  if (ftSession) {
+    const syntheticUser = {
+      id: ftSession.user?.id ?? "ft-user",
+      email: ftSession.email ?? ftSession.user?.email ?? "",
+      phone: ftSession.phone ?? ftSession.user?.phone ?? "",
+    } as unknown as User;
+    return <AppShell user={syntheticUser} />;
   }
 
   return (
