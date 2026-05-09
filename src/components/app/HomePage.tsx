@@ -32,7 +32,7 @@ interface ProfileData {
 
 // Mock data — se reemplazará con datos reales de la API
 const MOCK = {
-  name: "John Ivanov",
+  name: "NOMBRE APELLIDO",
   phone: "+34 681999090",
   plan: "EURO 12 Gb",
   balance: 115.0,
