@@ -86,6 +86,15 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   };
 
   const handleLogout = async () => {
+    const ft = getFTSession();
+    const token = ft?.token;
+    try {
+      if (token) {
+        await supabase.functions.invoke("logout", { body: { token } });
+      }
+    } catch (e) {
+      console.warn("logout api error", e);
+    }
     clearFTSession();
     const { error } = await supabase.auth.signOut();
     if (error) {
