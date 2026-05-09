@@ -17,10 +17,17 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getFTSession } from "@/lib/ft-auth";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
   user: User;
+}
+
+interface ProfileData {
+  name?: string;
+  phone?: string;
+  [key: string]: any;
 }
 
 // Mock data — se reemplazará con datos reales de la API
