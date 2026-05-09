@@ -219,7 +219,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <h1 className="text-base font-bold text-white tracking-wide truncate">
                 {profile?.name || MOCK.name}
               </h1>
-              <p className="text-sm text-white/80">{MOCK.phone}</p>
+              <p className="text-sm text-white/80">{profile?.phone || MOCK.phone}</p>
             </div>
             <button
               onClick={handleRefresh}
