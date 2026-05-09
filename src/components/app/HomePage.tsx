@@ -242,7 +242,9 @@ const HomePage = ({ user }: HomePageProps) => {
                 </DropdownMenu>
               ) : (
                 <p className="text-sm text-[#A36BFF]/80">
-                  {currentLine?.msisdn ? `+34 ${currentLine.msisdn}` : profile?.phone || MOCK.phone}
+                  {currentLine?.msisdn
+                    ? `+34 ${currentLine.msisdn}`
+                    : getFTSession()?.phone || MOCK.phone}
                 </p>
               )}
             </div>
