@@ -16,8 +16,7 @@ api.interceptors.request.use(async (config) => {
   const { data } = await supabase.auth.getSession();
   const authToken = data.session?.access_token;
   if (authToken) {
-    config.headers = config.headers ?? {};
-    (config.headers as any).Authorization = `Bearer ${authToken}`;
+    config.headers.set("Authorization", `Bearer ${authToken}`);
   }
   return config;
 });
