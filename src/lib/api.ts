@@ -82,6 +82,25 @@ const is401 = (error: AxiosError): boolean => {
   return false;
 };
 
+// Replace `token` field on a request body, supporting JSON, JSON-string, and FormData.
+const replaceTokenInBody = (config: AxiosRequestConfig, newToken: string) => {
+  const data = config.data;
+  if (!data) return;
+  if (typeof FormData !== "undefined" && data instanceof FormData) {
+    if (data.has("token")) data.set("token", newToken);
+    return;
+  }
+  try {
+    const parsed = typeof data === "string" ? JSON.parse(data) : data;
+    if (parsed && typeof parsed === "object" && "token" in parsed) {
+      parsed.token = newToken;
+      config.data = typeof data === "string" ? JSON.stringify(parsed) : parsed;
+    }
+  } catch {
+    // ignore non-JSON
+  }
+};
+
 api.interceptors.response.use(
   // Also flag a successful HTTP 200 from edge fn that contains an inner 401
   (response) => {
