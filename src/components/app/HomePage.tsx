@@ -146,11 +146,6 @@ const HomePage = ({ user }: HomePageProps) => {
                 {MOCK.minutesLimit ?? "Ilimitados"}
               </span>
             </div>
-            <div className="border-t border-gray-100 px-5 py-3">
-              <button className="text-sm font-medium text-[#A799B7] hover:underline">
-                Países de cobertura
-              </button>
-            </div>
           </div>
 
           {/* Buy GB */}
