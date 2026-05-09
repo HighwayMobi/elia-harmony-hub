@@ -14,7 +14,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#F5E6D3] backdrop-blur-sm safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#FFF6E8] backdrop-blur-sm safe-area-bottom">
       <div className="flex items-center justify-around h-16 max-w-md mx-auto">
         {tabs.map(({ id, icon: Icon, label }) => (
           <button

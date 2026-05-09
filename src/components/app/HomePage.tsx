@@ -244,11 +244,11 @@ const HomePage = ({ user }: HomePageProps) => {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
                   <Signal className="h-4 w-4 text-[#A36BFF]" />
                 </div>
-                <span className="text-base font-semibold text-gray-900">
+                <span className="text-base font-semibold text-[#2F2A33]">
                   {MOCK.plan}
                 </span>
               </div>
-              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#F5E6D3]">
+              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">
                 Cambiar
               </button>
             </div>
@@ -265,12 +265,12 @@ const HomePage = ({ user }: HomePageProps) => {
                   €{fmt(MOCK.monthlyFee)}
                 </span>
               </div>
-              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#F5E6D3] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
                 Recargar
               </button>
             </div>
 
-            <div className="bg-[#F5E6D3] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
+            <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
               Cuota mensual €{fmt(MOCK.monthlyFee)} del plan actual se cobrará el {MOCK.feeDate}
             </div>
           </div>
@@ -280,7 +280,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wifi className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-[#2F2A33]">
                   Gb disponibles
                 </span>
               </div>
@@ -291,7 +291,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PhoneIcon className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-[#2F2A33]">
                   Minutos disponibles
                 </span>
               </div>
@@ -307,7 +307,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
                 <Plus className="h-4 w-4 text-[#A36BFF]" />
               </div>
-              <span className="text-base font-semibold text-gray-900">
+              <span className="text-base font-semibold text-[#2F2A33]">
                 Comprar Gb
               </span>
             </div>
@@ -324,7 +324,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
                   <Clock className="h-4 w-4 text-[#A36BFF]" />
                 </div>
-                <span className="text-base font-semibold text-gray-900">
+                <span className="text-base font-semibold text-[#2F2A33]">
                   Finanzas
                 </span>
               </div>
@@ -357,7 +357,7 @@ const HomePage = ({ user }: HomePageProps) => {
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm font-semibold text-[#2F2A33]">
                       {MONTHS_ES[financeMonth.month]} {financeMonth.year}
                     </span>
                     <button
@@ -384,17 +384,17 @@ const HomePage = ({ user }: HomePageProps) => {
                   </div>
 
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-gray-900">Cuota del plan</span>
+                    <span className="text-sm text-[#2F2A33]">Cuota del plan</span>
                     <span className="text-sm font-semibold text-[#A36BFF]">
                       - {fmt(MOCK.monthlyFee)}€
                     </span>
                   </div>
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-gray-900">Recarga de saldo</span>
+                    <span className="text-sm text-[#2F2A33]">Recarga de saldo</span>
                     <span className="text-sm font-semibold text-[#A36BFF]">+ 0.00€</span>
                   </div>
 
-                  <div className="flex items-stretch bg-[#F5E6D3] text-[#A36BFF]">
+                  <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
                     <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                       <span className="text-xs font-medium opacity-90">Gastado</span>
                       <span className="text-lg font-bold">{fmt(MOCK.monthlyFee)}€</span>
