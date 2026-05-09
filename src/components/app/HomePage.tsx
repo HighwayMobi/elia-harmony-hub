@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import {
@@ -11,8 +11,12 @@ import {
   ChevronDown,
   ChevronLeft,
   RefreshCw,
+  UserRound,
+  Camera,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
