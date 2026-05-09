@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getFTSession, setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import { ftPost, ftUpload } from "@/lib/api";
 import {
   DropdownMenu,
   DropdownMenuContent,
