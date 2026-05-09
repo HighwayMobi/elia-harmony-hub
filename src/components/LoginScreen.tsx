@@ -107,11 +107,16 @@ const LoginScreen = () => {
 
         if (error || !data?.ok) {
           const upstream = (data as any)?.data;
-          const message =
-            upstream?.message ||
-            upstream?.error ||
-            error?.message ||
-            "Credenciales incorrectas";
+          const status = (data as any)?.status;
+          const rawMsg = (upstream?.message || upstream?.error || "").toString().toLowerCase();
+          const isInvalidCreds =
+            status === 401 ||
+            rawMsg.includes("invalid credentials") ||
+            rawMsg.includes("invalid") ||
+            rawMsg.includes("incorrect");
+          const message = isInvalidCreds
+            ? "Usuario o contraseña incorrectos"
+            : upstream?.message || upstream?.error || error?.message || "Credenciales incorrectas";
           toast.error(message);
         } else {
           // Edge fn returns { ok, status, data: <upstream body> }
