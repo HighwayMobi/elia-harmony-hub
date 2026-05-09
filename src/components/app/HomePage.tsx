@@ -17,7 +17,13 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getFTSession } from "@/lib/ft-auth";
+import { getFTSession, setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
@@ -63,6 +69,18 @@ const HomePage = ({ user }: HomePageProps) => {
     return { year: now.getFullYear(), month: now.getMonth() };
   });
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [lines, setLines] = useState<FactoryTeleLine[]>(() => getFTSession()?.lines || []);
+  const [currentLine, setCurrentLine] = useState<FactoryTeleLine | null>(() => getFTSession()?.line || null);
+
+  const switchLine = (line: FactoryTeleLine) => {
+    if (!line || line.id === currentLine?.id) return;
+    const ft = getFTSession();
+    if (!ft) return;
+    setFTSession({ ...ft, line_id: line.id, line });
+    setCurrentLine(line);
+    // Reload data for the new line
+    loadProfile();
+  };
 
   // Cargar perfil desde API FactoryTele
   const loadProfile = async () => {
@@ -225,7 +243,34 @@ const HomePage = ({ user }: HomePageProps) => {
               <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
                 {profile?.name || MOCK.name}
               </h1>
-              <p className="text-sm text-[#A36BFF]/80">{profile?.phone || MOCK.phone}</p>
+              {lines.length > 1 ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-[#A36BFF]/90 outline-none transition-opacity hover:opacity-80">
+                    <span>+34 {currentLine?.msisdn || ""}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="min-w-[220px]">
+                    {lines.map((l) => (
+                      <DropdownMenuItem
+                        key={String(l.id)}
+                        onClick={() => switchLine(l)}
+                        className={l.id === currentLine?.id ? "font-semibold text-[#A36BFF]" : ""}
+                      >
+                        <div className="flex flex-col">
+                          <span>+34 {l.msisdn}</span>
+                          {l.tariff_plan && (
+                            <span className="text-xs text-muted-foreground">{l.tariff_plan}</span>
+                          )}
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <p className="text-sm text-[#A36BFF]/80">
+                  {currentLine?.msisdn ? `+34 ${currentLine.msisdn}` : profile?.phone || MOCK.phone}
+                </p>
+              )}
             </div>
             <button
               onClick={handleRefresh}
@@ -245,7 +290,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <Signal className="h-4 w-4 text-[#A36BFF]" />
                 </div>
                 <span className="text-base font-semibold text-[#2F2A33]">
-                  {MOCK.plan}
+                  {currentLine?.tariff_plan || MOCK.plan}
                 </span>
               </div>
               <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">

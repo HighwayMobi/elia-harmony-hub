@@ -7,6 +7,9 @@ const EVENT = "factorytele-auth-change";
 export type FactoryTeleLine = {
   id: string | number;
   name?: string;
+  msisdn?: string;
+  status?: string;
+  tariff_plan?: string;
   [key: string]: any;
 };
 
@@ -17,6 +20,7 @@ export type FactoryTeleSession = {
   user?: any;
   line_id?: string | number;
   line?: FactoryTeleLine;
+  lines?: FactoryTeleLine[];
   raw?: any;
 };
 

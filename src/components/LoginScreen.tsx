@@ -151,12 +151,13 @@ const LoginScreen = () => {
                 ...sessionPayload,
                 line_id: lines[0].id,
                 line: lines[0],
+                lines,
               });
               toast.success("¡Bienvenido!");
             } else {
               setAvailableLines(lines);
               setSelectedLineId(String(lines[0].id));
-              setPendingLineSession(sessionPayload);
+              setPendingLineSession({ ...sessionPayload, lines });
               setLineOpen(true);
             }
           } else {
@@ -628,7 +629,8 @@ const LoginScreen = () => {
               <SelectContent>
                 {availableLines.map((l) => (
                   <SelectItem key={String(l.id)} value={String(l.id)}>
-                    {l.name || l.phone || l.number || `Línea ${l.id}`}
+                    {l.msisdn ? `+34 ${l.msisdn}` : l.name || `Línea ${l.id}`}
+                    {l.tariff_plan ? ` — ${l.tariff_plan}` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
