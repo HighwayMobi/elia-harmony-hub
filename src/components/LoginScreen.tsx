@@ -11,7 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff, Loader2, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { setFTSession } from "@/lib/ft-auth";
+import { setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import logo from "@/assets/logo-elia-balance.svg";
 
@@ -41,6 +48,12 @@ const LoginScreen = () => {
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [setPwdLoading, setSetPwdLoading] = useState(false);
+
+  // Line selection dialog (shown when auth_type === 'client' with multiple lines)
+  const [lineOpen, setLineOpen] = useState(false);
+  const [availableLines, setAvailableLines] = useState<FactoryTeleLine[]>([]);
+  const [selectedLineId, setSelectedLineId] = useState<string>("");
+  const [pendingLineSession, setPendingLineSession] = useState<any>(null);
 
   const formatPhoneDisplay = (digits: string) => {
     const a = digits.slice(0, 3);
@@ -102,14 +115,17 @@ const LoginScreen = () => {
           toast.error(message);
         } else {
           // Edge fn returns { ok, status, data: <upstream body> }
-          // upstream body shape: { success, data: { token, refresh_token, has_password, ... } }
+          // upstream body shape (new): { token, refresh_token, has_password, auth_type, lines, ... }
           const upstreamBody = (data as any).data || {};
-          const inner = upstreamBody.data || upstreamBody;
+          // Backwards compatibility: still accept old data.data nesting
+          const inner = upstreamBody.token ? upstreamBody : (upstreamBody.data || upstreamBody);
           const token =
             inner.token || inner.accessToken || inner.access_token;
           const hasPassword = inner.has_password;
+          const authType = inner.auth_type;
+          const lines: FactoryTeleLine[] = Array.isArray(inner.lines) ? inner.lines : [];
 
-          const sessionPayload = {
+          const sessionPayload: any = {
             token,
             email: method === "email" ? email.trim() : undefined,
             phone: method === "phone" ? `+34${phone}` : undefined,
@@ -124,6 +140,20 @@ const LoginScreen = () => {
             setNewPassword("");
             setNewPasswordConfirm("");
             setSetPwdOpen(true);
+          } else if (authType === "client" && lines.length > 0) {
+            if (lines.length === 1) {
+              setFTSession({
+                ...sessionPayload,
+                line_id: lines[0].id,
+                line: lines[0],
+              });
+              toast.success("¡Bienvenido!");
+            } else {
+              setAvailableLines(lines);
+              setSelectedLineId(String(lines[0].id));
+              setPendingLineSession(sessionPayload);
+              setLineOpen(true);
+            }
           } else {
             setFTSession(sessionPayload);
             toast.success("¡Bienvenido!");
@@ -557,6 +587,69 @@ const LoginScreen = () => {
               ) : (
                 "ESTABLECER NUEVA CONTRASEÑA"
               )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Line selection Dialog */}
+      <Dialog
+        open={lineOpen}
+        onOpenChange={(open) => {
+          if (!open) return;
+          setLineOpen(open);
+        }}
+      >
+        <DialogContent
+          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-white shadow-2xl [&>button]:hidden"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              Selecciona una línea
+            </DialogTitle>
+            <DialogDescription className="text-white/70">
+              Tu cuenta tiene varias líneas asociadas. Elige con cuál continuar.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3 pt-2">
+            <Select value={selectedLineId} onValueChange={setSelectedLineId}>
+              <SelectTrigger className="h-12 bg-white/20 border-white/30 text-white rounded-xl">
+                <SelectValue placeholder="Selecciona una línea" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableLines.map((l) => (
+                  <SelectItem key={String(l.id)} value={String(l.id)}>
+                    {l.name || l.phone || l.number || `Línea ${l.id}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              type="button"
+              onClick={() => {
+                const line = availableLines.find(
+                  (l) => String(l.id) === selectedLineId
+                );
+                if (!line || !pendingLineSession) {
+                  toast.error("Selecciona una línea válida");
+                  return;
+                }
+                setFTSession({
+                  ...pendingLineSession,
+                  line_id: line.id,
+                  line,
+                });
+                setLineOpen(false);
+                toast.success("¡Bienvenido!");
+              }}
+              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all"
+            >
+              CONTINUAR
             </Button>
           </div>
         </DialogContent>
