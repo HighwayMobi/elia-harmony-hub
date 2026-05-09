@@ -131,23 +131,7 @@ api.interceptors.response.use(
           reject(error);
           return;
         }
-        if (originalConfig.data) {
-          try {
-            const parsed =
-              typeof originalConfig.data === "string"
-                ? JSON.parse(originalConfig.data)
-                : originalConfig.data;
-            if (parsed && typeof parsed === "object" && "token" in parsed) {
-              parsed.token = newToken;
-              originalConfig.data =
-                typeof originalConfig.data === "string"
-                  ? JSON.stringify(parsed)
-                  : parsed;
-            }
-          } catch {
-            // ignore
-          }
-        }
+        replaceTokenInBody(originalConfig, newToken);
         resolve(api.request(originalConfig));
       });
     });
