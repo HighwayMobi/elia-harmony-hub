@@ -17,7 +17,7 @@ const AppShell = ({ user }: AppShellProps) => {
   return (
     <div
       className="relative min-h-screen flex flex-col"
-      style={{ backgroundColor: '#A799B7' }}
+      style={{ backgroundColor: '#A36BFF' }}
     >
       {/* Noise overlay */}
       <div
