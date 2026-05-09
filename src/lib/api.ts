@@ -119,24 +119,7 @@ api.interceptors.response.use(
         redirectToLogin();
         return Promise.reject(error);
       }
-      // Replace the token in body if present
-      if (originalConfig.data) {
-        try {
-          const parsed =
-            typeof originalConfig.data === "string"
-              ? JSON.parse(originalConfig.data)
-              : originalConfig.data;
-          if (parsed && typeof parsed === "object" && "token" in parsed) {
-            parsed.token = newToken;
-            originalConfig.data =
-              typeof originalConfig.data === "string"
-                ? JSON.stringify(parsed)
-                : parsed;
-          }
-        } catch {
-          // ignore — non-JSON body (e.g. FormData)
-        }
-      }
+      replaceTokenInBody(originalConfig, newToken);
       return api.request(originalConfig);
     }
 
