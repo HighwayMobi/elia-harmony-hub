@@ -17,10 +17,17 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getFTSession } from "@/lib/ft-auth";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
   user: User;
+}
+
+interface ProfileData {
+  name?: string;
+  phone?: string;
+  [key: string]: any;
 }
 
 // Mock data — se reemplazará con datos reales de la API
@@ -52,6 +59,38 @@ const HomePage = ({ user }: HomePageProps) => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+
+  // Cargar perfil desde API FactoryTele
+  useEffect(() => {
+    const loadProfile = async () => {
+      const ft = getFTSession();
+      const token = ft?.token;
+      if (!token) return;
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const authToken = sessionData.session?.access_token;
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-profile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: authToken ? `Bearer ${authToken}` : "",
+            },
+            body: JSON.stringify({ token }),
+          }
+        );
+        const json = await res.json().catch(() => ({}));
+        if (json.ok && json.data) {
+          setProfile(json.data);
+        }
+      } catch (e) {
+        console.warn("profile load error", e);
+      }
+    };
+    loadProfile();
+  }, []);
 
   // Cargar avatar existente
   useEffect(() => {
@@ -157,7 +196,7 @@ const HomePage = ({ user }: HomePageProps) => {
             />
             <div className="min-w-0">
               <h1 className="text-base font-bold text-white tracking-wide truncate">
-                {MOCK.name}
+                {profile?.name || MOCK.name}
               </h1>
               <p className="text-sm text-white/80">{MOCK.phone}</p>
             </div>
