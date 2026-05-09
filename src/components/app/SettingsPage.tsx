@@ -41,6 +41,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   };
 
   const handleLogout = async () => {
+    clearFTSession();
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast.error("Error al cerrar sesión");
