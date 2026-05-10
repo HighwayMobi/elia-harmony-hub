@@ -217,56 +217,37 @@ const HomePage = ({ user }: HomePageProps) => {
               <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
                 {profile?.name || MOCK.name}
               </h1>
-              {lines.length > 1 ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-2 text-sm text-[#A36BFF]/90 outline-none transition-opacity hover:opacity-80">
-                    <LineTypeIcon type={currentLine?.type} size="sm" />
-                    <span>
-                      {currentLine?.msisdn
-                        ? `+34 ${currentLine.msisdn}`
-                        : currentLine?.tariff_plan ||
-                          getLineTypeLabel(currentLine?.type)}
-                    </span>
-                    <ChevronDown className="h-4 w-4" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-[240px]">
-                    {lines.map((l) => (
-                      <DropdownMenuItem
+              {lines.length > 0 ? (
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {lines.map((l) => {
+                    const isActive = l.id === currentLine?.id;
+                    const label = l.msisdn
+                      ? `+34 ${l.msisdn}`
+                      : l.tariff_plan || getLineTypeLabel(l.type);
+                    return (
+                      <button
                         key={String(l.id)}
+                        type="button"
                         onClick={() => switchLine(l)}
-                        className={l.id === currentLine?.id ? "font-semibold text-[#A36BFF]" : ""}
+                        title={label}
+                        aria-label={label}
+                        aria-pressed={isActive}
+                        className={cn(
+                          "transition-all rounded-lg",
+                          isActive
+                            ? "ring-2 ring-[#A36BFF] ring-offset-1 ring-offset-[#FFF6E8]"
+                            : "opacity-60 hover:opacity-100"
+                        )}
                       >
-                        <div className="flex items-center gap-2 w-full">
-                          <LineTypeIcon type={l.type} size="sm" />
-                          <div className="flex flex-col min-w-0">
-                            <span className="truncate">
-                              {l.msisdn
-                                ? `+34 ${l.msisdn}`
-                                : l.tariff_plan || getLineTypeLabel(l.type)}
-                            </span>
-                            {l.tariff_plan && l.msisdn && (
-                              <span className="text-xs text-muted-foreground truncate">{l.tariff_plan}</span>
-                            )}
-                            {!l.msisdn && l.installation_address && (
-                              <span className="text-xs text-muted-foreground truncate">{l.installation_address}</span>
-                            )}
-                          </div>
-                        </div>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <div className="flex items-center gap-2 text-sm text-[#A36BFF]/80">
-                  <LineTypeIcon type={currentLine?.type} size="sm" />
-                  <span>
-                    {currentLine?.msisdn
-                      ? `+34 ${currentLine.msisdn}`
-                      : currentLine?.tariff_plan ||
-                        getFTSession()?.phone ||
-                        MOCK.phone}
-                  </span>
+                        <LineTypeIcon type={l.type} boxed size="sm" />
+                      </button>
+                    );
+                  })}
                 </div>
+              ) : (
+                <p className="text-sm text-[#A36BFF]/80">
+                  {getFTSession()?.phone || MOCK.phone}
+                </p>
               )}
             </div>
             <button
