@@ -259,6 +259,7 @@ const HomePage = ({ user }: HomePageProps) => {
       const streetAndNumber = parts.slice(0, 2).join(", ");
       return streetAndNumber || line.installation_address || getLineTypeLabel(line.type);
     }
+    if (line.type === "travel") return "Travel SIM";
     return line.tariff_plan || getLineTypeLabel(line.type);
   };
 
