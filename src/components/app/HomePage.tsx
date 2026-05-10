@@ -357,7 +357,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center gap-3">
                 <LineTypeIcon type={currentLine?.type} boxed size="md" />
                 <span className="text-base font-semibold text-[#2F2A33]">
-                  {lineDetails?.plan?.name || currentLine?.tariff_plan || MOCK.plan}
+                  {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
               <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">
