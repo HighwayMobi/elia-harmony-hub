@@ -299,7 +299,7 @@ const HomePage = ({ user }: HomePageProps) => {
             />
             <div className="min-w-0">
               <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
-                {profile?.name || MOCK.name}
+                {profile?.name || NA}
               </h1>
               {lines.length > 0 ? (
                 <DropdownMenu>
