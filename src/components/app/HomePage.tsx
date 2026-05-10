@@ -40,18 +40,8 @@ interface ProfileData {
   [key: string]: any;
 }
 
-// Mock data — se reemplazará con datos reales de la API
-const MOCK = {
-  name: "NOMBRE APELLIDO",
-  phone: "+34 681999090",
-  plan: "EURO 12 Gb",
-  balance: 115.0,
-  monthlyFee: 8.0,
-  feeDate: "15.05.2026",
-  dataRemaining: 35.1,
-  dataTotal: 37.5,
-  minutesLimit: null as number | null,
-};
+// Placeholder cuando la API no devuelve un valor
+const NA = "n/a";
 
 const MONTHS_ES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -244,7 +234,7 @@ const HomePage = ({ user }: HomePageProps) => {
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
-    if (!line) return getFTSession()?.phone || MOCK.phone;
+    if (!line) return getFTSession()?.phone || NA;
     if (line.msisdn) {
       const n = String(line.msisdn).replace(/^\+?34/, "");
       return `+34 ${n}`;
@@ -253,14 +243,14 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const formatLineSubtitle = (line?: FactoryTeleLine | null) => {
-    if (!line) return MOCK.plan;
+    if (!line) return NA;
     if (line.type === "fiber") {
       const parts = (line.installation_address || "").split(",").map((s) => s.trim()).filter(Boolean);
       const streetAndNumber = parts.slice(0, 2).join(", ");
-      return streetAndNumber || line.installation_address || getLineTypeLabel(line.type);
+      return streetAndNumber || line.installation_address || NA;
     }
     if (line.type === "travel") return "Travel SIM";
-    return line.tariff_plan || getLineTypeLabel(line.type);
+    return line.tariff_plan || NA;
   };
 
   return (
@@ -309,7 +299,7 @@ const HomePage = ({ user }: HomePageProps) => {
             />
             <div className="min-w-0">
               <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
-                {profile?.name || MOCK.name}
+                {profile?.name || NA}
               </h1>
               {lines.length > 0 ? (
                 <DropdownMenu>
@@ -347,7 +337,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 </DropdownMenu>
               ) : (
                 <p className="text-sm text-[#A36BFF]/80">
-                  {getFTSession()?.phone || MOCK.phone}
+                  {getFTSession()?.phone || NA}
                 </p>
               )}
             </div>
@@ -367,7 +357,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center gap-3">
                 <LineTypeIcon type={currentLine?.type} boxed size="md" />
                 <span className="text-base font-semibold text-[#2F2A33]">
-                  {lineDetails?.plan?.name || currentLine?.tariff_plan || MOCK.plan}
+                  {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
               <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">
@@ -379,12 +369,12 @@ const HomePage = ({ user }: HomePageProps) => {
               <div>
                 <span className="text-sm text-gray-500">Saldo</span>
                 <span className="ml-2 text-sm font-bold text-[#A36BFF]">
-                  €{fmt(lineDetails?.balance ?? MOCK.balance)}
+                  {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                 </span>
                 <br />
                 <span className="text-xs text-gray-500">Cuota mensual</span>
                 <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
-                  €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)}
+                  {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
                 </span>
               </div>
               <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
@@ -393,7 +383,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </div>
 
             <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)} del plan actual se cobrará el {lineDetails?.next_billing_date || MOCK.feeDate}
+              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {lineDetails?.next_billing_date || NA}
             </div>
           </div>
 
@@ -411,7 +401,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${((lineDetails.remains.data_gb_total ?? 0) - (lineDetails.remains.data_gb_used ?? 0)).toFixed(1)} Gb de ${(lineDetails.remains.data_gb_total ?? 0).toFixed(1)} Gb`
-                  : `${MOCK.dataRemaining} Gb de ${MOCK.dataTotal} Gb`}
+                  : NA}
               </span>
             </div>
             <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
@@ -426,7 +416,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${(lineDetails.remains.minutes_total ?? 0) - (lineDetails.remains.minutes_used ?? 0)} de ${lineDetails.remains.minutes_total ?? 0}`
-                  : MOCK.minutesLimit ?? "Ilimitados"}
+                  : NA}
               </span>
             </div>
           </div>
@@ -516,7 +506,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-[#2F2A33]">Cuota del plan</span>
                     <span className="text-sm font-semibold text-[#A36BFF]">
-                      - {fmt(MOCK.monthlyFee)}€
+                      {NA}
                     </span>
                   </div>
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
@@ -527,7 +517,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
                     <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                       <span className="text-xs font-medium opacity-90">Gastado</span>
-                      <span className="text-lg font-bold">{fmt(MOCK.monthlyFee)}€</span>
+                      <span className="text-lg font-bold">{NA}</span>
                     </div>
                     <div className="w-px bg-[#A36BFF]/30 my-2" />
                     <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
