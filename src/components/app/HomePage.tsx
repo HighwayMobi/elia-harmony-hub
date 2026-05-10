@@ -127,7 +127,7 @@ const HomePage = ({ user }: HomePageProps) => {
           : Array.isArray(payload?.lines)
           ? payload.lines
           : [];
-        const fetched = arr as FactoryTeleLine[];
+        const fetched = filterVisibleLines(arr as FactoryTeleLine[]);
         setLines(fetched);
         const ft = getFTSession();
         if (ft) {

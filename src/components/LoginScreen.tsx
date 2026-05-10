@@ -168,7 +168,7 @@ const LoginScreen = () => {
                 : Array.isArray(payload?.lines)
                 ? payload.lines
                 : [];
-              lines = arr as FactoryTeleLine[];
+              lines = filterVisibleLines(arr as FactoryTeleLine[]);
             } catch (err) {
               console.warn("get-account-lines error", err);
             }
