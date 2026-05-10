@@ -631,8 +631,15 @@ const LoginScreen = () => {
               <SelectContent>
                 {availableLines.map((l) => (
                   <SelectItem key={String(l.id)} value={String(l.id)}>
-                    {l.msisdn ? `+34 ${l.msisdn}` : l.name || `Línea ${l.id}`}
-                    {l.tariff_plan ? ` — ${l.tariff_plan}` : ""}
+                    <div className="flex items-center gap-2">
+                      <LineTypeIcon type={l.type} size="sm" />
+                      <span>
+                        {l.msisdn
+                          ? `+34 ${l.msisdn}`
+                          : l.tariff_plan || getLineTypeLabel(l.type)}
+                        {l.msisdn && l.tariff_plan ? ` — ${l.tariff_plan}` : ""}
+                      </span>
+                    </div>
                   </SelectItem>
                 ))}
               </SelectContent>
