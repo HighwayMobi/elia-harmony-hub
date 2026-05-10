@@ -58,6 +58,30 @@ const MONTHS_ES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
+interface LineDetails {
+  autopayment_enabled?: boolean;
+  balance?: number;
+  id?: string;
+  msisdn?: string;
+  next_billing_date?: string;
+  pending_plan?: { change_date?: string; name?: string; price?: number };
+  plan?: { gb?: number; minutes?: number; name?: string; price?: number; sms?: number };
+  remains?: {
+    data_gb_total?: number;
+    data_gb_used?: number;
+    is_unlimited_data?: boolean;
+    is_unlimited_sms?: boolean;
+    is_unlimited_voice?: boolean;
+    minutes_total?: number;
+    minutes_used?: number;
+    sms_total?: number;
+    sms_used?: number;
+  };
+  status?: string;
+  type?: string;
+  [key: string]: any;
+}
+
 const HomePage = ({ user }: HomePageProps) => {
   const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
@@ -72,6 +96,52 @@ const HomePage = ({ user }: HomePageProps) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [lines, setLines] = useState<FactoryTeleLine[]>(() => getFTSession()?.lines || []);
   const [currentLine, setCurrentLine] = useState<FactoryTeleLine | null>(() => getFTSession()?.line || null);
+  const [lineDetails, setLineDetails] = useState<LineDetails | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  const loadLineDetails = async (lineId: string | number) => {
+    if (!lineId) return;
+    setLoadingDetails(true);
+    try {
+      const { data: json } = await ftPost<any>("get-line-details", { line_id: lineId });
+      if (json?.ok) {
+        const payload = json.data?.data ? json.data.data : json.data;
+        setLineDetails(payload || null);
+      }
+    } catch (e) {
+      console.warn("line details error", e);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const loadLines = async () => {
+    try {
+      const { data: json } = await ftPost<any>("get-account-lines");
+      if (json?.ok) {
+        const payload = json.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.lines)
+          ? payload.lines
+          : [];
+        const fetched = arr as FactoryTeleLine[];
+        setLines(fetched);
+        const ft = getFTSession();
+        if (ft) {
+          const stillExists = fetched.find((l) => l.id === currentLine?.id);
+          const next = stillExists || fetched[0] || null;
+          setFTSession({ ...ft, lines: fetched, line: next || ft.line, line_id: next?.id ?? ft.line_id });
+          if (next && next.id !== currentLine?.id) setCurrentLine(next);
+          if (next) loadLineDetails(next.id);
+        }
+      }
+    } catch (e) {
+      console.warn("lines load error", e);
+    }
+  };
 
   const switchLine = (line: FactoryTeleLine) => {
     if (!line || line.id === currentLine?.id) return;
@@ -79,8 +149,8 @@ const HomePage = ({ user }: HomePageProps) => {
     if (!ft) return;
     setFTSession({ ...ft, line_id: line.id, line });
     setCurrentLine(line);
-    // Reload data for the new line
-    loadProfile();
+    setLineDetails(null);
+    loadLineDetails(line.id);
   };
 
   // Cargar perfil desde API FactoryTele
@@ -120,8 +190,11 @@ const HomePage = ({ user }: HomePageProps) => {
 
   useEffect(() => {
     loadProfile();
+    loadLines();
+    if (currentLine?.id) loadLineDetails(currentLine.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -294,7 +367,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center gap-3">
                 <LineTypeIcon type={currentLine?.type} boxed size="md" />
                 <span className="text-base font-semibold text-[#2F2A33]">
-                  {currentLine?.tariff_plan || MOCK.plan}
+                  {lineDetails?.plan?.name || currentLine?.tariff_plan || MOCK.plan}
                 </span>
               </div>
               <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">
@@ -306,12 +379,12 @@ const HomePage = ({ user }: HomePageProps) => {
               <div>
                 <span className="text-sm text-gray-500">Saldo</span>
                 <span className="ml-2 text-sm font-bold text-[#A36BFF]">
-                  €{fmt(MOCK.balance)}
+                  €{fmt(lineDetails?.balance ?? MOCK.balance)}
                 </span>
                 <br />
                 <span className="text-xs text-gray-500">Cuota mensual</span>
                 <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
-                  €{fmt(MOCK.monthlyFee)}
+                  €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)}
                 </span>
               </div>
               <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
@@ -320,7 +393,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </div>
 
             <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual €{fmt(MOCK.monthlyFee)} del plan actual se cobrará el {MOCK.feeDate}
+              Cuota mensual €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)} del plan actual se cobrará el {lineDetails?.next_billing_date || MOCK.feeDate}
             </div>
           </div>
 
@@ -334,7 +407,11 @@ const HomePage = ({ user }: HomePageProps) => {
                 </span>
               </div>
               <span className="text-sm font-bold text-[#A36BFF]">
-                {MOCK.dataRemaining} Gb de {MOCK.dataTotal} Gb
+                {lineDetails?.remains?.is_unlimited_data
+                  ? "Ilimitados"
+                  : lineDetails?.remains
+                  ? `${((lineDetails.remains.data_gb_total ?? 0) - (lineDetails.remains.data_gb_used ?? 0)).toFixed(1)} Gb de ${(lineDetails.remains.data_gb_total ?? 0).toFixed(1)} Gb`
+                  : `${MOCK.dataRemaining} Gb de ${MOCK.dataTotal} Gb`}
               </span>
             </div>
             <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
@@ -345,7 +422,11 @@ const HomePage = ({ user }: HomePageProps) => {
                 </span>
               </div>
               <span className="text-sm font-bold text-[#A36BFF]">
-                {MOCK.minutesLimit ?? "Ilimitados"}
+                {lineDetails?.remains?.is_unlimited_voice
+                  ? "Ilimitados"
+                  : lineDetails?.remains
+                  ? `${(lineDetails.remains.minutes_total ?? 0) - (lineDetails.remains.minutes_used ?? 0)} de ${lineDetails.remains.minutes_total ?? 0}`
+                  : MOCK.minutesLimit ?? "Ilimitados"}
               </span>
             </div>
           </div>
