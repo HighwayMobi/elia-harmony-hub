@@ -506,7 +506,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
                     <span className="text-sm text-[#2F2A33]">Cuota del plan</span>
                     <span className="text-sm font-semibold text-[#A36BFF]">
-                      - {fmt(MOCK.monthlyFee)}€
+                      {NA}
                     </span>
                   </div>
                   <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
