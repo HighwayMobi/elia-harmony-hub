@@ -2,17 +2,16 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import {
-  Wifi,
   Phone as PhoneIcon,
   Plus,
   Clock,
-  Signal,
   ChevronRight,
   ChevronDown,
   ChevronLeft,
   RefreshCw,
   UserRound,
   Camera,
+  Wifi,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
@@ -219,33 +219,54 @@ const HomePage = ({ user }: HomePageProps) => {
               </h1>
               {lines.length > 1 ? (
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-[#A36BFF]/90 outline-none transition-opacity hover:opacity-80">
-                    <span>+34 {currentLine?.msisdn || ""}</span>
+                  <DropdownMenuTrigger className="flex items-center gap-2 text-sm text-[#A36BFF]/90 outline-none transition-opacity hover:opacity-80">
+                    <LineTypeIcon type={currentLine?.type} size="sm" />
+                    <span>
+                      {currentLine?.msisdn
+                        ? `+34 ${currentLine.msisdn}`
+                        : currentLine?.tariff_plan ||
+                          getLineTypeLabel(currentLine?.type)}
+                    </span>
                     <ChevronDown className="h-4 w-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="min-w-[220px]">
+                  <DropdownMenuContent align="start" className="min-w-[240px]">
                     {lines.map((l) => (
                       <DropdownMenuItem
                         key={String(l.id)}
                         onClick={() => switchLine(l)}
                         className={l.id === currentLine?.id ? "font-semibold text-[#A36BFF]" : ""}
                       >
-                        <div className="flex flex-col">
-                          <span>+34 {l.msisdn}</span>
-                          {l.tariff_plan && (
-                            <span className="text-xs text-muted-foreground">{l.tariff_plan}</span>
-                          )}
+                        <div className="flex items-center gap-2 w-full">
+                          <LineTypeIcon type={l.type} size="sm" />
+                          <div className="flex flex-col min-w-0">
+                            <span className="truncate">
+                              {l.msisdn
+                                ? `+34 ${l.msisdn}`
+                                : l.tariff_plan || getLineTypeLabel(l.type)}
+                            </span>
+                            {l.tariff_plan && l.msisdn && (
+                              <span className="text-xs text-muted-foreground truncate">{l.tariff_plan}</span>
+                            )}
+                            {!l.msisdn && l.installation_address && (
+                              <span className="text-xs text-muted-foreground truncate">{l.installation_address}</span>
+                            )}
+                          </div>
                         </div>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <p className="text-sm text-[#A36BFF]/80">
-                  {currentLine?.msisdn
-                    ? `+34 ${currentLine.msisdn}`
-                    : getFTSession()?.phone || MOCK.phone}
-                </p>
+                <div className="flex items-center gap-2 text-sm text-[#A36BFF]/80">
+                  <LineTypeIcon type={currentLine?.type} size="sm" />
+                  <span>
+                    {currentLine?.msisdn
+                      ? `+34 ${currentLine.msisdn}`
+                      : currentLine?.tariff_plan ||
+                        getFTSession()?.phone ||
+                        MOCK.phone}
+                  </span>
+                </div>
               )}
             </div>
             <button
@@ -262,9 +283,7 @@ const HomePage = ({ user }: HomePageProps) => {
           <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
-                  <Signal className="h-4 w-4 text-[#A36BFF]" />
-                </div>
+                <LineTypeIcon type={currentLine?.type} boxed size="md" />
                 <span className="text-base font-semibold text-[#2F2A33]">
                   {currentLine?.tariff_plan || MOCK.plan}
                 </span>

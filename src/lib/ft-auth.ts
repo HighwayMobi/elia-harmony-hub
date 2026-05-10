@@ -4,12 +4,16 @@
 const KEY = "factorytele_session";
 const EVENT = "factorytele-auth-change";
 
+export type FactoryTeleLineType = "mobile" | "travel" | "fiber" | string;
+
 export type FactoryTeleLine = {
   id: string | number;
   name?: string;
   msisdn?: string;
   status?: string;
   tariff_plan?: string;
+  type?: FactoryTeleLineType;
+  installation_address?: string;
   [key: string]: any;
 };
 
