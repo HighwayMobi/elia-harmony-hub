@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { LineTypeIcon, getLineTypeLabel } from "@/components/app/LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
 
 type LoginMethod = "email" | "phone";
