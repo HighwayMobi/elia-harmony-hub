@@ -182,8 +182,9 @@ const HomePage = ({ user }: HomePageProps) => {
   const formatLineSubtitle = (line?: FactoryTeleLine | null) => {
     if (!line) return MOCK.plan;
     if (line.type === "fiber") {
-      const street = (line.installation_address || "").split(",")[0]?.trim();
-      return street || line.installation_address || getLineTypeLabel(line.type);
+      const parts = (line.installation_address || "").split(",").map((s) => s.trim()).filter(Boolean);
+      const streetAndNumber = parts.slice(0, 2).join(", ");
+      return streetAndNumber || line.installation_address || getLineTypeLabel(line.type);
     }
     if (line.type === "travel") return "Travel SIM";
     return line.tariff_plan || getLineTypeLabel(line.type);
