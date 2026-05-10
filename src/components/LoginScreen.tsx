@@ -63,6 +63,13 @@ const LoginScreen = () => {
     return [a, b, c].filter(Boolean).join(" ");
   };
 
+  const formatLinePhone = (raw: string) => {
+    let digits = raw.replace(/\D/g, "");
+    if (digits.startsWith("0034")) digits = digits.slice(4);
+    if (digits.startsWith("34") && digits.length > 9) digits = digits.slice(2);
+    return `+34 ${formatPhoneDisplay(digits)}`;
+  };
+
   const sanitizePhone = (raw: string) => {
     let digits = raw.replace(/\D/g, "");
     if (digits.length > 0 && !/[67]/.test(digits[0])) digits = "";
@@ -635,7 +642,7 @@ const LoginScreen = () => {
                       <LineTypeIcon type={l.type} size="sm" />
                       <span>
                         {l.msisdn
-                          ? `+34 ${l.msisdn}`
+                          ? formatLinePhone(l.msisdn)
                           : l.tariff_plan || getLineTypeLabel(l.type)}
                         {l.msisdn && l.tariff_plan ? ` — ${l.tariff_plan}` : ""}
                       </span>
