@@ -128,15 +128,14 @@ const LoginScreen = () => {
           toast.error(message);
         } else {
           // Edge fn returns { ok, status, data: <upstream body> }
-          // upstream body shape (new): { token, refresh_token, has_password, auth_type, lines, ... }
+          // upstream body shape (new): { token, refresh_token, has_password, auth_type, ... }
+          // NOTE: lines are NO LONGER returned by login — fetched separately via get-account-lines.
           const upstreamBody = (data as any).data || {};
-          // Backwards compatibility: still accept old data.data nesting
           const inner = upstreamBody.token ? upstreamBody : (upstreamBody.data || upstreamBody);
           const token =
             inner.token || inner.accessToken || inner.access_token;
           const hasPassword = inner.has_password;
           const authType = inner.auth_type;
-          const lines: FactoryTeleLine[] = Array.isArray(inner.lines) ? inner.lines : [];
 
           const sessionPayload: any = {
             token,
@@ -154,7 +153,26 @@ const LoginScreen = () => {
             setNewPassword("");
             setNewPasswordConfirm("");
             setSetPwdOpen(true);
-          } else if (authType === "client" && lines.length > 0) {
+          } else if (authType === "client") {
+            // Fetch lines via separate endpoint
+            let lines: FactoryTeleLine[] = [];
+            try {
+              const { data: linesResp } = await supabase.functions.invoke("get-account-lines", {
+                body: { token },
+              });
+              const payload = (linesResp as any)?.data;
+              const arr = Array.isArray(payload)
+                ? payload
+                : Array.isArray(payload?.data)
+                ? payload.data
+                : Array.isArray(payload?.lines)
+                ? payload.lines
+                : [];
+              lines = arr as FactoryTeleLine[];
+            } catch (err) {
+              console.warn("get-account-lines error", err);
+            }
+
             if (lines.length === 1) {
               setFTSession({
                 ...sessionPayload,
@@ -163,11 +181,14 @@ const LoginScreen = () => {
                 lines,
               });
               toast.success("¡Bienvenido!");
-            } else {
+            } else if (lines.length > 1) {
               setAvailableLines(lines);
               setSelectedLineId(String(lines[0].id));
               setPendingLineSession({ ...sessionPayload, lines });
               setLineOpen(true);
+            } else {
+              setFTSession(sessionPayload);
+              toast.success("¡Bienvenido!");
             }
           } else {
             setFTSession(sessionPayload);
