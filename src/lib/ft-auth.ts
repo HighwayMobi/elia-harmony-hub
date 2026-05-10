@@ -17,6 +17,14 @@ export type FactoryTeleLine = {
   [key: string]: any;
 };
 
+// Statuses considered visible/usable in the app.
+export const VISIBLE_LINE_STATUSES = ["ACTIVE", "BLOCKED", "SUSPENDED", "FREEZE"] as const;
+
+export const filterVisibleLines = <T extends { status?: string }>(arr: T[]): T[] =>
+  (arr || []).filter((l) =>
+    VISIBLE_LINE_STATUSES.includes(String(l?.status || "").toUpperCase() as any)
+  );
+
 export type FactoryTeleSession = {
   token?: string;
   refresh_token?: string;

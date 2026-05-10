@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff, Loader2, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { setFTSession, FactoryTeleLine } from "@/lib/ft-auth";
+import { setFTSession, FactoryTeleLine, filterVisibleLines } from "@/lib/ft-auth";
 import {
   Select,
   SelectContent,
@@ -168,7 +168,7 @@ const LoginScreen = () => {
                 : Array.isArray(payload?.lines)
                 ? payload.lines
                 : [];
-              lines = arr as FactoryTeleLine[];
+              lines = filterVisibleLines(arr as FactoryTeleLine[]);
             } catch (err) {
               console.warn("get-account-lines error", err);
             }
