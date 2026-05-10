@@ -337,7 +337,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 </DropdownMenu>
               ) : (
                 <p className="text-sm text-[#A36BFF]/80">
-                  {getFTSession()?.phone || MOCK.phone}
+                  {getFTSession()?.phone || NA}
                 </p>
               )}
             </div>
