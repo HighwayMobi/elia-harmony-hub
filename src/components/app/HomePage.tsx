@@ -172,7 +172,10 @@ const HomePage = ({ user }: HomePageProps) => {
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
     if (!line) return getFTSession()?.phone || MOCK.phone;
-    if (line.msisdn) return `+34 ${line.msisdn}`;
+    if (line.msisdn) {
+      const n = String(line.msisdn).replace(/^\+?34/, "");
+      return `+34 ${n}`;
+    }
     return line.tariff_plan || getLineTypeLabel(line.type);
   };
 
