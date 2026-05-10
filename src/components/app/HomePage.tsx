@@ -369,12 +369,12 @@ const HomePage = ({ user }: HomePageProps) => {
               <div>
                 <span className="text-sm text-gray-500">Saldo</span>
                 <span className="ml-2 text-sm font-bold text-[#A36BFF]">
-                  €{fmt(lineDetails?.balance ?? MOCK.balance)}
+                  {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                 </span>
                 <br />
                 <span className="text-xs text-gray-500">Cuota mensual</span>
                 <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
-                  €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)}
+                  {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
                 </span>
               </div>
               <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
@@ -383,7 +383,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </div>
 
             <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual €{fmt(lineDetails?.plan?.price ?? MOCK.monthlyFee)} del plan actual se cobrará el {lineDetails?.next_billing_date || MOCK.feeDate}
+              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {lineDetails?.next_billing_date || NA}
             </div>
           </div>
 
