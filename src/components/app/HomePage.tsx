@@ -168,6 +168,18 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const fmt = (n: number) => n.toFixed(2);
+  const selectedLine = currentLine || lines[0] || null;
+
+  const formatLineTitle = (line?: FactoryTeleLine | null) => {
+    if (!line) return getFTSession()?.phone || MOCK.phone;
+    if (line.msisdn) return `+34 ${line.msisdn}`;
+    return line.tariff_plan || getLineTypeLabel(line.type);
+  };
+
+  const formatLineSubtitle = (line?: FactoryTeleLine | null) => {
+    if (!line) return MOCK.plan;
+    return line.tariff_plan || line.installation_address || getLineTypeLabel(line.type);
+  };
 
   return (
     <div className="flex-1 flex flex-col">
@@ -218,32 +230,39 @@ const HomePage = ({ user }: HomePageProps) => {
                 {profile?.name || MOCK.name}
               </h1>
               {lines.length > 0 ? (
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  {lines.map((l) => {
-                    const isActive = l.id === currentLine?.id;
-                    const label = l.msisdn
-                      ? `+34 ${l.msisdn}`
-                      : l.tariff_plan || getLineTypeLabel(l.type);
-                    return (
-                      <button
-                        key={String(l.id)}
-                        type="button"
-                        onClick={() => switchLine(l)}
-                        title={label}
-                        aria-label={label}
-                        aria-pressed={isActive}
-                        className={cn(
-                          "transition-all rounded-lg",
-                          isActive
-                            ? "ring-2 ring-[#A36BFF] ring-offset-1 ring-offset-[#FFF6E8]"
-                            : "opacity-60 hover:opacity-100"
-                        )}
-                      >
-                        <LineTypeIcon type={l.type} boxed size="sm" />
-                      </button>
-                    );
-                  })}
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="mt-0.5 flex max-w-[220px] items-center gap-1 text-left text-sm font-semibold text-[#FF7A1A] transition-opacity hover:opacity-80"
+                      aria-label="Seleccionar suscripción"
+                    >
+                      <span className="truncate">{formatLineTitle(selectedLine)}</span>
+                      <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56 rounded-xl bg-white p-2 shadow-lg">
+                    {lines.map((l) => {
+                      const isActive = l.id === selectedLine?.id;
+                      return (
+                        <DropdownMenuItem
+                          key={String(l.id)}
+                          onClick={() => switchLine(l)}
+                          className={cn(
+                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-[#FFF6E8]",
+                            isActive && "text-[#FF7A1A]"
+                          )}
+                        >
+                          <LineTypeIcon type={l.type} boxed size="sm" />
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate text-sm font-semibold">{formatLineTitle(l)}</div>
+                            <div className="truncate text-xs text-gray-500">{formatLineSubtitle(l)}</div>
+                          </div>
+                        </DropdownMenuItem>
+                      );
+                    })}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
                 <p className="text-sm text-[#A36BFF]/80">
                   {getFTSession()?.phone || MOCK.phone}
