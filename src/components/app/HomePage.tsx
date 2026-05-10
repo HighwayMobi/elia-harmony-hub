@@ -2,11 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import {
-  Wifi,
   Phone as PhoneIcon,
   Plus,
   Clock,
-  Clock,
+  ChevronRight,
+  ChevronDown,
+  ChevronLeft,
+  RefreshCw,
+  UserRound,
+  Camera,
+  Wifi,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
