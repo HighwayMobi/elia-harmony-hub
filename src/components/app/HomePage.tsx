@@ -225,9 +225,18 @@ const HomePage = ({ user }: HomePageProps) => {
     }
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
+    if (refreshing) return;
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
+    try {
+      await Promise.all([
+        loadProfile(),
+        loadLines(),
+        currentLine?.id ? loadLineDetails(currentLine.id) : Promise.resolve(),
+      ]);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const fmt = (n: number) => n.toFixed(2);
