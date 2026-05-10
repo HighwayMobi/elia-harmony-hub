@@ -58,6 +58,30 @@ const MONTHS_ES = [
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
+interface LineDetails {
+  autopayment_enabled?: boolean;
+  balance?: number;
+  id?: string;
+  msisdn?: string;
+  next_billing_date?: string;
+  pending_plan?: { change_date?: string; name?: string; price?: number };
+  plan?: { gb?: number; minutes?: number; name?: string; price?: number; sms?: number };
+  remains?: {
+    data_gb_total?: number;
+    data_gb_used?: number;
+    is_unlimited_data?: boolean;
+    is_unlimited_sms?: boolean;
+    is_unlimited_voice?: boolean;
+    minutes_total?: number;
+    minutes_used?: number;
+    sms_total?: number;
+    sms_used?: number;
+  };
+  status?: string;
+  type?: string;
+  [key: string]: any;
+}
+
 const HomePage = ({ user }: HomePageProps) => {
   const { toast } = useToast();
   const [financesOpen, setFinancesOpen] = useState(false);
@@ -72,6 +96,52 @@ const HomePage = ({ user }: HomePageProps) => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [lines, setLines] = useState<FactoryTeleLine[]>(() => getFTSession()?.lines || []);
   const [currentLine, setCurrentLine] = useState<FactoryTeleLine | null>(() => getFTSession()?.line || null);
+  const [lineDetails, setLineDetails] = useState<LineDetails | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  const loadLineDetails = async (lineId: string | number) => {
+    if (!lineId) return;
+    setLoadingDetails(true);
+    try {
+      const { data: json } = await ftPost<any>("get-line-details", { line_id: lineId });
+      if (json?.ok) {
+        const payload = json.data?.data ? json.data.data : json.data;
+        setLineDetails(payload || null);
+      }
+    } catch (e) {
+      console.warn("line details error", e);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const loadLines = async () => {
+    try {
+      const { data: json } = await ftPost<any>("get-account-lines");
+      if (json?.ok) {
+        const payload = json.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.lines)
+          ? payload.lines
+          : [];
+        const fetched = arr as FactoryTeleLine[];
+        setLines(fetched);
+        const ft = getFTSession();
+        if (ft) {
+          const stillExists = fetched.find((l) => l.id === currentLine?.id);
+          const next = stillExists || fetched[0] || null;
+          setFTSession({ ...ft, lines: fetched, line: next || ft.line, line_id: next?.id ?? ft.line_id });
+          if (next && next.id !== currentLine?.id) setCurrentLine(next);
+          if (next) loadLineDetails(next.id);
+        }
+      }
+    } catch (e) {
+      console.warn("lines load error", e);
+    }
+  };
 
   const switchLine = (line: FactoryTeleLine) => {
     if (!line || line.id === currentLine?.id) return;
@@ -79,8 +149,8 @@ const HomePage = ({ user }: HomePageProps) => {
     if (!ft) return;
     setFTSession({ ...ft, line_id: line.id, line });
     setCurrentLine(line);
-    // Reload data for the new line
-    loadProfile();
+    setLineDetails(null);
+    loadLineDetails(line.id);
   };
 
   // Cargar perfil desde API FactoryTele
@@ -120,8 +190,11 @@ const HomePage = ({ user }: HomePageProps) => {
 
   useEffect(() => {
     loadProfile();
+    loadLines();
+    if (currentLine?.id) loadLineDetails(currentLine.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
