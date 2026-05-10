@@ -40,18 +40,8 @@ interface ProfileData {
   [key: string]: any;
 }
 
-// Mock data — se reemplazará con datos reales de la API
-const MOCK = {
-  name: "NOMBRE APELLIDO",
-  phone: "+34 681999090",
-  plan: "EURO 12 Gb",
-  balance: 115.0,
-  monthlyFee: 8.0,
-  feeDate: "15.05.2026",
-  dataRemaining: 35.1,
-  dataTotal: 37.5,
-  minutesLimit: null as number | null,
-};
+// Placeholder cuando la API no devuelve un valor
+const NA = "n/a";
 
 const MONTHS_ES = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
