@@ -517,7 +517,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
                     <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                       <span className="text-xs font-medium opacity-90">Gastado</span>
-                      <span className="text-lg font-bold">{fmt(MOCK.monthlyFee)}€</span>
+                      <span className="text-lg font-bold">{NA}</span>
                     </div>
                     <div className="w-px bg-[#A36BFF]/30 my-2" />
                     <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
