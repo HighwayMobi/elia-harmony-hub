@@ -234,7 +234,7 @@ const HomePage = ({ user }: HomePageProps) => {
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
-    if (!line) return getFTSession()?.phone || MOCK.phone;
+    if (!line) return getFTSession()?.phone || NA;
     if (line.msisdn) {
       const n = String(line.msisdn).replace(/^\+?34/, "");
       return `+34 ${n}`;
@@ -243,14 +243,14 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const formatLineSubtitle = (line?: FactoryTeleLine | null) => {
-    if (!line) return MOCK.plan;
+    if (!line) return NA;
     if (line.type === "fiber") {
       const parts = (line.installation_address || "").split(",").map((s) => s.trim()).filter(Boolean);
       const streetAndNumber = parts.slice(0, 2).join(", ");
-      return streetAndNumber || line.installation_address || getLineTypeLabel(line.type);
+      return streetAndNumber || line.installation_address || NA;
     }
     if (line.type === "travel") return "Travel SIM";
-    return line.tariff_plan || getLineTypeLabel(line.type);
+    return line.tariff_plan || NA;
   };
 
   return (
