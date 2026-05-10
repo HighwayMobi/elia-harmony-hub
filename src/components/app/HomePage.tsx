@@ -401,7 +401,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${((lineDetails.remains.data_gb_total ?? 0) - (lineDetails.remains.data_gb_used ?? 0)).toFixed(1)} Gb de ${(lineDetails.remains.data_gb_total ?? 0).toFixed(1)} Gb`
-                  : `${MOCK.dataRemaining} Gb de ${MOCK.dataTotal} Gb`}
+                  : NA}
               </span>
             </div>
             <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
@@ -416,7 +416,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${(lineDetails.remains.minutes_total ?? 0) - (lineDetails.remains.minutes_used ?? 0)} de ${lineDetails.remains.minutes_total ?? 0}`
-                  : MOCK.minutesLimit ?? "Ilimitados"}
+                  : NA}
               </span>
             </div>
           </div>
