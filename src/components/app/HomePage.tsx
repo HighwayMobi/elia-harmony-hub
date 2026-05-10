@@ -25,6 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
 
 interface HomePageProps {
