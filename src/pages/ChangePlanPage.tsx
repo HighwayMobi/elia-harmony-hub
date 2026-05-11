@@ -69,6 +69,26 @@ const ChangePlanPage = () => {
   const [lineDetails, setLineDetails] = useState<any>(() => getCachedLineDetails(lineId) || null);
 
   useEffect(() => {
+    if (lineId || !ft?.token || ft?.auth_type === "subscriber") return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const fetched = filterVisibleLines(await fetchLines());
+        const first = fetched[0];
+        if (!cancelled && first) {
+          setActiveLine(first);
+          setFTSession({ ...ft, line_id: first.id, line: first, lines: fetched });
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [lineId, ft]);
+
+  useEffect(() => {
     if (!lineId) return;
     let cancelled = false;
     (async () => {
