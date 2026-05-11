@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
+import { fetchLineDetails, invalidateLineDetails } from "@/lib/api-cache";
 
 const PaymentSuccessPage = () => {
   const navigate = useNavigate();
@@ -13,6 +15,23 @@ const PaymentSuccessPage = () => {
 
   useEffect(() => {
     if (!isSuccess) return;
+    // Refrescar saldo de la línea tras el pago
+    (async () => {
+      const ft = getFTSession();
+      const lineId =
+        ft?.line?.id ||
+        ft?.line_id ||
+        ft?.lines?.[0]?.id ||
+        getSubscriptionIdFromToken(ft?.token);
+      if (lineId) {
+        invalidateLineDetails(lineId);
+        try {
+          await fetchLineDetails(lineId, true);
+        } catch {
+          // ignore
+        }
+      }
+    })();
     const id = setInterval(() => setCountdown((c) => c - 1), 1000);
     const to = setTimeout(() => navigate(returnTo), 4000);
     return () => {
