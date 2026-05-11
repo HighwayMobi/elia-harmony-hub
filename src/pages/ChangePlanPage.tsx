@@ -260,7 +260,7 @@ const ChangePlanPage = () => {
       const { data: json } = await ftPost<any>("change-line-plan", {
         line_id: lineId,
         plan_id: selectedPlan.id,
-        apply_now: isUpgrade && whenChange === "now",
+        apply_now: whenChange === "now",
       });
       const inner = json?.data?.data ?? json?.data;
       const success = json?.ok && (inner?.success !== false);
