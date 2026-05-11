@@ -45,6 +45,15 @@ const fmtDateDM = (iso?: string) => {
   return `${day} - ${month}`;
 };
 
+const fmtDateDot = (iso?: string) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  return `${day}.${month}.${d.getUTCFullYear()}`;
+};
+
 const parseDateMaybe = (s?: string): Date | null => {
   if (!s) return null;
   const d = new Date(s);
