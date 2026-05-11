@@ -98,6 +98,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     } catch (e) {
       console.warn("logout api error", e);
     }
+    invalidateAll();
     clearFTSession();
     const { error } = await supabase.auth.signOut();
     if (error) {
