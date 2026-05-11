@@ -48,7 +48,7 @@ interface ProfileData {
   first_name?: string;
   last_name?: string;
   email?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Placeholder cuando la API no devuelve un valor
@@ -80,7 +80,7 @@ interface LineDetails {
   };
   status?: string;
   type?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const HomePage = ({ user }: HomePageProps) => {
@@ -241,9 +241,13 @@ const HomePage = ({ user }: HomePageProps) => {
       await uploadAvatar(file);
       toast({ title: "Avatar actualizado" });
       await loadProfile(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast({ title: "Error al subir", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error al subir",
+        description: err instanceof Error ? err.message : "No se pudo subir el avatar",
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
