@@ -30,8 +30,19 @@ type CatalogPlan = {
 
 const fmt = (n: number) => Number(n || 0).toFixed(2);
 
-const formatDate = (d: Date) =>
-  `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
+const MONTHS_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const fmtDateDM = (iso?: string) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = MONTHS_ES[d.getUTCMonth()];
+  return `${day} - ${month}`;
+};
 
 const parseDateMaybe = (s?: string): Date | null => {
   if (!s) return null;
@@ -113,17 +124,16 @@ const ChangePlanPage = () => {
   const soonDate = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return formatDate(d);
+    return d.toISOString();
   }, []);
 
   const feeDate = useMemo(() => {
-    const raw =
+    return (
       line?.next_payment_date ||
       line?.plan?.expire_at ||
       line?.expire_at ||
-      "";
-    const d = parseDateMaybe(raw);
-    return d ? formatDate(d) : "";
+      ""
+    );
   }, [line]);
 
   const TypeIcon = lineType === "fiber" ? Wifi : lineType === "travel" ? Plane : Signal;
@@ -311,39 +321,37 @@ const ChangePlanPage = () => {
                 </div>
               </div>
 
-              {isUpgrade && (
-                <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-                  <p className="text-sm font-semibold text-foreground">
-                    ¿Cuándo aplicar la nueva tarifa?
-                  </p>
-                  <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="whenChange"
-                      value="now"
-                      checked={whenChange === "now"}
-                      onChange={() => setWhenChange("now")}
-                      className="mt-1 accent-[#A36BFF]"
-                    />
-                    <span className="text-sm text-foreground">
-                      Pronto ({soonDate})
-                    </span>
-                  </label>
-                  <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="whenChange"
-                      value="later"
-                      checked={whenChange === "later"}
-                      onChange={() => setWhenChange("later")}
-                      className="mt-1 accent-[#A36BFF]"
-                    />
-                    <span className="text-sm text-foreground">
-                      Al final del periodo actual{feeDate ? ` (${feeDate})` : ""}
-                    </span>
-                  </label>
-                </div>
-              )}
+              <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+                <p className="text-sm font-semibold text-foreground">
+                  ¿Cuándo aplicar la nueva tarifa?
+                </p>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="whenChange"
+                    value="now"
+                    checked={whenChange === "now"}
+                    onChange={() => setWhenChange("now")}
+                    className="mt-1 accent-[#A36BFF]"
+                  />
+                  <span className="text-sm text-foreground">
+                    Pronto ({fmtDateDM(soonDate)})
+                  </span>
+                </label>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="whenChange"
+                    value="later"
+                    checked={whenChange === "later"}
+                    onChange={() => setWhenChange("later")}
+                    className="mt-1 accent-[#A36BFF]"
+                  />
+                  <span className="text-sm text-foreground">
+                    Al final del periodo actual{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
+                  </span>
+                </label>
+              </div>
 
               <div
                 className={cn(
@@ -353,7 +361,7 @@ const ChangePlanPage = () => {
                     : "bg-primary/5 border-primary/20"
                 )}
               >
-                <p>La nueva tarifa entrará en vigor el {effectiveDate}.</p>
+                <p>La nueva tarifa entrará en vigor el {fmtDateDM(effectiveDate)}.</p>
               </div>
             </div>
           )}
