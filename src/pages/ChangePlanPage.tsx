@@ -116,15 +116,6 @@ const ChangePlanPage = () => {
             )}
           </div>
 
-          {currentPlanName && (
-            <div className="mb-6 rounded-2xl bg-white/95 px-5 py-3 flex items-center gap-3 shadow-md">
-              <Check className="h-5 w-5 text-[#A36BFF]" />
-              <div className="flex-1">
-                <span className="text-xs text-gray-500">Tarifa actual</span>
-                <p className="text-sm font-bold text-[#2F2A33]">{currentPlanName}</p>
-              </div>
-            </div>
-          )}
 
           {loading && (
             <div className="flex items-center justify-center py-16">
