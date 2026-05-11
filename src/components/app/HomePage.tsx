@@ -665,6 +665,29 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
         </div>
       </motion.main>
+
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancelar cambio de plan</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres cancelar el cambio de plan programado?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingPlanChange}>No</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleCancelPlanChange();
+              }}
+              disabled={cancellingPlanChange}
+            >
+              Sí, cancelar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
