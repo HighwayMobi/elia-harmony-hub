@@ -30,8 +30,19 @@ type CatalogPlan = {
 
 const fmt = (n: number) => Number(n || 0).toFixed(2);
 
-const formatDate = (d: Date) =>
-  `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
+const MONTHS_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+];
+
+const fmtDateDM = (iso?: string) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = MONTHS_ES[d.getUTCMonth()];
+  return `${day} - ${month}`;
+};
 
 const parseDateMaybe = (s?: string): Date | null => {
   if (!s) return null;
