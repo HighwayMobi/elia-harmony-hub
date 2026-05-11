@@ -20,6 +20,16 @@ import { useToast } from "@/hooks/use-toast";
 import { getFTSession, setFTSession, FactoryTeleLine, filterVisibleLines } from "@/lib/ft-auth";
 import { ftPost, ftUpload } from "@/lib/api";
 import {
+  fetchProfile,
+  fetchLines,
+  fetchLineDetails,
+  uploadAvatar,
+  getCachedProfile,
+  getCachedLines,
+  getCachedLineDetails,
+  getCachedAvatarUrl,
+} from "@/lib/api-cache";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
