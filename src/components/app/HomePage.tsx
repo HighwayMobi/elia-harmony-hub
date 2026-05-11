@@ -358,8 +358,15 @@ const HomePage = ({ user }: HomePageProps) => {
       return streetAndNumber || line.installation_address || NA;
     }
     if (line.type === "travel") return "Travel SIM";
-    return line.tariff_plan || NA;
+    const cachedPlan =
+      (line.id && String(line.id) === String(selectedLine?.id) ? lineDetails?.plan?.name : undefined) ||
+      getCachedLineDetails(line.id)?.plan?.name;
+    return line.tariff_plan || cachedPlan || NA;
   };
+
+  const ftSession = getFTSession();
+  const showLineSelector =
+    lines.length > 1 && ftSession?.auth_type !== "subscriber";
 
   return (
     <div className="flex-1 flex flex-col">
@@ -409,7 +416,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
                 {profile?.name || NA}
               </h1>
-              {lines.length > 0 ? (
+              {showLineSelector ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
