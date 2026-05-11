@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Shield, Loader2 } from "lucide-react";
 import { ftPost } from "@/lib/api";
+import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
 
 interface StripePaymentFormProps {
@@ -23,6 +24,14 @@ const stripeCache = new Map<string, Promise<Stripe | null>>();
 const getStripe = (pk: string) => {
   if (!stripeCache.has(pk)) stripeCache.set(pk, loadStripe(pk));
   return stripeCache.get(pk)!;
+};
+
+const PARTNER_KEY = "pk_elia-balance_014228521ed9b9e5";
+
+const maskSensitive = (value?: string) => {
+  if (!value) return "";
+  if (value.length <= 16) return `${value.slice(0, 4)}…${value.slice(-4)}`;
+  return `${value.slice(0, 12)}…${value.slice(-6)} (len:${value.length})`;
 };
 
 const InnerForm = ({
@@ -116,6 +125,13 @@ const StripePaymentForm = ({
     let cancelled = false;
     (async () => {
       try {
+        const session = getFTSession();
+        console.log("Token:", maskSensitive(session?.token));
+        console.log("Headers:", {
+          Authorization: `Bearer ${maskSensitive(session?.token)}`,
+          "X-Partner-Key": maskSensitive(PARTNER_KEY),
+        });
+        console.log("Body:", { amount, line_id: lineId });
         const { data: json } = await ftPost<any>("billing-topup", {
           amount,
           line_id: lineId,
