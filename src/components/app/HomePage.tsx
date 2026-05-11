@@ -713,7 +713,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 <div className="border-t border-gray-100">
                   <div className="px-5 py-3 flex items-center justify-between border-b border-gray-100">
                     {(() => {
-                      const actRaw = lineDetails?.activation_date;
+                      const actRaw = (lineDetails as any)?.activation_date as string | undefined;
                       const actDate = actRaw ? new Date(actRaw) : null;
                       const atMin =
                         actDate && !isNaN(actDate.getTime())
