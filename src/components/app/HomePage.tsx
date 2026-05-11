@@ -127,11 +127,21 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const loadLines = async (force = false) => {
+    const ft = getFTSession();
+    if (ft?.auth_type === "subscriber") {
+      const line = ft.line || (ft.line_id ? ({ id: ft.line_id } as FactoryTeleLine) : null);
+      if (line) {
+        setLines([line]);
+        if (!currentLine) setCurrentLine(line);
+        await loadLineDetails(line.id, force);
+      }
+      return;
+    }
+
     try {
       const arr = await fetchLines(force);
       const fetched = filterVisibleLines(arr as FactoryTeleLine[]);
       setLines(fetched);
-      const ft = getFTSession();
       if (ft) {
         const stillExists = fetched.find((l) => l.id === currentLine?.id);
         const next = stillExists || fetched[0] || null;
