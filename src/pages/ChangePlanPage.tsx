@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
@@ -53,8 +53,10 @@ const parseDateMaybe = (s?: string): Date | null => {
 
 const ChangePlanPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const routeState = (location.state || {}) as { line?: any; lineDetails?: any };
   const ft = getFTSession();
-  const [activeLine, setActiveLine] = useState<any>(() => ft?.line || null);
+  const [activeLine, setActiveLine] = useState<any>(() => routeState.line || ft?.line || null);
   const line: any = activeLine || ft?.line;
   const lineId = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token);
   const lineType = ((line?.type || ft?.line?.type) as string) || "mobile";
@@ -66,7 +68,7 @@ const ChangePlanPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
   const [submitting, setSubmitting] = useState(false);
-  const [lineDetails, setLineDetails] = useState<any>(() => getCachedLineDetails(lineId) || null);
+  const [lineDetails, setLineDetails] = useState<any>(() => routeState.lineDetails || getCachedLineDetails(lineId) || null);
 
   useEffect(() => {
     if (lineId || !ft?.token || ft?.auth_type === "subscriber") return;
