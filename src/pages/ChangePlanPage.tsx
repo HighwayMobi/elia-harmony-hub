@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { fetchLineDetails, getCachedLineDetails, invalidateLineDetails } from "@/lib/api-cache";
-import { getFTSession } from "@/lib/ft-auth";
+import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -55,7 +55,8 @@ const ChangePlanPage = () => {
   const navigate = useNavigate();
   const ft = getFTSession();
   const line: any = ft?.line;
-  const lineType = (line?.type as string) || "mobile";
+  const lineId = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token);
+  const lineType = ((line?.type || ft?.line?.type) as string) || "mobile";
 
   const [plans, setPlans] = useState<CatalogPlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,14 +65,14 @@ const ChangePlanPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
   const [submitting, setSubmitting] = useState(false);
-  const [lineDetails, setLineDetails] = useState<any>(() => getCachedLineDetails(line?.id) || null);
+  const [lineDetails, setLineDetails] = useState<any>(() => getCachedLineDetails(lineId) || null);
 
   useEffect(() => {
-    if (!line?.id) return;
+    if (!lineId) return;
     let cancelled = false;
     (async () => {
       try {
-        const data = await fetchLineDetails(line.id);
+        const data = await fetchLineDetails(lineId);
         if (!cancelled) setLineDetails(data || null);
       } catch {
         // ignore
@@ -80,7 +81,7 @@ const ChangePlanPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [line?.id]);
+  }, [lineId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -126,12 +127,13 @@ const ChangePlanPage = () => {
     line?.tariff_plan ||
     "";
   const lineLabel = useMemo(() => {
-    if (line?.msisdn) {
-      const n = String(line.msisdn).replace(/^\+?34/, "");
+    const msisdn = lineDetails?.msisdn || line?.msisdn;
+    if (msisdn) {
+      const n = String(msisdn).replace(/^\+?34/, "");
       return `+34 ${n}`;
     }
     return ft?.phone || "";
-  }, [line, ft]);
+  }, [line, lineDetails?.msisdn, ft]);
 
   const currentPlanPrice =
     lineDetails?.plan?.price ?? line?.plan?.price ?? null;
@@ -181,12 +183,12 @@ const ChangePlanPage = () => {
   };
 
   const handleConfirm = async () => {
-    if (!selectedPlan || !line?.id) return;
+    if (!selectedPlan || !lineId) return;
     setSubmitting(true);
     setError(null);
     try {
       const { data: json } = await ftPost<any>("change-line-plan", {
-        line_id: line.id,
+        line_id: lineId,
         plan_id: selectedPlan.id,
         apply_now: isUpgrade && whenChange === "now",
       });
@@ -203,9 +205,9 @@ const ChangePlanPage = () => {
         return;
       }
       // After write op: invalidate cached line details and re-fetch once.
-      invalidateLineDetails(line.id);
+      invalidateLineDetails(lineId);
       try {
-        const data = await fetchLineDetails(line.id, true);
+        const data = await fetchLineDetails(lineId, true);
         setLineDetails(data || null);
       } catch {
         // ignore
