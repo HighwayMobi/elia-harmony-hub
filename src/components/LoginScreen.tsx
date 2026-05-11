@@ -81,6 +81,40 @@ const LoginScreen = () => {
 
   const validatePhone = (value: string) => /^[67]\d{8}$/.test(value);
 
+  const getSubscriberLineSession = async (token: string) => {
+    let subscriptionId: string | undefined;
+    try {
+      const parts = String(token).split(".");
+      if (parts.length >= 2) {
+        const payloadJson = JSON.parse(
+          atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+        );
+        subscriptionId = payloadJson?.subscription_id;
+      }
+    } catch (err) {
+      console.warn("decode subscriber token error", err);
+    }
+
+    if (!subscriptionId) return {};
+
+    let line: FactoryTeleLine = { id: subscriptionId } as FactoryTeleLine;
+    try {
+      const { data: detailsResp } = await supabase.functions.invoke(
+        "get-line-details",
+        { body: { token, line_id: subscriptionId } }
+      );
+      const payload = (detailsResp as any)?.data;
+      const lineData = payload?.data ?? payload;
+      if (lineData && typeof lineData === "object") {
+        line = { id: subscriptionId, ...(lineData as any) } as FactoryTeleLine;
+      }
+    } catch (err) {
+      console.warn("get-line-details (subscriber) error", err);
+    }
+
+    return { line_id: line.id, line, lines: [line] };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
