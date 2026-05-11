@@ -573,7 +573,10 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
 
           {/* Buy GB */}
-          <button className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50">
+          <button
+            onClick={() => navigate("/buy-addon", { state: { line: currentLine, lineDetails } })}
+            className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50"
+          >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
                 <Plus className="h-4 w-4 text-[#A36BFF]" />
