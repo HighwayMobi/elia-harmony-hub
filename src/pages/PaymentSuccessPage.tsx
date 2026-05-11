@@ -15,6 +15,23 @@ const PaymentSuccessPage = () => {
 
   useEffect(() => {
     if (!isSuccess) return;
+    // Refrescar saldo de la línea tras el pago
+    (async () => {
+      const ft = getFTSession();
+      const lineId =
+        ft?.line?.id ||
+        ft?.line_id ||
+        ft?.lines?.[0]?.id ||
+        getSubscriptionIdFromToken(ft?.token);
+      if (lineId) {
+        invalidateLineDetails(lineId);
+        try {
+          await fetchLineDetails(lineId, true);
+        } catch {
+          // ignore
+        }
+      }
+    })();
     const id = setInterval(() => setCountdown((c) => c - 1), 1000);
     const to = setTimeout(() => navigate(returnTo), 4000);
     return () => {
