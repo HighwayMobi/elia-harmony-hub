@@ -124,17 +124,16 @@ const ChangePlanPage = () => {
   const soonDate = useMemo(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return formatDate(d);
+    return d.toISOString();
   }, []);
 
   const feeDate = useMemo(() => {
-    const raw =
+    return (
       line?.next_payment_date ||
       line?.plan?.expire_at ||
       line?.expire_at ||
-      "";
-    const d = parseDateMaybe(raw);
-    return d ? formatDate(d) : "";
+      ""
+    );
   }, [line]);
 
   const TypeIcon = lineType === "fiber" ? Wifi : lineType === "travel" ? Plane : Signal;
