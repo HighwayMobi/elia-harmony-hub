@@ -712,18 +712,31 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="overflow-hidden">
                 <div className="border-t border-gray-100">
                   <div className="px-5 py-3 flex items-center justify-between border-b border-gray-100">
-                    <button
-                      onClick={() => {
-                        const prev =
-                          financeMonth.month === 0
-                            ? { year: financeMonth.year - 1, month: 11 }
-                            : { year: financeMonth.year, month: financeMonth.month - 1 };
-                        setFinanceMonth(prev);
-                      }}
-                      className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
+                    {(() => {
+                      const actRaw = (lineDetails as any)?.activation_date as string | undefined;
+                      const actDate = actRaw ? new Date(actRaw) : null;
+                      const atMin =
+                        actDate && !isNaN(actDate.getTime())
+                          ? financeMonth.year === actDate.getUTCFullYear() &&
+                            financeMonth.month === actDate.getUTCMonth()
+                          : false;
+                      return (
+                        <button
+                          onClick={() => {
+                            if (atMin) return;
+                            const prev =
+                              financeMonth.month === 0
+                                ? { year: financeMonth.year - 1, month: 11 }
+                                : { year: financeMonth.year, month: financeMonth.month - 1 };
+                            setFinanceMonth(prev);
+                          }}
+                          disabled={atMin}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 disabled:opacity-30"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                      );
+                    })()}
                     <span className="text-sm font-semibold text-[#2F2A33]">
                       {MONTHS_ES[financeMonth.month]} {financeMonth.year}
                     </span>
