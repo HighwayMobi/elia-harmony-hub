@@ -166,23 +166,42 @@ const ChangePlanPage = () => {
   };
 
   const handleConfirm = async () => {
-    if (!selectedPlan) return;
+    if (!selectedPlan || !line?.id) return;
     setSubmitting(true);
-    // Wire to a future "change-plan" endpoint here.
-    setTimeout(async () => {
-      // After write op: invalidate cached line details and re-fetch once.
-      if (line?.id) {
-        invalidateLineDetails(line.id);
-        try {
-          const data = await fetchLineDetails(line.id, true);
-          setLineDetails(data || null);
-        } catch {
-          // ignore
-        }
+    setError(null);
+    try {
+      const { data: json } = await ftPost<any>("change-line-plan", {
+        line_id: line.id,
+        plan_id: selectedPlan.id,
+        apply_now: isUpgrade && whenChange === "now",
+      });
+      const inner = json?.data?.data ?? json?.data;
+      const success = json?.ok && (inner?.success !== false);
+      if (!success) {
+        const msg =
+          inner?.error ||
+          inner?.message ||
+          json?.data?.error ||
+          "No se pudo cambiar la tarifa";
+        setError(String(msg));
+        setSubmitting(false);
+        return;
       }
-      setSubmitting(false);
+      // After write op: invalidate cached line details and re-fetch once.
+      invalidateLineDetails(line.id);
+      try {
+        const data = await fetchLineDetails(line.id, true);
+        setLineDetails(data || null);
+      } catch {
+        // ignore
+      }
       setConfirmOpen(false);
-    }, 400);
+      navigate(-1);
+    } catch (e: any) {
+      setError(e?.message || "Error de red");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const isUpgrade =
