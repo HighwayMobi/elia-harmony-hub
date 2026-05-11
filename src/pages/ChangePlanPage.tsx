@@ -119,7 +119,12 @@ const ChangePlanPage = () => {
     };
   }, [lineType]);
 
-  const currentPlanName = line?.tariff_plan || "";
+  const currentPlanName =
+    lineDetails?.plan?.name ||
+    lineDetails?.tariff_plan ||
+    line?.plan?.name ||
+    line?.tariff_plan ||
+    "";
   const lineLabel = useMemo(() => {
     if (line?.msisdn) {
       const n = String(line.msisdn).replace(/^\+?34/, "");
