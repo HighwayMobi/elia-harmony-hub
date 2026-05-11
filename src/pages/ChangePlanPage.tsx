@@ -45,6 +45,15 @@ const fmtDateDM = (iso?: string) => {
   return `${day} - ${month}`;
 };
 
+const fmtDateDot = (iso?: string) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = String(d.getUTCMonth() + 1).padStart(2, "0");
+  return `${day}.${month}.${d.getUTCFullYear()}`;
+};
+
 const parseDateMaybe = (s?: string): Date | null => {
   if (!s) return null;
   const d = new Date(s);
@@ -481,7 +490,7 @@ const ChangePlanPage = () => {
                     className="mt-1 accent-[#A36BFF]"
                   />
                   <span className="text-sm text-foreground">
-                    Pronto ({fmtDateDM(soonDate)})
+                    Pronto ({fmtDateDot(soonDate)})
                   </span>
                 </label>
                 <label className="flex items-start gap-2 cursor-pointer">
@@ -494,7 +503,7 @@ const ChangePlanPage = () => {
                     className="mt-1 accent-[#A36BFF]"
                   />
                   <span className="text-sm text-foreground">
-                    Al final del periodo pagado{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
+                    Al final del periodo pagado{feeDate ? ` (${fmtDateDot(feeDate)})` : ""}
                   </span>
                 </label>
               </div>
@@ -509,8 +518,8 @@ const ChangePlanPage = () => {
               >
                 <p>
                   {whenChange === "later"
-                    ? `La nueva tarifa entrará en vigor al finalizar el periodo pagado: ${fmtDateDM(effectiveDate)}.`
-                    : `La nueva tarifa entrará en vigor el ${fmtDateDM(effectiveDate)}.`}
+                    ? `La nueva tarifa entrará en vigor al finalizar el periodo pagado: ${fmtDateDot(effectiveDate)}.`
+                    : `La nueva tarifa entrará en vigor el ${fmtDateDot(effectiveDate)}.`}
                 </p>
               </div>
             </div>
