@@ -490,7 +490,7 @@ const ChangePlanPage = () => {
                     className="mt-1 accent-[#A36BFF]"
                   />
                   <span className="text-sm text-foreground">
-                    Pronto ({fmtDateDM(soonDate)})
+                    Pronto ({fmtDateDot(soonDate)})
                   </span>
                 </label>
                 <label className="flex items-start gap-2 cursor-pointer">
@@ -503,7 +503,7 @@ const ChangePlanPage = () => {
                     className="mt-1 accent-[#A36BFF]"
                   />
                   <span className="text-sm text-foreground">
-                    Al final del periodo pagado{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
+                    Al final del periodo pagado{feeDate ? ` (${fmtDateDot(feeDate)})` : ""}
                   </span>
                 </label>
               </div>
