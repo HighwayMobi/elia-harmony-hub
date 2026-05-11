@@ -379,19 +379,22 @@ const HomePage = ({ user }: HomePageProps) => {
               </button>
             </div>
 
-            <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
-              <div>
-                <span className="text-sm text-gray-500">Saldo</span>
-                <span className="ml-2 text-sm font-bold text-[#A36BFF]">
-                  {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
-                </span>
-                <br />
-                <span className="text-xs text-gray-500">Cuota mensual</span>
-                <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
-                  {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
-                </span>
+            <div className="border-t border-gray-100 px-5 py-3 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm text-gray-500">Saldo</span>
+                  <span className="ml-2 text-sm font-bold text-[#A36BFF]">
+                    {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500">Cuota mensual</span>
+                  <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
+                    {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
+                  </span>
+                </div>
               </div>
-              <button className="rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button className="w-full rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
                 Recargar
               </button>
             </div>
