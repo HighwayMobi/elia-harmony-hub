@@ -28,6 +28,7 @@ export const filterVisibleLines = <T extends { status?: string }>(arr: T[]): T[]
 export type FactoryTeleSession = {
   token?: string;
   refresh_token?: string;
+  auth_type?: string;
   email?: string;
   phone?: string;
   user?: any;
