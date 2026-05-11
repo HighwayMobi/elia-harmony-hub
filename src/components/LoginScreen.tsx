@@ -198,6 +198,48 @@ const LoginScreen = () => {
               setFTSession(sessionPayload);
               toast.success("¡Bienvenido!");
             }
+          } else if (authType === "subscriber") {
+            // Subscriber token: there's no account-level lines list.
+            // The JWT carries `subscription_id` — use it as the active line id
+            // and fetch its details directly.
+            let subscriptionId: string | undefined;
+            try {
+              const parts = String(token).split(".");
+              if (parts.length >= 2) {
+                const payloadJson = JSON.parse(
+                  atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
+                );
+                subscriptionId = payloadJson?.subscription_id;
+              }
+            } catch (err) {
+              console.warn("decode subscriber token error", err);
+            }
+
+            let line: FactoryTeleLine | null = null;
+            if (subscriptionId) {
+              try {
+                const { data: detailsResp } = await supabase.functions.invoke(
+                  "get-line-details",
+                  { body: { token, line_id: subscriptionId } }
+                );
+                const payload = (detailsResp as any)?.data;
+                const lineData = payload?.data ?? payload;
+                if (lineData && typeof lineData === "object") {
+                  line = { id: subscriptionId, ...(lineData as any) } as FactoryTeleLine;
+                } else {
+                  line = { id: subscriptionId } as FactoryTeleLine;
+                }
+              } catch (err) {
+                console.warn("get-line-details (subscriber) error", err);
+                line = { id: subscriptionId } as FactoryTeleLine;
+              }
+            }
+
+            setFTSession({
+              ...sessionPayload,
+              ...(line ? { line_id: line.id, line, lines: [line] } : {}),
+            });
+            toast.success("¡Bienvenido!");
           } else {
             setFTSession(sessionPayload);
             toast.success("¡Bienvenido!");
