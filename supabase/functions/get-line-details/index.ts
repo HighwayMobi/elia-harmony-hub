@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     );
 
     const text = await upstream.text();
-    console.log("get-line-details upstream:", upstream.status, "id:", lineId, "body:", text?.slice(0, 500));
+    console.log("get-line-details upstream:", upstream.status, "id:", lineId, "body:", text?.slice(0, 2000));
 
     let data: any;
     try {
