@@ -304,7 +304,12 @@ const LoginScreen = () => {
         toast.error(message);
         return;
       }
-      if (pendingSession) setFTSession(pendingSession);
+      if (pendingSession) {
+        const subscriberLine = pendingSession.auth_type === "subscriber"
+          ? await getSubscriberLineSession(pendingToken)
+          : {};
+        setFTSession({ ...pendingSession, ...subscriberLine });
+      }
       setSetPwdOpen(false);
       toast.success("Contraseña establecida. ¡Bienvenido!");
     } catch {
