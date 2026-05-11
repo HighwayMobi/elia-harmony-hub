@@ -107,6 +107,13 @@ const HomePage = ({ user }: HomePageProps) => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+  const [financeData, setFinanceData] = useState<{
+    cost: number;
+    income: number;
+    items: Array<{ amount: number; balance_after?: number; date: string; description?: string; event_type?: string; type?: string }>;
+  } | null>(null);
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeError, setFinanceError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(() => {
     const p = getCachedProfile();
     if (!p) return null;
@@ -275,6 +282,44 @@ const HomePage = ({ user }: HomePageProps) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLine?.id]);
+
+  // Cargar transacciones del mes seleccionado cuando Finanzas está abierto
+  useEffect(() => {
+    if (!financesOpen) return;
+    const lineId = currentLine?.id;
+    if (!lineId) return;
+    const monthStr = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+    let cancelled = false;
+    setFinanceLoading(true);
+    setFinanceError(null);
+    (async () => {
+      try {
+        const { data: json } = await ftPost<any>("get-line-transactions", {
+          line_id: lineId,
+          month: monthStr,
+        });
+        if (cancelled) return;
+        if (!json?.ok) {
+          throw new Error(json?.data?.error || json?.data?.message || "No se pudieron cargar las transacciones");
+        }
+        const inner = json.data?.data ?? json.data ?? {};
+        setFinanceData({
+          cost: Number(inner.cost ?? 0),
+          income: Number(inner.income ?? 0),
+          items: Array.isArray(inner.items) ? inner.items : [],
+        });
+      } catch (e) {
+        if (cancelled) return;
+        setFinanceError(e instanceof Error ? e.message : "Error");
+        setFinanceData(null);
+      } finally {
+        if (!cancelled) setFinanceLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [financesOpen, currentLine?.id, financeMonth.year, financeMonth.month]);
 
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -705,28 +750,67 @@ const HomePage = ({ user }: HomePageProps) => {
                     </button>
                   </div>
 
-                  <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-[#2F2A33]">Cuota del plan</span>
-                    <span className="text-sm font-semibold text-[#A36BFF]">
-                      {NA}
-                    </span>
-                  </div>
-                  <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-[#2F2A33]">Recarga de saldo</span>
-                    <span className="text-sm font-semibold text-[#A36BFF]">+ 0.00€</span>
-                  </div>
+                  {financeLoading ? (
+                    <div className="px-5 py-6 text-center text-sm text-gray-500">
+                      Cargando...
+                    </div>
+                  ) : financeError ? (
+                    <div className="px-5 py-6 text-center text-sm text-red-500">
+                      {financeError}
+                    </div>
+                  ) : (
+                    <>
+                      {financeData?.items?.length ? (
+                        financeData.items.map((it, idx) => {
+                          const isIncome = Number(it.amount) > 0;
+                          return (
+                            <div
+                              key={idx}
+                              className="px-5 py-3 flex items-center justify-between border-b border-gray-100"
+                            >
+                              <div className="flex flex-col">
+                                <span className="text-sm text-[#2F2A33]">
+                                  {it.description || it.event_type || it.type || "Movimiento"}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {it.date ? fmtDateDot(it.date) : ""}
+                                </span>
+                              </div>
+                              <span
+                                className={cn(
+                                  "text-sm font-semibold",
+                                  isIncome ? "text-green-600" : "text-[#A36BFF]"
+                                )}
+                              >
+                                {isIncome ? "+ " : "- "}
+                                {Math.abs(Number(it.amount || 0)).toFixed(2)}€
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="px-5 py-6 text-center text-sm text-gray-400">
+                          Sin movimientos este mes
+                        </div>
+                      )}
 
-                  <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
-                    <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
-                      <span className="text-xs font-medium opacity-90">Gastado</span>
-                      <span className="text-lg font-bold">{NA}</span>
-                    </div>
-                    <div className="w-px bg-[#A36BFF]/30 my-2" />
-                    <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
-                      <span className="text-xs font-medium opacity-90">Recargado</span>
-                      <span className="text-lg font-bold">0.00€</span>
-                    </div>
-                  </div>
+                      <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
+                        <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
+                          <span className="text-xs font-medium opacity-90">Gastado</span>
+                          <span className="text-lg font-bold">
+                            {Number(financeData?.cost ?? 0).toFixed(2)}€
+                          </span>
+                        </div>
+                        <div className="w-px bg-[#A36BFF]/30 my-2" />
+                        <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
+                          <span className="text-xs font-medium opacity-90">Recargado</span>
+                          <span className="text-lg font-bold">
+                            {Number(financeData?.income ?? 0).toFixed(2)}€
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
