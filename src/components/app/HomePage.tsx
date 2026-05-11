@@ -37,6 +37,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { invalidateLineDetails } from "@/lib/api-cache";
 
 interface HomePageProps {
   user: User;
