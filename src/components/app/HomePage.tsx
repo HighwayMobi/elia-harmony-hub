@@ -242,6 +242,14 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const fmt = (n: number) => n.toFixed(2);
+  const fmtDate = (iso?: string) => {
+    if (!iso) return NA;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const day = d.getUTCDate().toString().padStart(2, "0");
+    const month = MONTHS_ES[d.getUTCMonth()];
+    return `${day} - ${month}`;
+  };
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
