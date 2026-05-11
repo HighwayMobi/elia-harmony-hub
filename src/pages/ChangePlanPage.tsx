@@ -361,7 +361,7 @@ const ChangePlanPage = () => {
                     : "bg-primary/5 border-primary/20"
                 )}
               >
-                <p>La nueva tarifa entrará en vigor el {effectiveDate}.</p>
+                <p>La nueva tarifa entrará en vigor el {fmtDateDM(effectiveDate)}.</p>
               </div>
             </div>
           )}
