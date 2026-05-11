@@ -290,6 +290,54 @@ const HomePage = ({ user }: HomePageProps) => {
     const month = MONTHS_ES[d.getUTCMonth()];
     return `${day} - ${month}`;
   };
+  const fmtDateDot = (iso?: string) => {
+    if (!iso) return NA;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const day = d.getUTCDate().toString().padStart(2, "0");
+    const month = (d.getUTCMonth() + 1).toString().padStart(2, "0");
+    return `${day}.${month}.${d.getUTCFullYear()}`;
+  };
+  const isTomorrowUTC = (iso?: string) => {
+    if (!iso) return false;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return false;
+    const now = new Date();
+    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    return (
+      d.getUTCFullYear() === tomorrow.getUTCFullYear() &&
+      d.getUTCMonth() === tomorrow.getUTCMonth() &&
+      d.getUTCDate() === tomorrow.getUTCDate()
+    );
+  };
+
+  const handleCancelPlanChange = async () => {
+    const ft = getFTSession();
+    const token = ft?.token;
+    const lineId = currentLine?.id;
+    if (!token || !lineId) return;
+    setCancellingPlanChange(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cancel-line-plan-change", {
+        body: { token, line_id: lineId },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.data?.error || data?.data?.message || "No se pudo cancelar");
+      toast({ title: "Cambio de plan cancelado" });
+      invalidateLineDetails(lineId);
+      await loadLineDetails(lineId, true);
+    } catch (e: unknown) {
+      toast({
+        title: "Error",
+        description: e instanceof Error ? e.message : "No se pudo cancelar el cambio",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingPlanChange(false);
+      setCancelDialogOpen(false);
+    }
+  };
+
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
