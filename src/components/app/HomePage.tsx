@@ -224,9 +224,9 @@ const HomePage = ({ user }: HomePageProps) => {
     setRefreshing(true);
     try {
       await Promise.all([
-        loadProfile(),
-        loadLines(),
-        currentLine?.id ? loadLineDetails(currentLine.id) : Promise.resolve(),
+        loadProfile(true),
+        loadLines(true),
+        currentLine?.id ? loadLineDetails(currentLine.id, true) : Promise.resolve(),
       ]);
     } finally {
       setRefreshing(false);
