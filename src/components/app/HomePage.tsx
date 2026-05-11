@@ -119,6 +119,25 @@ const HomePage = ({ user }: HomePageProps) => {
     try {
       const data = await fetchLineDetails(lineId, force);
       setLineDetails(data || null);
+      if (data && typeof data === "object") {
+        const hydratedLine = { id: lineId, ...(data as FactoryTeleLine) };
+        setCurrentLine((prev) =>
+          prev && String(prev.id) === String(lineId) ? { ...prev, ...hydratedLine } : hydratedLine
+        );
+        setLines((prev) => {
+          const exists = prev.some((l) => String(l.id) === String(lineId));
+          return exists
+            ? prev.map((l) => (String(l.id) === String(lineId) ? { ...l, ...hydratedLine } : l))
+            : [hydratedLine];
+        });
+        const ft = getFTSession();
+        if (ft && (String(ft.line_id || "") === String(lineId) || String(ft.line?.id || "") === String(lineId))) {
+          const nextLines = (ft.lines || []).some((l) => String(l.id) === String(lineId))
+            ? (ft.lines || []).map((l) => (String(l.id) === String(lineId) ? { ...l, ...hydratedLine } : l))
+            : [hydratedLine];
+          setFTSession({ ...ft, line_id: lineId, line: { ...(ft.line || {}), ...hydratedLine }, lines: nextLines });
+        }
+      }
     } catch (e) {
       console.warn("line details error", e);
     } finally {
@@ -257,12 +276,13 @@ const HomePage = ({ user }: HomePageProps) => {
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
-    if (!line) return getFTSession()?.phone || NA;
-    if (line.msisdn) {
-      const n = String(line.msisdn).replace(/^\+?34/, "");
+    const msisdn = line?.msisdn || lineDetails?.msisdn;
+    if (!line && !msisdn) return getFTSession()?.phone || NA;
+    if (msisdn) {
+      const n = String(msisdn).replace(/^\+?34/, "");
       return `+34 ${n}`;
     }
-    return line.tariff_plan || getLineTypeLabel(line.type);
+    return line?.tariff_plan || getLineTypeLabel(line?.type);
   };
 
   const formatLineSubtitle = (line?: FactoryTeleLine | null) => {
