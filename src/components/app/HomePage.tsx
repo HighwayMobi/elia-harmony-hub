@@ -242,6 +242,14 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const fmt = (n: number) => n.toFixed(2);
+  const fmtDate = (iso?: string) => {
+    if (!iso) return NA;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const day = d.getUTCDate().toString().padStart(2, "0");
+    const month = MONTHS_ES[d.getUTCMonth()];
+    return `${day} - ${month}`;
+  };
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
@@ -400,7 +408,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </div>
 
             <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {lineDetails?.next_billing_date || NA}
+              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
             </div>
           </div>
 
