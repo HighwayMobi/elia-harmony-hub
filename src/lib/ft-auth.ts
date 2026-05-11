@@ -25,9 +25,25 @@ export const filterVisibleLines = <T extends { status?: string }>(arr: T[]): T[]
     VISIBLE_LINE_STATUSES.includes(String(l?.status || "").toUpperCase() as any)
   );
 
+export const getSubscriptionIdFromToken = (token?: string): string | undefined => {
+  try {
+    const payload = token?.split(".")[1];
+    if (!payload) return undefined;
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+    const parsed: unknown = JSON.parse(atob(padded));
+    return typeof parsed === "object" && parsed !== null && "subscription_id" in parsed
+      ? String((parsed as { subscription_id?: unknown }).subscription_id || "") || undefined
+      : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 export type FactoryTeleSession = {
   token?: string;
   refresh_token?: string;
+  auth_type?: string;
   email?: string;
   phone?: string;
   user?: any;

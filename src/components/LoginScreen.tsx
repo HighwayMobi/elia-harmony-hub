@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Eye, EyeOff, Loader2, Mail, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { setFTSession, FactoryTeleLine, filterVisibleLines } from "@/lib/ft-auth";
+import { setFTSession, FactoryTeleLine, filterVisibleLines, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import {
   Select,
   SelectContent,
@@ -81,6 +81,28 @@ const LoginScreen = () => {
 
   const validatePhone = (value: string) => /^[67]\d{8}$/.test(value);
 
+  const getSubscriberLineSession = async (token: string) => {
+    const subscriptionId = getSubscriptionIdFromToken(token);
+    if (!subscriptionId) return {};
+
+    let line: FactoryTeleLine = { id: subscriptionId } as FactoryTeleLine;
+    try {
+      const { data: detailsResp } = await supabase.functions.invoke(
+        "get-line-details",
+        { body: { token, line_id: subscriptionId } }
+      );
+      const payload = (detailsResp as any)?.data;
+      const lineData = payload?.data ?? payload;
+      if (lineData && typeof lineData === "object") {
+        line = { id: subscriptionId, ...(lineData as any) } as FactoryTeleLine;
+      }
+    } catch (err) {
+      console.warn("get-line-details (subscriber) error", err);
+    }
+
+    return { line_id: line.id, line, lines: [line] };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -140,6 +162,7 @@ const LoginScreen = () => {
           const sessionPayload: any = {
             token,
             refresh_token: inner.refresh_token,
+            auth_type: authType,
             email: method === "email" ? email.trim() : undefined,
             phone: method === "phone" ? `+34${phone}` : undefined,
             user: inner.user,
@@ -202,42 +225,9 @@ const LoginScreen = () => {
             // Subscriber token: there's no account-level lines list.
             // The JWT carries `subscription_id` — use it as the active line id
             // and fetch its details directly.
-            let subscriptionId: string | undefined;
-            try {
-              const parts = String(token).split(".");
-              if (parts.length >= 2) {
-                const payloadJson = JSON.parse(
-                  atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))
-                );
-                subscriptionId = payloadJson?.subscription_id;
-              }
-            } catch (err) {
-              console.warn("decode subscriber token error", err);
-            }
-
-            let line: FactoryTeleLine | null = null;
-            if (subscriptionId) {
-              try {
-                const { data: detailsResp } = await supabase.functions.invoke(
-                  "get-line-details",
-                  { body: { token, line_id: subscriptionId } }
-                );
-                const payload = (detailsResp as any)?.data;
-                const lineData = payload?.data ?? payload;
-                if (lineData && typeof lineData === "object") {
-                  line = { id: subscriptionId, ...(lineData as any) } as FactoryTeleLine;
-                } else {
-                  line = { id: subscriptionId } as FactoryTeleLine;
-                }
-              } catch (err) {
-                console.warn("get-line-details (subscriber) error", err);
-                line = { id: subscriptionId } as FactoryTeleLine;
-              }
-            }
-
             setFTSession({
               ...sessionPayload,
-              ...(line ? { line_id: line.id, line, lines: [line] } : {}),
+              ...(await getSubscriberLineSession(token)),
             });
             toast.success("¡Bienvenido!");
           } else {
@@ -302,7 +292,12 @@ const LoginScreen = () => {
         toast.error(message);
         return;
       }
-      if (pendingSession) setFTSession(pendingSession);
+      if (pendingSession) {
+        const subscriberLine = pendingSession.auth_type === "subscriber"
+          ? await getSubscriberLineSession(pendingToken)
+          : {};
+        setFTSession({ ...pendingSession, ...subscriberLine });
+      }
       setSetPwdOpen(false);
       toast.success("Contraseña establecida. ¡Bienvenido!");
     } catch {

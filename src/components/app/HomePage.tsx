@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getFTSession, setFTSession, FactoryTeleLine, filterVisibleLines } from "@/lib/ft-auth";
+import { getFTSession, setFTSession, FactoryTeleLine, filterVisibleLines, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { ftPost, ftUpload } from "@/lib/api";
 import {
   fetchProfile,
@@ -127,11 +127,23 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const loadLines = async (force = false) => {
+    const ft = getFTSession();
+    const subscriptionId = getSubscriptionIdFromToken(ft?.token);
+    if (ft?.auth_type === "subscriber" || subscriptionId) {
+      const lineId = ft?.line_id || subscriptionId;
+      const line = ft.line || (lineId ? ({ id: lineId } as FactoryTeleLine) : null);
+      if (line) {
+        setLines([line]);
+        if (!currentLine) setCurrentLine(line);
+        await loadLineDetails(line.id, force);
+      }
+      return;
+    }
+
     try {
       const arr = await fetchLines(force);
       const fetched = filterVisibleLines(arr as FactoryTeleLine[]);
       setLines(fetched);
-      const ft = getFTSession();
       if (ft) {
         const stillExists = fetched.find((l) => l.id === currentLine?.id);
         const next = stillExists || fetched[0] || null;
