@@ -750,28 +750,67 @@ const HomePage = ({ user }: HomePageProps) => {
                     </button>
                   </div>
 
-                  <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-[#2F2A33]">Cuota del plan</span>
-                    <span className="text-sm font-semibold text-[#A36BFF]">
-                      {NA}
-                    </span>
-                  </div>
-                  <div className="px-5 py-3.5 flex items-center justify-between border-b border-gray-100">
-                    <span className="text-sm text-[#2F2A33]">Recarga de saldo</span>
-                    <span className="text-sm font-semibold text-[#A36BFF]">+ 0.00€</span>
-                  </div>
+                  {financeLoading ? (
+                    <div className="px-5 py-6 text-center text-sm text-gray-500">
+                      Cargando...
+                    </div>
+                  ) : financeError ? (
+                    <div className="px-5 py-6 text-center text-sm text-red-500">
+                      {financeError}
+                    </div>
+                  ) : (
+                    <>
+                      {financeData?.items?.length ? (
+                        financeData.items.map((it, idx) => {
+                          const isIncome = Number(it.amount) > 0;
+                          return (
+                            <div
+                              key={idx}
+                              className="px-5 py-3 flex items-center justify-between border-b border-gray-100"
+                            >
+                              <div className="flex flex-col">
+                                <span className="text-sm text-[#2F2A33]">
+                                  {it.description || it.event_type || it.type || "Movimiento"}
+                                </span>
+                                <span className="text-xs text-gray-400">
+                                  {it.date ? formatDateDdMmYyyy(it.date) : ""}
+                                </span>
+                              </div>
+                              <span
+                                className={cn(
+                                  "text-sm font-semibold",
+                                  isIncome ? "text-green-600" : "text-[#A36BFF]"
+                                )}
+                              >
+                                {isIncome ? "+ " : "- "}
+                                {Math.abs(Number(it.amount || 0)).toFixed(2)}€
+                              </span>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="px-5 py-6 text-center text-sm text-gray-400">
+                          Sin movimientos este mes
+                        </div>
+                      )}
 
-                  <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
-                    <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
-                      <span className="text-xs font-medium opacity-90">Gastado</span>
-                      <span className="text-lg font-bold">{NA}</span>
-                    </div>
-                    <div className="w-px bg-[#A36BFF]/30 my-2" />
-                    <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
-                      <span className="text-xs font-medium opacity-90">Recargado</span>
-                      <span className="text-lg font-bold">0.00€</span>
-                    </div>
-                  </div>
+                      <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
+                        <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
+                          <span className="text-xs font-medium opacity-90">Gastado</span>
+                          <span className="text-lg font-bold">
+                            {Number(financeData?.cost ?? 0).toFixed(2)}€
+                          </span>
+                        </div>
+                        <div className="w-px bg-[#A36BFF]/30 my-2" />
+                        <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
+                          <span className="text-xs font-medium opacity-90">Recargado</span>
+                          <span className="text-lg font-bold">
+                            {Number(financeData?.income ?? 0).toFixed(2)}€
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
