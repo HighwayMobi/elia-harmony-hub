@@ -73,8 +73,23 @@ const ChangePlanPage = () => {
     let cancelled = false;
     (async () => {
       try {
+        if (!line?.id && ft?.auth_type !== "subscriber") {
+          const fetched = filterVisibleLines(await fetchLines());
+          const matched = fetched.find((l) => String(l.id) === String(lineId)) || fetched[0];
+          if (matched) {
+            setActiveLine(matched);
+            setFTSession({ ...ft, line_id: matched.id, line: matched, lines: fetched });
+          }
+        }
         const data = await fetchLineDetails(lineId);
-        if (!cancelled) setLineDetails(data || null);
+        if (!cancelled) {
+          setLineDetails(data || null);
+          if (data && typeof data === "object") {
+            const hydratedLine = { id: lineId, ...(data as any) };
+            setActiveLine(hydratedLine);
+            if (ft) setFTSession({ ...ft, line_id: lineId, line: hydratedLine });
+          }
+        }
       } catch {
         // ignore
       }
