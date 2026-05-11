@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import {
@@ -74,6 +75,7 @@ interface LineDetails {
 
 const HomePage = ({ user }: HomePageProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -369,7 +371,10 @@ const HomePage = ({ user }: HomePageProps) => {
                   {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
-              <button className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]">
+              <button
+                onClick={() => navigate("/change-plan")}
+                className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+              >
                 Cambiar
               </button>
             </div>
