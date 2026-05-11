@@ -499,9 +499,26 @@ const HomePage = ({ user }: HomePageProps) => {
               </button>
             </div>
 
-            <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
-            </div>
+            {lineDetails?.pending_plan?.name ? (
+              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF] flex flex-col items-center gap-1.5">
+                <span>
+                  A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
+                  {lineDetails.pending_plan.price != null ? ` — €${fmt(lineDetails.pending_plan.price)}/mes` : ""}
+                </span>
+                {!isTomorrowUTC(lineDetails.pending_plan.change_date) && (
+                  <button
+                    onClick={() => setCancelDialogOpen(true)}
+                    className="rounded-lg border border-[#A36BFF] px-4 py-1 text-xs font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
+                Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
+              </div>
+            )}
           </div>
 
           {/* Data + minutes */}
