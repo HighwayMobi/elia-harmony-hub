@@ -174,6 +174,14 @@ const LoginScreen = () => {
             }
 
             if (lines.length === 1) {
+              // Pre-fetch line details so HomePage shows data instantly
+              try {
+                await supabase.functions.invoke("get-line-details", {
+                  body: { token, line_id: lines[0].id },
+                });
+              } catch (err) {
+                console.warn("get-line-details (login) error", err);
+              }
               setFTSession({
                 ...sessionPayload,
                 line_id: lines[0].id,
@@ -675,13 +683,20 @@ const LoginScreen = () => {
 
             <Button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 const line = availableLines.find(
                   (l) => String(l.id) === selectedLineId
                 );
                 if (!line || !pendingLineSession) {
                   toast.error("Selecciona una línea válida");
                   return;
+                }
+                try {
+                  await supabase.functions.invoke("get-line-details", {
+                    body: { token: pendingLineSession.token, line_id: line.id },
+                  });
+                } catch (err) {
+                  console.warn("get-line-details (login) error", err);
                 }
                 setFTSession({
                   ...pendingLineSession,
