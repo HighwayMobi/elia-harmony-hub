@@ -74,7 +74,19 @@ const TopUpPage = () => {
     <div className="min-h-screen bg-[#F5F3F7]">
       <div className="mx-auto max-w-md px-4 pt-4 pb-10">
         <button
-          onClick={() => (showPaymentForm ? setShowPaymentForm(false) : navigate(-1))}
+          onClick={() => {
+            if (showPaymentForm) {
+              setShowPaymentForm(false);
+              return;
+            }
+            if (returnTo) {
+              navigate(returnTo);
+            } else if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate("/");
+            }
+          }}
           className="flex items-center gap-1 text-sm font-medium text-[#2F2A33] hover:text-[#A36BFF] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
