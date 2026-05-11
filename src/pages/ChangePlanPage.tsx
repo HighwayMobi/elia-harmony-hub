@@ -63,6 +63,29 @@ const ChangePlanPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
   const [submitting, setSubmitting] = useState(false);
+  const [lineDetails, setLineDetails] = useState<any>(null);
+
+  useEffect(() => {
+    if (!line?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data: json } = await ftPost<any>("get-line-details", {
+          line_id: line.id,
+        });
+        if (cancelled) return;
+        if (json?.ok) {
+          const payload = json.data?.data ?? json.data;
+          setLineDetails(payload || null);
+        }
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [line?.id]);
 
   useEffect(() => {
     let cancelled = false;
