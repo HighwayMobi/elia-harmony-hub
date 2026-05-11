@@ -129,7 +129,7 @@ const ChangePlanPage = () => {
 
   const feeDate = useMemo(() => {
     return (
-      line?.next_payment_date ||
+      line?.next_billing_date ||
       line?.plan?.expire_at ||
       line?.expire_at ||
       ""
