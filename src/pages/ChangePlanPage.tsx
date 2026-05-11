@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Signal, Loader2, Check, Wifi, Plane } from "lucide-react";
+import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
