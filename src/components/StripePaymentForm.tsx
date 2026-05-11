@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -47,6 +48,7 @@ const InnerForm = ({
 }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,12 +60,24 @@ const InnerForm = ({
     const successParams = new URLSearchParams();
     if (returnTo) successParams.set("returnTo", returnTo);
     const returnUrl = `${window.location.origin}/payment-success?${successParams.toString()}`;
-    const { error: stripeError } = await stripe.confirmPayment({
+    // `redirect: "if_required"` evita el fallo cuando estamos dentro de un iframe
+    // (preview de Lovable) donde Stripe no puede cambiar window.location.
+    const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: { return_url: returnUrl, receipt_email: email || undefined },
+      redirect: "if_required",
     });
     if (stripeError) {
       setError(stripeError.message || "Error al procesar el pago");
+      setSubmitting(false);
+      return;
+    }
+    // Si no hubo redirect (3DS no requerido o iframe), navegamos manualmente.
+    const status = paymentIntent?.status;
+    if (status === "succeeded" || status === "processing" || status === "requires_capture") {
+      successParams.set("redirect_status", status === "succeeded" ? "succeeded" : "processing");
+      navigate(`/payment-success?${successParams.toString()}`);
+    } else {
       setSubmitting(false);
     }
   };
