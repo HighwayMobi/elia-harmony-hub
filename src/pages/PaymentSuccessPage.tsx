@@ -9,34 +9,41 @@ const PaymentSuccessPage = () => {
   const [params] = useSearchParams();
   const returnTo = params.get("returnTo") || "/";
   const status = params.get("redirect_status"); // succeeded | processing | requires_payment_method | failed
-  const [countdown, setCountdown] = useState(4);
+  const [countdown, setCountdown] = useState(5);
+  const [refreshing, setRefreshing] = useState(false);
 
   const isSuccess = !status || status === "succeeded" || status === "processing";
 
   useEffect(() => {
     if (!isSuccess) return;
-    // Refrescar saldo de la línea tras el pago
-    (async () => {
-      const ft = getFTSession();
-      const lineId =
-        ft?.line?.id ||
-        ft?.line_id ||
-        ft?.lines?.[0]?.id ||
-        getSubscriptionIdFromToken(ft?.token);
-      if (lineId) {
+    const ft = getFTSession();
+    const lineId =
+      ft?.line?.id ||
+      ft?.line_id ||
+      ft?.lines?.[0]?.id ||
+      getSubscriptionIdFromToken(ft?.token);
+
+    // Esperar 3 s para dar tiempo al webhook del backend a actualizar el saldo,
+    // y entonces consultar GET /account/lines/:id.
+    const refreshTimer = setTimeout(async () => {
+      if (!lineId) return;
+      setRefreshing(true);
+      try {
         invalidateLineDetails(lineId);
-        try {
-          await fetchLineDetails(lineId, true);
-        } catch {
-          // ignore
-        }
+        await fetchLineDetails(lineId, true);
+      } catch {
+        // ignore
+      } finally {
+        setRefreshing(false);
       }
-    })();
-    const id = setInterval(() => setCountdown((c) => c - 1), 1000);
-    const to = setTimeout(() => navigate(returnTo), 4000);
+    }, 3000);
+
+    const tick = setInterval(() => setCountdown((c) => c - 1), 1000);
+    const redirect = setTimeout(() => navigate(returnTo), 5000);
     return () => {
-      clearInterval(id);
-      clearTimeout(to);
+      clearTimeout(refreshTimer);
+      clearInterval(tick);
+      clearTimeout(redirect);
     };
   }, [isSuccess, navigate, returnTo]);
 
@@ -59,7 +66,7 @@ const PaymentSuccessPage = () => {
                 : "Tu saldo se actualizará en unos instantes."}
             </p>
             <p className="mt-4 text-xs text-gray-400">
-              Volviendo en {Math.max(0, countdown)}s…
+              {refreshing ? "Actualizando saldo…" : `Volviendo en ${Math.max(0, countdown)}s…`}
             </p>
             <button
               onClick={() => navigate(returnTo)}
