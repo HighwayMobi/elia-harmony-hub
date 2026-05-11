@@ -107,6 +107,13 @@ const HomePage = ({ user }: HomePageProps) => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
+  const [financeData, setFinanceData] = useState<{
+    cost: number;
+    income: number;
+    items: Array<{ amount: number; balance_after?: number; date: string; description?: string; event_type?: string; type?: string }>;
+  } | null>(null);
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeError, setFinanceError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(() => {
     const p = getCachedProfile();
     if (!p) return null;
