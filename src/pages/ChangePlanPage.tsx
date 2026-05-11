@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Signal, Loader2, Check, Wifi, Plane } from "lucide-react";
+import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
@@ -116,15 +116,6 @@ const ChangePlanPage = () => {
             )}
           </div>
 
-          {currentPlanName && (
-            <div className="mb-6 rounded-2xl bg-white/95 px-5 py-3 flex items-center gap-3 shadow-md">
-              <Check className="h-5 w-5 text-[#A36BFF]" />
-              <div className="flex-1">
-                <span className="text-xs text-gray-500">Tarifa actual</span>
-                <p className="text-sm font-bold text-[#2F2A33]">{currentPlanName}</p>
-              </div>
-            </div>
-          )}
 
           {loading && (
             <div className="flex items-center justify-center py-16">
