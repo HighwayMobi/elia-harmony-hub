@@ -4,6 +4,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const maskSensitive = (value?: string) => {
+  if (!value) return "";
+  if (value.length <= 16) return `${value.slice(0, 4)}…${value.slice(-4)}`;
+  return `${value.slice(0, 12)}…${value.slice(-6)} (len:${value.length})`;
+};
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -41,6 +47,13 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("Token:", maskSensitive(token));
+    console.log("Headers:", {
+      Authorization: `Bearer ${maskSensitive(token)}`,
+      "X-Partner-Key": maskSensitive(partnerKey),
+    });
+    console.log("Body:", { amount, line_id: String(lineId) });
 
     const upstream = await fetch(
       `https://platform.factorytele.com/api/v1/pub/billing/topup`,
