@@ -468,12 +468,22 @@ const HomePage = ({ user }: HomePageProps) => {
                   {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
-              <button
-                onClick={() => navigate("/change-plan", { state: { line: currentLine, lineDetails } })}
-                className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
-              >
-                Cambiar
-              </button>
+              {lineDetails?.pending_plan?.name ? (
+                <button
+                  title="Ya se ha solicitado un cambio de tarifa"
+                  disabled
+                  className="rounded-xl border border-[#A36BFF]/40 px-5 py-2 text-sm font-semibold text-[#A36BFF]/40 cursor-not-allowed"
+                >
+                  Cambiar
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate("/change-plan", { state: { line: currentLine, lineDetails } })}
+                  className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+                >
+                  Cambiar
+                </button>
+              )}
             </div>
 
             <div className="border-t border-gray-100 px-5 py-3 flex flex-col gap-3">
@@ -516,7 +526,7 @@ const HomePage = ({ user }: HomePageProps) => {
               </div>
             ) : (
               <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-                Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
+                Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDateDot(lineDetails?.next_billing_date)}
               </div>
             )}
           </div>
