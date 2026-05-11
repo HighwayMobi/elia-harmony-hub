@@ -37,6 +37,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { invalidateLineDetails } from "@/lib/api-cache";
 
 interface HomePageProps {
   user: User;
@@ -112,6 +123,8 @@ const HomePage = ({ user }: HomePageProps) => {
     () => getCachedLineDetails(getFTSession()?.line?.id) || null
   );
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingPlanChange, setCancellingPlanChange] = useState(false);
 
   const loadLineDetails = async (lineId: string | number, force = false) => {
     if (!lineId) return;
@@ -277,6 +290,54 @@ const HomePage = ({ user }: HomePageProps) => {
     const month = MONTHS_ES[d.getUTCMonth()];
     return `${day} - ${month}`;
   };
+  const fmtDateDot = (iso?: string) => {
+    if (!iso) return NA;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const day = d.getUTCDate().toString().padStart(2, "0");
+    const month = (d.getUTCMonth() + 1).toString().padStart(2, "0");
+    return `${day}.${month}.${d.getUTCFullYear()}`;
+  };
+  const isTomorrowUTC = (iso?: string) => {
+    if (!iso) return false;
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return false;
+    const now = new Date();
+    const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    return (
+      d.getUTCFullYear() === tomorrow.getUTCFullYear() &&
+      d.getUTCMonth() === tomorrow.getUTCMonth() &&
+      d.getUTCDate() === tomorrow.getUTCDate()
+    );
+  };
+
+  const handleCancelPlanChange = async () => {
+    const ft = getFTSession();
+    const token = ft?.token;
+    const lineId = currentLine?.id;
+    if (!token || !lineId) return;
+    setCancellingPlanChange(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cancel-line-plan-change", {
+        body: { token, line_id: lineId },
+      });
+      if (error) throw error;
+      if (!data?.ok) throw new Error(data?.data?.error || data?.data?.message || "No se pudo cancelar");
+      toast({ title: "Cambio de plan cancelado" });
+      invalidateLineDetails(lineId);
+      await loadLineDetails(lineId, true);
+    } catch (e: unknown) {
+      toast({
+        title: "Error",
+        description: e instanceof Error ? e.message : "No se pudo cancelar el cambio",
+        variant: "destructive",
+      });
+    } finally {
+      setCancellingPlanChange(false);
+      setCancelDialogOpen(false);
+    }
+  };
+
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
@@ -438,9 +499,26 @@ const HomePage = ({ user }: HomePageProps) => {
               </button>
             </div>
 
-            <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
-              Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
-            </div>
+            {lineDetails?.pending_plan?.name ? (
+              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF] flex flex-col items-center gap-1.5">
+                <span>
+                  A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
+                  {lineDetails.pending_plan.price != null ? ` — €${fmt(lineDetails.pending_plan.price)}/mes` : ""}
+                </span>
+                {!isTomorrowUTC(lineDetails.pending_plan.change_date) && (
+                  <button
+                    onClick={() => setCancelDialogOpen(true)}
+                    className="rounded-lg border border-[#A36BFF] px-4 py-1 text-xs font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+                  >
+                    Cancelar
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
+                Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDate(lineDetails?.next_billing_date)}
+              </div>
+            )}
           </div>
 
           {/* Data + minutes */}
@@ -587,6 +665,29 @@ const HomePage = ({ user }: HomePageProps) => {
           </div>
         </div>
       </motion.main>
+
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancelar cambio de plan</AlertDialogTitle>
+            <AlertDialogDescription>
+              ¿Estás seguro de que quieres cancelar el cambio de plan programado?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancellingPlanChange}>No</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleCancelPlanChange();
+              }}
+              disabled={cancellingPlanChange}
+            >
+              Sí, cancelar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
