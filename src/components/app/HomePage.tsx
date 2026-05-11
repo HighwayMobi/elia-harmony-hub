@@ -430,7 +430,10 @@ const HomePage = ({ user }: HomePageProps) => {
                   </span>
                 </div>
               </div>
-              <button className="w-full rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]">
+              <button
+                onClick={() => navigate("/topup")}
+                className="w-full rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
+              >
                 Recargar
               </button>
             </div>
