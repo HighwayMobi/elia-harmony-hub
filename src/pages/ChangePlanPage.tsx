@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
+import { fetchLineDetails, getCachedLineDetails, invalidateLineDetails } from "@/lib/api-cache";
 import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
 import {
@@ -63,21 +64,15 @@ const ChangePlanPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [whenChange, setWhenChange] = useState<"now" | "later">("now");
   const [submitting, setSubmitting] = useState(false);
-  const [lineDetails, setLineDetails] = useState<any>(null);
+  const [lineDetails, setLineDetails] = useState<any>(() => getCachedLineDetails(line?.id) || null);
 
   useEffect(() => {
     if (!line?.id) return;
     let cancelled = false;
     (async () => {
       try {
-        const { data: json } = await ftPost<any>("get-line-details", {
-          line_id: line.id,
-        });
-        if (cancelled) return;
-        if (json?.ok) {
-          const payload = json.data?.data ?? json.data;
-          setLineDetails(payload || null);
-        }
+        const data = await fetchLineDetails(line.id);
+        if (!cancelled) setLineDetails(data || null);
       } catch {
         // ignore
       }
@@ -174,7 +169,17 @@ const ChangePlanPage = () => {
     if (!selectedPlan) return;
     setSubmitting(true);
     // Wire to a future "change-plan" endpoint here.
-    setTimeout(() => {
+    setTimeout(async () => {
+      // After write op: invalidate cached line details and re-fetch once.
+      if (line?.id) {
+        invalidateLineDetails(line.id);
+        try {
+          const data = await fetchLineDetails(line.id, true);
+          setLineDetails(data || null);
+        } catch {
+          // ignore
+        }
+      }
       setSubmitting(false);
       setConfirmOpen(false);
     }, 400);
