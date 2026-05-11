@@ -28,6 +28,7 @@ import {
   getCachedLines,
   getCachedLineDetails,
   getCachedAvatarUrl,
+  subscribeApiCache,
 } from "@/lib/api-cache";
 import {
   DropdownMenu,
