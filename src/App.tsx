@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import ChangePlanPage from "./pages/ChangePlanPage";
 import TopUpPage from "./pages/TopUpPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import BuyAddonPage from "./pages/BuyAddonPage";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/change-plan" element={<ChangePlanPage />} />
           <Route path="/topup" element={<TopUpPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/buy-addon" element={<BuyAddonPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
