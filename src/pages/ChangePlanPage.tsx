@@ -407,7 +407,7 @@ const ChangePlanPage = () => {
                     className="mt-1 accent-[#A36BFF]"
                   />
                   <span className="text-sm text-foreground">
-                    Al final del periodo actual{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
+                    Al final del periodo pagado{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
                   </span>
                 </label>
               </div>
@@ -420,7 +420,11 @@ const ChangePlanPage = () => {
                     : "bg-primary/5 border-primary/20"
                 )}
               >
-                <p>La nueva tarifa entrará en vigor el {fmtDateDM(effectiveDate)}.</p>
+                <p>
+                  {whenChange === "later"
+                    ? `La nueva tarifa entrará en vigor al finalizar el periodo pagado: ${fmtDateDM(effectiveDate)}.`
+                    : `La nueva tarifa entrará en vigor el ${fmtDateDM(effectiveDate)}.`}
+                </p>
               </div>
             </div>
           )}
