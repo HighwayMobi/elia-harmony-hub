@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
+import { fetchLineDetails, invalidateLineDetails } from "@/lib/api-cache";
 
 const PaymentSuccessPage = () => {
   const navigate = useNavigate();
