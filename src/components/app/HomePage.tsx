@@ -773,7 +773,7 @@ const HomePage = ({ user }: HomePageProps) => {
                                   {it.description || it.event_type || it.type || "Movimiento"}
                                 </span>
                                 <span className="text-xs text-gray-400">
-                                  {it.date ? formatDateDdMmYyyy(it.date) : ""}
+                                  {it.date ? fmtDateDot(it.date) : ""}
                                 </span>
                               </div>
                               <span
