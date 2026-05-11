@@ -360,7 +360,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 </DropdownMenu>
               ) : (
                 <p className="text-sm text-[#A36BFF]/80">
-                  {getFTSession()?.phone || NA}
+                  {formatLineTitle(selectedLine)}
                 </p>
               )}
             </div>
