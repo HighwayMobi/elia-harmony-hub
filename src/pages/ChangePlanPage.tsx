@@ -140,21 +140,30 @@ const ChangePlanPage = () => {
 
   const currentPlan = useMemo(() => {
     const norm = (s: string) =>
-      String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+      String(s || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .replace(/\s*gb\b/g, "gb")
+        .replace(/\s*\+\s*/g, "+");
     const byName = currentPlanName
       ? plans.find((p) => p.name && norm(p.name) === norm(currentPlanName))
       : null;
     if (byName) return byName;
+    const byPlanShape = plans.find(
+      (p) =>
+        Number(p.price) === Number(currentPlanPrice) &&
+        Number(p.gb || 0) === Number(lineDetails?.plan?.gb || 0) &&
+        Boolean(p.is_unlimited_voice) === Boolean(lineDetails?.remains?.is_unlimited_voice)
+    );
+    if (byPlanShape) return byPlanShape;
     if (currentPlanPrice != null) {
       return (
         plans.find((p) => Number(p.price) === Number(currentPlanPrice)) || null
       );
     }
     return null;
-  }, [plans, currentPlanName, currentPlanPrice]);
-
-  // eslint-disable-next-line no-console
-  console.debug("[ChangePlan] currentPlanName=", currentPlanName, "price=", currentPlanPrice, "matched=", currentPlan?.id, "lineDetails?", !!lineDetails);
+  }, [plans, currentPlanName, currentPlanPrice, lineDetails?.plan?.gb, lineDetails?.remains?.is_unlimited_voice]);
 
   const soonDate = useMemo(() => {
     const d = new Date();
