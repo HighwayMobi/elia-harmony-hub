@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
+import { fetchLineDetails, getCachedLineDetails, invalidateLineDetails } from "@/lib/api-cache";
 import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
 import {
