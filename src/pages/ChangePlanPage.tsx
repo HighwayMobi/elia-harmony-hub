@@ -133,16 +133,26 @@ const ChangePlanPage = () => {
     return ft?.phone || "";
   }, [line, ft]);
 
-  const currentPlan = useMemo(
-    () =>
-      plans.find(
-        (p) =>
-          p.name &&
-          currentPlanName &&
-          p.name.trim().toLowerCase() === currentPlanName.trim().toLowerCase()
-      ) || null,
-    [plans, currentPlanName]
-  );
+  const currentPlanPrice =
+    lineDetails?.plan?.price ?? line?.plan?.price ?? null;
+
+  const currentPlan = useMemo(() => {
+    const norm = (s: string) =>
+      String(s || "").trim().toLowerCase().replace(/\s+/g, " ");
+    const byName = currentPlanName
+      ? plans.find((p) => p.name && norm(p.name) === norm(currentPlanName))
+      : null;
+    if (byName) return byName;
+    if (currentPlanPrice != null) {
+      return (
+        plans.find((p) => Number(p.price) === Number(currentPlanPrice)) || null
+      );
+    }
+    return null;
+  }, [plans, currentPlanName, currentPlanPrice]);
+
+  // eslint-disable-next-line no-console
+  console.debug("[ChangePlan] currentPlanName=", currentPlanName, "price=", currentPlanPrice, "matched=", currentPlan?.id, "lineDetails?", !!lineDetails);
 
   const soonDate = useMemo(() => {
     const d = new Date();
