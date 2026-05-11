@@ -5,6 +5,13 @@ import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { getFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import logo from "@/assets/logo-elia-balance.svg";
 
 type CatalogPlan = {
@@ -23,15 +30,28 @@ type CatalogPlan = {
 
 const fmt = (n: number) => Number(n || 0).toFixed(2);
 
+const formatDate = (d: Date) =>
+  `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
+
+const parseDateMaybe = (s?: string): Date | null => {
+  if (!s) return null;
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 const ChangePlanPage = () => {
   const navigate = useNavigate();
   const ft = getFTSession();
-  const line = ft?.line;
+  const line: any = ft?.line;
   const lineType = (line?.type as string) || "mobile";
 
   const [plans, setPlans] = useState<CatalogPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<CatalogPlan | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [whenChange, setWhenChange] = useState<"now" | "later">("now");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,7 +99,60 @@ const ChangePlanPage = () => {
     return ft?.phone || "";
   }, [line, ft]);
 
+  const currentPlan = useMemo(
+    () =>
+      plans.find(
+        (p) =>
+          p.name &&
+          currentPlanName &&
+          p.name.trim().toLowerCase() === currentPlanName.trim().toLowerCase()
+      ) || null,
+    [plans, currentPlanName]
+  );
+
+  const soonDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return formatDate(d);
+  }, []);
+
+  const feeDate = useMemo(() => {
+    const raw =
+      line?.next_payment_date ||
+      line?.plan?.expire_at ||
+      line?.expire_at ||
+      "";
+    const d = parseDateMaybe(raw);
+    return d ? formatDate(d) : "";
+  }, [line]);
+
   const TypeIcon = lineType === "fiber" ? Wifi : lineType === "travel" ? Plane : Signal;
+
+  const handleSelectPlan = (plan: CatalogPlan) => {
+    setSelectedPlan(plan);
+    const isUpgrade =
+      currentPlan !== null && plan.price > (currentPlan.price ?? 0);
+    setWhenChange(isUpgrade ? "now" : "later");
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
+    if (!selectedPlan) return;
+    setSubmitting(true);
+    // Wire to a future "change-plan" endpoint here.
+    setTimeout(() => {
+      setSubmitting(false);
+      setConfirmOpen(false);
+    }, 400);
+  };
+
+  const isUpgrade =
+    !!selectedPlan &&
+    currentPlan !== null &&
+    selectedPlan.price > (currentPlan?.price ?? 0);
+
+  const effectiveDate =
+    isUpgrade && whenChange === "now" ? soonDate : feeDate || "—";
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#A799B7" }}>
@@ -115,7 +188,6 @@ const ChangePlanPage = () => {
               </p>
             )}
           </div>
-
 
           {loading && (
             <div className="flex items-center justify-center py-16">
@@ -190,6 +262,7 @@ const ChangePlanPage = () => {
                   <div className="mt-3 flex justify-end">
                     <button
                       disabled={!!isCurrent}
+                      onClick={() => handleSelectPlan(plan)}
                       className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#A36BFF]"
                     >
                       {isCurrent ? "Actual" : "Seleccionar"}
@@ -201,6 +274,110 @@ const ChangePlanPage = () => {
           </div>
         </div>
       </motion.main>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar cambio de tarifa</DialogTitle>
+          </DialogHeader>
+          {selectedPlan && (
+            <div className="space-y-4 py-2">
+              <div className="rounded-xl border border-border bg-secondary/30 p-4 space-y-2">
+                {lineLabel && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">para la línea</span>
+                    <span className="font-semibold text-[#FF7A1A]">{lineLabel}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Nueva tarifa</span>
+                  <span className="font-semibold text-foreground">
+                    {selectedPlan.name}
+                  </span>
+                </div>
+                {selectedPlan.gb !== undefined && !selectedPlan.is_unlimited_data && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Datos</span>
+                    <span className="font-semibold text-foreground">
+                      {selectedPlan.gb} GB
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Cuota mensual</span>
+                  <span className="font-bold text-[#FF7A1A]">
+                    €{fmt(selectedPlan.price)}
+                  </span>
+                </div>
+              </div>
+
+              {isUpgrade && (
+                <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+                  <p className="text-sm font-semibold text-foreground">
+                    ¿Cuándo aplicar la nueva tarifa?
+                  </p>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="whenChange"
+                      value="now"
+                      checked={whenChange === "now"}
+                      onChange={() => setWhenChange("now")}
+                      className="mt-1 accent-[#A36BFF]"
+                    />
+                    <span className="text-sm text-foreground">
+                      Pronto ({soonDate})
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="whenChange"
+                      value="later"
+                      checked={whenChange === "later"}
+                      onChange={() => setWhenChange("later")}
+                      className="mt-1 accent-[#A36BFF]"
+                    />
+                    <span className="text-sm text-foreground">
+                      Al final del periodo actual{feeDate ? ` (${feeDate})` : ""}
+                    </span>
+                  </label>
+                </div>
+              )}
+
+              <div
+                className={cn(
+                  "rounded-xl border p-4 text-sm text-foreground",
+                  isUpgrade && whenChange === "now"
+                    ? "bg-green-50/50 border-green-300/50"
+                    : "bg-primary/5 border-primary/20"
+                )}
+              >
+                <p>La nueva tarifa entrará en vigor el {effectiveDate}.</p>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <button
+              onClick={() => setConfirmOpen(false)}
+              className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleConfirm}
+              disabled={submitting}
+              className="flex-1 rounded-xl bg-[#FF7A1A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#FF7A1A]/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+              ) : (
+                "Confirmar"
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
