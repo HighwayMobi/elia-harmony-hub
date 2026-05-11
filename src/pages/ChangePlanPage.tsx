@@ -234,6 +234,29 @@ const ChangePlanPage = () => {
     setSubmitting(true);
     setError(null);
     try {
+      // 1. Refrescar info de la línea para comprobar saldo actual
+      let balance: number | null = null;
+      try {
+        invalidateLineDetails(lineId);
+        const fresh = await fetchLineDetails(lineId, true);
+        if (fresh) {
+          setLineDetails(fresh);
+          balance = Number((fresh as any)?.balance ?? NaN);
+        }
+      } catch {
+        // si falla, dejamos que el upstream decida
+      }
+
+      const price = Number(selectedPlan.price) || 0;
+      if (Number.isFinite(balance as number) && (balance as number) < price) {
+        const deficit = Math.max(3, Math.ceil(price - (balance as number)));
+        setConfirmOpen(false);
+        setSubmitting(false);
+        navigate(`/topup?amount=${deficit}&returnTo=/change-plan`);
+        return;
+      }
+
+      // 2. Solicitar cambio de tarifa
       const { data: json } = await ftPost<any>("change-line-plan", {
         line_id: lineId,
         plan_id: selectedPlan.id,
@@ -241,6 +264,21 @@ const ChangePlanPage = () => {
       });
       const inner = json?.data?.data ?? json?.data;
       const success = json?.ok && (inner?.success !== false);
+
+      // 3. Manejar saldo insuficiente desde el servidor (HTTP 402)
+      const upstreamStatus = Number(json?.status);
+      const upstreamMsg = String(inner?.message || inner?.error || "").toLowerCase();
+      if (!success && (upstreamStatus === 402 || upstreamMsg.includes("insufficient"))) {
+        const deficit = Math.max(
+          3,
+          Math.ceil(price - (Number.isFinite(balance as number) ? (balance as number) : 0))
+        );
+        setConfirmOpen(false);
+        setSubmitting(false);
+        navigate(`/topup?amount=${deficit}&returnTo=/change-plan`);
+        return;
+      }
+
       if (!success) {
         const msg =
           inner?.error ||
