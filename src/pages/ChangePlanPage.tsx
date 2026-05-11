@@ -282,11 +282,7 @@ const ChangePlanPage = () => {
 
           <div className="space-y-3">
             {plans.map((plan) => {
-              const isCurrent =
-                currentPlanName &&
-                plan.name &&
-                plan.name.trim().toLowerCase() ===
-                  currentPlanName.trim().toLowerCase();
+              const isCurrent = !!currentPlan && currentPlan.id === plan.id;
               const dataLabel = plan.is_unlimited_data
                 ? "Datos ilimitados"
                 : plan.gb
