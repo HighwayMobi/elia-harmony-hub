@@ -128,8 +128,9 @@ const HomePage = ({ user }: HomePageProps) => {
 
   const loadLines = async (force = false) => {
     const ft = getFTSession();
-    if (ft?.auth_type === "subscriber") {
-      const lineId = ft.line_id || getSubscriptionIdFromToken(ft.token);
+    const subscriptionId = getSubscriptionIdFromToken(ft?.token);
+    if (ft?.auth_type === "subscriber" || subscriptionId) {
+      const lineId = ft?.line_id || subscriptionId;
       const line = ft.line || (lineId ? ({ id: lineId } as FactoryTeleLine) : null);
       if (line) {
         setLines([line]);
