@@ -518,8 +518,8 @@ const ChangePlanPage = () => {
               >
                 <p>
                   {whenChange === "later"
-                    ? `La nueva tarifa entrará en vigor al finalizar el periodo pagado: ${fmtDateDM(effectiveDate)}.`
-                    : `La nueva tarifa entrará en vigor el ${fmtDateDM(effectiveDate)}.`}
+                    ? `La nueva tarifa entrará en vigor al finalizar el periodo pagado: ${fmtDateDot(effectiveDate)}.`
+                    : `La nueva tarifa entrará en vigor el ${fmtDateDot(effectiveDate)}.`}
                 </p>
               </div>
             </div>
