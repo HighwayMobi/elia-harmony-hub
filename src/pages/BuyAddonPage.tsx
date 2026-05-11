@@ -81,7 +81,7 @@ const BuyAddonPage = () => {
         });
         if (cancelled) return;
         if (!json?.ok) {
-          setError(json?.data?.error || "No se pudieron cargar los complementos");
+          setError(json?.data?.error || "No se pudieron cargar los paquetes de datos");
           setAddons([]);
         } else {
           const payload = json.data?.data ?? json.data;
@@ -167,7 +167,7 @@ const BuyAddonPage = () => {
 
       if (!success) {
         const msg =
-          inner?.error || inner?.message || json?.data?.error || "No se pudo activar el complemento";
+          inner?.error || inner?.message || json?.data?.error || "No se pudo activar el paquete de datos";
         setError(String(msg));
         setSubmitting(false);
         return;
@@ -179,7 +179,7 @@ const BuyAddonPage = () => {
       } catch {
         // ignore
       }
-      toast({ title: "Complemento activado", description: selectedAddon.name });
+      toast({ title: "Gb añadidos", description: selectedAddon.name });
       setConfirmOpen(false);
       navigate(-1);
     } catch (e: any) {
@@ -215,7 +215,7 @@ const BuyAddonPage = () => {
               Comprar Gb
             </h1>
             <p className="mt-1 text-sm text-white/80">
-              Elige un complemento para tu línea
+              Elige un paquete de datos para tu línea
             </p>
             {lineLabel && (
               <p className="mt-1 text-sm font-semibold text-[#FF7A1A]">
@@ -241,7 +241,7 @@ const BuyAddonPage = () => {
 
           {!loading && !error && addons.length === 0 && (
             <div className="rounded-2xl bg-white/95 px-5 py-4 text-sm text-gray-600 shadow">
-              No hay complementos disponibles.
+              No hay paquetes de datos disponibles.
             </div>
           )}
 
@@ -328,7 +328,7 @@ const BuyAddonPage = () => {
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Complemento</span>
+                  <span className="text-muted-foreground">Paquete</span>
                   <span className="font-semibold text-foreground">{selectedAddon.name}</span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -347,7 +347,7 @@ const BuyAddonPage = () => {
                 </div>
               ) : (
                 <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-                  El importe se descontará de tu saldo y el complemento se activará al instante.
+                  El importe se descontará de tu saldo y el paquete se activará al instante.
                 </div>
               )}
 
