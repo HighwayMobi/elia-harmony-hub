@@ -321,39 +321,37 @@ const ChangePlanPage = () => {
                 </div>
               </div>
 
-              {isUpgrade && (
-                <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-                  <p className="text-sm font-semibold text-foreground">
-                    ¿Cuándo aplicar la nueva tarifa?
-                  </p>
-                  <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="whenChange"
-                      value="now"
-                      checked={whenChange === "now"}
-                      onChange={() => setWhenChange("now")}
-                      className="mt-1 accent-[#A36BFF]"
-                    />
-                    <span className="text-sm text-foreground">
-                      Pronto ({soonDate})
-                    </span>
-                  </label>
-                  <label className="flex items-start gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="whenChange"
-                      value="later"
-                      checked={whenChange === "later"}
-                      onChange={() => setWhenChange("later")}
-                      className="mt-1 accent-[#A36BFF]"
-                    />
-                    <span className="text-sm text-foreground">
-                      Al final del periodo actual{feeDate ? ` (${feeDate})` : ""}
-                    </span>
-                  </label>
-                </div>
-              )}
+              <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+                <p className="text-sm font-semibold text-foreground">
+                  ¿Cuándo aplicar la nueva tarifa?
+                </p>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="whenChange"
+                    value="now"
+                    checked={whenChange === "now"}
+                    onChange={() => setWhenChange("now")}
+                    className="mt-1 accent-[#A36BFF]"
+                  />
+                  <span className="text-sm text-foreground">
+                    Pronto ({fmtDateDM(soonDate)})
+                  </span>
+                </label>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="whenChange"
+                    value="later"
+                    checked={whenChange === "later"}
+                    onChange={() => setWhenChange("later")}
+                    className="mt-1 accent-[#A36BFF]"
+                  />
+                  <span className="text-sm text-foreground">
+                    Al final del periodo actual{feeDate ? ` (${fmtDateDM(feeDate)})` : ""}
+                  </span>
+                </label>
+              </div>
 
               <div
                 className={cn(
