@@ -229,6 +229,51 @@ const HomePage = ({ user }: HomePageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sincronizar con la caché: si otra página (recarga, compra de Gb, etc.)
+  // actualiza los detalles de la línea actual, refrescamos el saldo aquí.
+  useEffect(() => {
+    const unsubscribe = subscribeApiCache((slice, key) => {
+      if (slice === "lineDetails") {
+        const id = currentLine?.id;
+        if (!id) return;
+        if (key && String(key) !== String(id)) return;
+        const fresh = getCachedLineDetails(id);
+        if (fresh) setLineDetails(fresh as LineDetails);
+      } else if (slice === "lines") {
+        const fresh = getCachedLines();
+        if (Array.isArray(fresh)) setLines(filterVisibleLines(fresh as FactoryTeleLine[]));
+      } else if (slice === "profile") {
+        const p = getCachedProfile();
+        if (p) {
+          const fullName =
+            [p.first_name, p.last_name].filter(Boolean).join(" ") || p.email || "Usuario";
+          setProfile({ name: fullName, phone: p.phone, ...p });
+        }
+      } else if (slice === "avatarUrl") {
+        setAvatarUrl(getCachedAvatarUrl());
+      }
+    });
+    return unsubscribe;
+  }, [currentLine?.id]);
+
+  // Refrescar la línea actual al volver a esta pantalla (p. ej. tras
+  // pagar una recarga o comprar Gb) para reflejar el nuevo saldo.
+  useEffect(() => {
+    const onFocus = () => {
+      if (currentLine?.id) loadLineDetails(currentLine.id, true);
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") onFocus();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLine?.id]);
+
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
