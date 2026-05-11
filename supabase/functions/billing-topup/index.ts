@@ -63,6 +63,10 @@ Deno.serve(async (req) => {
       lineId,
       "amount:",
       amount,
+      "token_len:",
+      token.length,
+      "token_prefix:",
+      token.slice(0, 16),
       "body:",
       text?.slice(0, 500)
     );
