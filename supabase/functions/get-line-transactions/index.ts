@@ -41,7 +41,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const url = `https://platform.factorytele.com/api/v1/account/lines/${encodeURIComponent(
+    const url = `https://platform.factorytele.com/api/v1/pub/account/lines/${encodeURIComponent(
       String(lineId)
     )}/transactions?month=${encodeURIComponent(month)}`;
 
