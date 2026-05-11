@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { clearFTSession, getFTSession } from "@/lib/ft-auth";
+import { invalidateAll } from "@/lib/api-cache";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { LogOut, User as UserIcon, Mail, Activity, Phone, MapPin, IdCard, Loader2 } from "lucide-react";
