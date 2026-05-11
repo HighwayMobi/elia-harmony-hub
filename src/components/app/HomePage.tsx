@@ -770,7 +770,16 @@ const HomePage = ({ user }: HomePageProps) => {
                             >
                               <div className="flex flex-col">
                                 <span className="text-sm text-[#2F2A33]">
-                                  {it.description || it.event_type || it.type || "Movimiento"}
+                                  {(() => {
+                                    const raw = (it.description || it.event_type || it.type || "").toString().toLowerCase();
+                                    const map: Record<string, string> = {
+                                      topup: "Cuenta recarga",
+                                      "top-up": "Cuenta recarga",
+                                      top_up: "Cuenta recarga",
+                                      charge: "Cargo",
+                                    };
+                                    return map[raw] || it.description || it.event_type || it.type || "Movimiento";
+                                  })()}
                                 </span>
                                 <span className="text-xs text-gray-400">
                                   {it.date ? fmtDateDot(it.date) : ""}
