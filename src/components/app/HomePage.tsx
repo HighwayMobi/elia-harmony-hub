@@ -283,6 +283,44 @@ const HomePage = ({ user }: HomePageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLine?.id]);
 
+  // Cargar transacciones del mes seleccionado cuando Finanzas está abierto
+  useEffect(() => {
+    if (!financesOpen) return;
+    const lineId = currentLine?.id;
+    if (!lineId) return;
+    const monthStr = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+    let cancelled = false;
+    setFinanceLoading(true);
+    setFinanceError(null);
+    (async () => {
+      try {
+        const { data: json } = await ftPost<any>("get-line-transactions", {
+          line_id: lineId,
+          month: monthStr,
+        });
+        if (cancelled) return;
+        if (!json?.ok) {
+          throw new Error(json?.data?.error || json?.data?.message || "No se pudieron cargar las transacciones");
+        }
+        const inner = json.data?.data ?? json.data ?? {};
+        setFinanceData({
+          cost: Number(inner.cost ?? 0),
+          income: Number(inner.income ?? 0),
+          items: Array.isArray(inner.items) ? inner.items : [],
+        });
+      } catch (e) {
+        if (cancelled) return;
+        setFinanceError(e instanceof Error ? e.message : "Error");
+        setFinanceData(null);
+      } finally {
+        if (!cancelled) setFinanceLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [financesOpen, currentLine?.id, financeMonth.year, financeMonth.month]);
+
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
