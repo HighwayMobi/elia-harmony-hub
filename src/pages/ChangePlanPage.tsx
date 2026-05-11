@@ -152,12 +152,13 @@ const ChangePlanPage = () => {
 
   const feeDate = useMemo(() => {
     return (
+      lineDetails?.next_billing_date ||
       line?.next_billing_date ||
       line?.plan?.expire_at ||
       line?.expire_at ||
       ""
     );
-  }, [line]);
+  }, [line, lineDetails]);
 
   const TypeIcon = lineType === "fiber" ? Wifi : lineType === "travel" ? Plane : Signal;
 
