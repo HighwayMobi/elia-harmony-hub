@@ -78,28 +78,37 @@ const HomePage = ({ user }: HomePageProps) => {
   const navigate = useNavigate();
   const [financesOpen, setFinancesOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(() => getCachedAvatarUrl());
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [financeMonth, setFinanceMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
   });
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [lines, setLines] = useState<FactoryTeleLine[]>(() => getFTSession()?.lines || []);
-  const [currentLine, setCurrentLine] = useState<FactoryTeleLine | null>(() => getFTSession()?.line || null);
-  const [lineDetails, setLineDetails] = useState<LineDetails | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(() => {
+    const p = getCachedProfile();
+    if (!p) return null;
+    const fullName =
+      [p.first_name, p.last_name].filter(Boolean).join(" ") || p.email || "Usuario";
+    return { name: fullName, phone: p.phone, ...p };
+  });
+  const [lines, setLines] = useState<FactoryTeleLine[]>(
+    () => getCachedLines() || getFTSession()?.lines || []
+  );
+  const [currentLine, setCurrentLine] = useState<FactoryTeleLine | null>(
+    () => getFTSession()?.line || null
+  );
+  const [lineDetails, setLineDetails] = useState<LineDetails | null>(
+    () => getCachedLineDetails(getFTSession()?.line?.id) || null
+  );
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const loadLineDetails = async (lineId: string | number) => {
+  const loadLineDetails = async (lineId: string | number, force = false) => {
     if (!lineId) return;
     setLoadingDetails(true);
     try {
-      const { data: json } = await ftPost<any>("get-line-details", { line_id: lineId });
-      if (json?.ok) {
-        const payload = json.data?.data ? json.data.data : json.data;
-        setLineDetails(payload || null);
-      }
+      const data = await fetchLineDetails(lineId, force);
+      setLineDetails(data || null);
     } catch (e) {
       console.warn("line details error", e);
     } finally {
@@ -107,28 +116,18 @@ const HomePage = ({ user }: HomePageProps) => {
     }
   };
 
-  const loadLines = async () => {
+  const loadLines = async (force = false) => {
     try {
-      const { data: json } = await ftPost<any>("get-account-lines");
-      if (json?.ok) {
-        const payload = json.data;
-        const arr = Array.isArray(payload)
-          ? payload
-          : Array.isArray(payload?.data)
-          ? payload.data
-          : Array.isArray(payload?.lines)
-          ? payload.lines
-          : [];
-        const fetched = filterVisibleLines(arr as FactoryTeleLine[]);
-        setLines(fetched);
-        const ft = getFTSession();
-        if (ft) {
-          const stillExists = fetched.find((l) => l.id === currentLine?.id);
-          const next = stillExists || fetched[0] || null;
-          setFTSession({ ...ft, lines: fetched, line: next || ft.line, line_id: next?.id ?? ft.line_id });
-          if (next && next.id !== currentLine?.id) setCurrentLine(next);
-          if (next) loadLineDetails(next.id);
-        }
+      const arr = await fetchLines(force);
+      const fetched = filterVisibleLines(arr as FactoryTeleLine[]);
+      setLines(fetched);
+      const ft = getFTSession();
+      if (ft) {
+        const stillExists = fetched.find((l) => l.id === currentLine?.id);
+        const next = stillExists || fetched[0] || null;
+        setFTSession({ ...ft, lines: fetched, line: next || ft.line, line_id: next?.id ?? ft.line_id });
+        if (next && next.id !== currentLine?.id) setCurrentLine(next);
+        if (next) loadLineDetails(next.id, force);
       }
     } catch (e) {
       console.warn("lines load error", e);
@@ -141,18 +140,18 @@ const HomePage = ({ user }: HomePageProps) => {
     if (!ft) return;
     setFTSession({ ...ft, line_id: line.id, line });
     setCurrentLine(line);
-    setLineDetails(null);
-    loadLineDetails(line.id);
+    const cached = getCachedLineDetails(line.id);
+    setLineDetails(cached || null);
+    loadLineDetails(line.id, !cached);
   };
 
   // Cargar perfil desde API FactoryTele
-  const loadProfile = async () => {
+  const loadProfile = async (force = false) => {
     const ft = getFTSession();
     if (!ft?.token) return;
     try {
-      const { data: json } = await ftPost<any>("get-profile");
-      if (json?.ok && json.data?.data) {
-        const apiProfile = json.data.data;
+      const apiProfile = await fetchProfile(force);
+      if (apiProfile) {
         const fullName = [apiProfile.first_name, apiProfile.last_name]
           .filter(Boolean)
           .join(" ") || apiProfile.email || "Usuario";
@@ -161,19 +160,7 @@ const HomePage = ({ user }: HomePageProps) => {
           phone: apiProfile.phone,
           ...apiProfile,
         });
-        const raw =
-          apiProfile.avatar_url ||
-          apiProfile.line_avatar_url ||
-          apiProfile.avatar ||
-          apiProfile.photo ||
-          apiProfile.image ||
-          null;
-        if (raw) {
-          const absolute = /^https?:\/\//i.test(raw)
-            ? raw
-            : `https://platform.factorytele.com${raw.startsWith("/") ? "" : "/"}${raw}`;
-          setAvatarUrl(`${absolute}${absolute.includes("?") ? "&" : "?"}t=${Date.now()}`);
-        }
+        setAvatarUrl(getCachedAvatarUrl());
       }
     } catch (e) {
       console.warn("profile load error", e);
@@ -210,14 +197,9 @@ const HomePage = ({ user }: HomePageProps) => {
     const localPreview = URL.createObjectURL(file);
     setAvatarUrl(localPreview);
     try {
-      const form = new FormData();
-      form.append("avatar", file, file.name);
-      const { data: json } = await ftUpload<any>("upload-avatar", form);
-      if (!json?.ok) {
-        throw new Error(json?.data?.message || json?.error || "Error al subir");
-      }
+      await uploadAvatar(file);
       toast({ title: "Avatar actualizado" });
-      await loadProfile();
+      await loadProfile(true);
     } catch (err: any) {
       console.error(err);
       toast({ title: "Error al subir", description: err.message, variant: "destructive" });
