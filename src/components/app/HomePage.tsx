@@ -253,7 +253,9 @@ const HomePage = ({ user }: HomePageProps) => {
         setAvatarUrl(getCachedAvatarUrl());
       }
     });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, [currentLine?.id]);
 
   // Refrescar la línea actual al volver a esta pantalla (p. ej. tras
