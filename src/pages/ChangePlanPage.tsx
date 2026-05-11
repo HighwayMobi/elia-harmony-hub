@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Signal, Loader2, Wifi, Plane } from "lucide-react";
 import { ftPost } from "@/lib/api";
-import { fetchLineDetails, getCachedLineDetails, invalidateLineDetails } from "@/lib/api-cache";
-import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
+import { fetchLineDetails, fetchLines, getCachedLineDetails, invalidateLineDetails } from "@/lib/api-cache";
+import { filterVisibleLines, getFTSession, getSubscriptionIdFromToken, setFTSession } from "@/lib/ft-auth";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -54,7 +54,8 @@ const parseDateMaybe = (s?: string): Date | null => {
 const ChangePlanPage = () => {
   const navigate = useNavigate();
   const ft = getFTSession();
-  const line: any = ft?.line;
+  const [activeLine, setActiveLine] = useState<any>(() => ft?.line || null);
+  const line: any = activeLine || ft?.line;
   const lineId = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token);
   const lineType = ((line?.type || ft?.line?.type) as string) || "mobile";
 
