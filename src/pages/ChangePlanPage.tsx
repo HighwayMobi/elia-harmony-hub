@@ -56,9 +56,9 @@ const ChangePlanPage = () => {
   const location = useLocation();
   const routeState = (location.state || {}) as { line?: any; lineDetails?: any };
   const ft = getFTSession();
-  const [activeLine, setActiveLine] = useState<any>(() => routeState.line || ft?.line || null);
+  const [activeLine, setActiveLine] = useState<any>(() => routeState.line || ft?.line || ft?.lines?.[0] || null);
   const line: any = activeLine || ft?.line;
-  const lineId = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token);
+  const lineId = line?.id || ft?.line_id || ft?.lines?.[0]?.id || getSubscriptionIdFromToken(ft?.token);
   const lineType = ((line?.type || ft?.line?.type) as string) || "mobile";
 
   const [plans, setPlans] = useState<CatalogPlan[]>([]);
