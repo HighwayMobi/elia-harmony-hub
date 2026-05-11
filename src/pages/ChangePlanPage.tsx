@@ -169,7 +169,17 @@ const ChangePlanPage = () => {
     if (!selectedPlan) return;
     setSubmitting(true);
     // Wire to a future "change-plan" endpoint here.
-    setTimeout(() => {
+    setTimeout(async () => {
+      // After write op: invalidate cached line details and re-fetch once.
+      if (line?.id) {
+        invalidateLineDetails(line.id);
+        try {
+          const data = await fetchLineDetails(line.id, true);
+          setLineDetails(data || null);
+        } catch {
+          // ignore
+        }
+      }
       setSubmitting(false);
       setConfirmOpen(false);
     }, 400);
