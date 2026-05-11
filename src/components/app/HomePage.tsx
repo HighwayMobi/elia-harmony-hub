@@ -123,6 +123,8 @@ const HomePage = ({ user }: HomePageProps) => {
     () => getCachedLineDetails(getFTSession()?.line?.id) || null
   );
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancellingPlanChange, setCancellingPlanChange] = useState(false);
 
   const loadLineDetails = async (lineId: string | number, force = false) => {
     if (!lineId) return;
