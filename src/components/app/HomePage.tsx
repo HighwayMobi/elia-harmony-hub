@@ -552,7 +552,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="ml-auto p-2 rounded-xl text-[#F5E6D3]/80 hover:text-[#F5E6D3] hover:bg-[#F5E6D3]/10 transition-colors disabled:opacity-50"
+              className="ml-auto p-2 rounded-xl text-[#F5E6D3]/80 hover:text-[#F5E6D3] hover:bg-[#A799B7]/10 transition-colors disabled:opacity-50"
               aria-label="Actualizar"
             >
               <RefreshCw className={cn("h-5 w-5", refreshing && "animate-spin")} />
@@ -671,8 +671,8 @@ const HomePage = ({ user }: HomePageProps) => {
             className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/10">
-                <Plus className="h-4 w-4 text-[#F5E6D3]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/10">
+                <Plus className="h-4 w-4 text-[#A799B7]" />
               </div>
               <span className="text-base font-semibold text-[#2F2A33]">
                 Comprar Gb
@@ -688,8 +688,8 @@ const HomePage = ({ user }: HomePageProps) => {
               className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/10">
-                  <Clock className="h-4 w-4 text-[#F5E6D3]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/10">
+                  <Clock className="h-4 w-4 text-[#A799B7]" />
                 </div>
                 <span className="text-base font-semibold text-[#2F2A33]">
                   Finanzas
