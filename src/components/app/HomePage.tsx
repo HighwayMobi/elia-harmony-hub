@@ -590,7 +590,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-sm text-gray-500">Saldo</span>
-                  <span className="ml-2 text-sm font-bold text-[#F5E6D3]">
+                  <span className="ml-2 text-sm font-bold text-[#2F2A33]">
                     {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                   </span>
                 </div>
@@ -640,7 +640,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Gb disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#F5E6D3]">
+              <span className="text-sm font-bold text-[#2F2A33]">
                 {lineDetails?.remains?.is_unlimited_data
                   ? "Ilimitados"
                   : lineDetails?.remains
@@ -655,7 +655,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Minutos disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#F5E6D3]">
+              <span className="text-sm font-bold text-[#2F2A33]">
                 {lineDetails?.remains?.is_unlimited_voice
                   ? "Ilimitados"
                   : lineDetails?.remains
