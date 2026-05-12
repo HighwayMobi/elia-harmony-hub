@@ -96,8 +96,8 @@ const InnerForm = ({
         className={cn(
           "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
           submitting
-            ? "bg-[#A36BFF]/70 text-[#FFF6E8] cursor-wait"
-            : "bg-[#A36BFF] text-[#FFF6E8] shadow-lg shadow-[#A36BFF]/30 hover:brightness-110 active:scale-[0.98]"
+            ? "bg-[#F5E6D3]/70 text-[#A799B7] cursor-wait"
+            : "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
         )}
       >
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -106,7 +106,7 @@ const InnerForm = ({
       <button
         type="button"
         onClick={onCancel}
-        className="w-full text-center text-sm font-medium text-gray-500 hover:text-[#A36BFF] transition-colors"
+        className="w-full text-center text-sm font-medium text-gray-500 hover:text-[#F5E6D3] transition-colors"
       >
         ← Volver
       </button>
@@ -181,7 +181,7 @@ const StripePaymentForm = ({
         </div>
         <button
           onClick={onCancel}
-          className="text-sm font-medium text-[#A36BFF] hover:underline"
+          className="text-sm font-medium text-[#F5E6D3] hover:underline"
         >
           ← Volver
         </button>
@@ -192,7 +192,7 @@ const StripePaymentForm = ({
   if (!clientSecret || !stripePromise) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-10 text-sm text-gray-500">
-        <Loader2 className="h-5 w-5 animate-spin text-[#A36BFF]" />
+        <Loader2 className="h-5 w-5 animate-spin text-[#F5E6D3]" />
         Preparando pago seguro…
       </div>
     );
@@ -206,7 +206,7 @@ const StripePaymentForm = ({
         appearance: {
           theme: "stripe",
           variables: {
-            colorPrimary: "#A36BFF",
+            colorPrimary: "#F5E6D3",
             colorText: "#2F2A33",
             borderRadius: "12px",
             fontFamily: "system-ui, -apple-system, sans-serif",

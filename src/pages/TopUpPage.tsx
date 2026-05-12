@@ -87,7 +87,7 @@ const TopUpPage = () => {
               navigate("/");
             }
           }}
-          className="flex items-center gap-1 text-sm font-medium text-[#2F2A33] hover:text-[#A36BFF] transition-colors"
+          className="flex items-center gap-1 text-sm font-medium text-[#2F2A33] hover:text-[#F5E6D3] transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Atrás
@@ -137,8 +137,8 @@ const TopUpPage = () => {
                       className={cn(
                         "rounded-xl border py-2.5 text-sm font-semibold transition-all",
                         selectedPreset === p
-                          ? "border-[#A36BFF] bg-[#A36BFF] text-[#FFF6E8] shadow-md shadow-[#A36BFF]/25"
-                          : "border-gray-200 bg-white text-[#2F2A33] hover:border-[#A36BFF]/40 hover:bg-[#A36BFF]/5"
+                          ? "border-[#F5E6D3] bg-[#F5E6D3] text-[#A799B7] shadow-md shadow-[#F5E6D3]/25"
+                          : "border-gray-200 bg-white text-[#2F2A33] hover:border-[#F5E6D3]/40 hover:bg-[#F5E6D3]/5"
                       )}
                     >
                       €{p}
@@ -155,7 +155,7 @@ const TopUpPage = () => {
                     placeholder="Otro importe (min. €3)"
                     value={amount}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-8 pr-4 text-sm text-[#2F2A33] placeholder:text-gray-400 focus:border-[#A36BFF] focus:outline-none focus:ring-2 focus:ring-[#A36BFF]/20 transition-all"
+                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-8 pr-4 text-sm text-[#2F2A33] placeholder:text-gray-400 focus:border-[#F5E6D3] focus:outline-none focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all"
                   />
                 </div>
               </div>
@@ -167,14 +167,14 @@ const TopUpPage = () => {
                   {editingEmail ? (
                     <button
                       onClick={() => setEditingEmail(false)}
-                      className="text-xs font-medium text-[#A36BFF] hover:underline"
+                      className="text-xs font-medium text-[#F5E6D3] hover:underline"
                     >
                       OK
                     </button>
                   ) : (
                     <button
                       onClick={() => setEditingEmail(true)}
-                      className="flex items-center gap-1 text-xs font-medium text-[#A36BFF] hover:underline"
+                      className="flex items-center gap-1 text-xs font-medium text-[#F5E6D3] hover:underline"
                     >
                       <Pencil className="h-3 w-3" />
                     </button>
@@ -191,7 +191,7 @@ const TopUpPage = () => {
                         "mt-2 w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#2F2A33] focus:outline-none focus:ring-2 transition-all",
                         showEmailError
                           ? "border-red-400 focus:border-red-400 focus:ring-red-200"
-                          : "border-gray-200 focus:border-[#A36BFF] focus:ring-[#A36BFF]/20"
+                          : "border-gray-200 focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/20"
                       )}
                     />
                     {showEmailError && (
@@ -231,7 +231,7 @@ const TopUpPage = () => {
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
                   isValid
-                    ? "bg-[#A36BFF] text-[#FFF6E8] shadow-lg shadow-[#A36BFF]/30 hover:brightness-110 active:scale-[0.98]"
+                    ? "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}
               >

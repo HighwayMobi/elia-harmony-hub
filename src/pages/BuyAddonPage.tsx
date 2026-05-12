@@ -222,7 +222,7 @@ const BuyAddonPage = () => {
                 {lineLabel}
               </p>
             )}
-            <p className="mt-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#A36BFF]">
+            <p className="mt-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#F5E6D3]">
               Saldo: €{fmt(balance)}
             </p>
           </div>
@@ -280,8 +280,8 @@ const BuyAddonPage = () => {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#A36BFF]/10 shrink-0">
-                        <Icon className="h-5 w-5 text-[#A36BFF]" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5E6D3]/10 shrink-0">
+                        <Icon className="h-5 w-5 text-[#F5E6D3]" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-base font-bold text-[#2F2A33] truncate">
@@ -294,14 +294,14 @@ const BuyAddonPage = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-lg font-bold text-[#A36BFF] whitespace-nowrap">
+                    <span className="text-lg font-bold text-[#F5E6D3] whitespace-nowrap">
                       €{fmt(addon.price)}
                     </span>
                   </div>
                   <div className="mt-3 flex justify-end">
                     <button
                       onClick={() => handleSelect(addon)}
-                      className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-white"
+                      className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-white"
                     >
                       Seleccionar
                     </button>

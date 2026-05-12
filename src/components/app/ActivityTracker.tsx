@@ -95,7 +95,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
       {!showForm ? (
         <Button
           onClick={() => setShowForm(true)}
-          className="w-full bg-white hover:bg-[#A36BFF]/15 text-[#2F2A33] border-0 h-12 rounded-2xl"
+          className="w-full bg-white hover:bg-[#F5E6D3]/15 text-[#2F2A33] border-0 h-12 rounded-2xl"
         >
           <Plus className="w-5 h-5 mr-2" />
           Registrar actividad
@@ -109,7 +109,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
           <div className="space-y-2">
             <label className="text-[#2F2A33]/60 text-xs">Tipo de actividad</label>
             <Select value={activityType} onValueChange={setActivityType}>
-              <SelectTrigger className="bg-white border-[#A36BFF]/20 text-[#2F2A33]">
+              <SelectTrigger className="bg-white border-[#F5E6D3]/20 text-[#2F2A33]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -128,7 +128,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="bg-white border-[#A36BFF]/20 text-[#2F2A33]"
+              className="bg-white border-[#F5E6D3]/20 text-[#2F2A33]"
             />
           </div>
 
@@ -140,7 +140,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
                 value={durationMin}
                 onChange={(e) => setDurationMin(e.target.value)}
                 placeholder="30"
-                className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
+                className="bg-white border-[#F5E6D3]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
               />
             </div>
             <div className="space-y-2">
@@ -150,7 +150,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
                 value={steps}
                 onChange={(e) => setSteps(e.target.value)}
                 placeholder="0"
-                className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
+                className="bg-white border-[#F5E6D3]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
               />
             </div>
           </div>
@@ -162,7 +162,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
               placeholder="0"
-              className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
+              className="bg-white border-[#F5E6D3]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
             />
           </div>
 
@@ -172,7 +172,7 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Detalles de la actividad"
-              className="bg-white border-[#A36BFF]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
+              className="bg-white border-[#F5E6D3]/20 text-[#2F2A33] placeholder:text-[#2F2A33]/40"
             />
           </div>
 
@@ -180,14 +180,14 @@ const ActivityTracker = ({ user }: ActivityTrackerProps) => {
             <Button
               onClick={() => setShowForm(false)}
               variant="ghost"
-              className="flex-1 text-[#2F2A33]/60 hover:text-[#A36BFF] hover:bg-[#A36BFF]/10"
+              className="flex-1 text-[#2F2A33]/60 hover:text-[#F5E6D3] hover:bg-[#F5E6D3]/10"
             >
               Cancelar
             </Button>
             <Button
               onClick={() => addMutation.mutate()}
               disabled={!startTime || !activityType || addMutation.isPending}
-              className="flex-1 bg-[#A36BFF]/10 hover:bg-[#A36BFF]/20 text-[#2F2A33] border-0"
+              className="flex-1 bg-[#F5E6D3]/10 hover:bg-[#F5E6D3]/20 text-[#2F2A33] border-0"
             >
               Guardar
             </Button>
