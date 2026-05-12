@@ -596,7 +596,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 </div>
                 <div>
                   <span className="text-xs text-gray-500">Cuota mensual</span>
-                  <span className="ml-1 text-xs font-semibold text-[#F5E6D3]">
+                  <span className="ml-1 text-xs font-semibold text-[#2F2A33]">
                     {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
                   </span>
                 </div>
