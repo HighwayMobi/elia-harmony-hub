@@ -487,7 +487,7 @@ const HomePage = ({ user }: HomePageProps) => {
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
               ) : (
-                <UserRound className="h-7 w-7 text-[#A36BFF]" />
+                <UserRound className="h-7 w-7 text-[#F5E6D3]" />
               )}
               <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <Camera className="h-5 w-5 text-white" />
@@ -506,7 +506,7 @@ const HomePage = ({ user }: HomePageProps) => {
               onChange={handleAvatarChange}
             />
             <div className="min-w-0">
-              <h1 className="text-base font-bold text-[#A36BFF] tracking-wide truncate">
+              <h1 className="text-base font-bold text-[#F5E6D3] tracking-wide truncate">
                 {profile?.name || NA}
               </h1>
               {showLineSelector ? (
@@ -529,7 +529,7 @@ const HomePage = ({ user }: HomePageProps) => {
                           key={String(l.id)}
                           onClick={() => switchLine(l)}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-[#FFF6E8]",
+                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-[#A799B7]",
                             isActive && "text-[#FF7A1A]"
                           )}
                         >
@@ -544,7 +544,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <p className="text-sm text-[#A36BFF]/80">
+                <p className="text-sm text-[#F5E6D3]/80">
                   {formatLineTitle(selectedLine)}
                 </p>
               )}
@@ -552,7 +552,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="ml-auto p-2 rounded-xl text-[#A36BFF]/80 hover:text-[#A36BFF] hover:bg-[#A36BFF]/10 transition-colors disabled:opacity-50"
+              className="ml-auto p-2 rounded-xl text-[#F5E6D3]/80 hover:text-[#F5E6D3] hover:bg-[#F5E6D3]/10 transition-colors disabled:opacity-50"
               aria-label="Actualizar"
             >
               <RefreshCw className={cn("h-5 w-5", refreshing && "animate-spin")} />
@@ -572,14 +572,14 @@ const HomePage = ({ user }: HomePageProps) => {
                 <button
                   title="Ya se ha solicitado un cambio de tarifa"
                   disabled
-                  className="rounded-xl border border-[#A36BFF]/40 px-5 py-2 text-sm font-semibold text-[#A36BFF]/40 cursor-not-allowed"
+                  className="rounded-xl border border-[#F5E6D3]/40 px-5 py-2 text-sm font-semibold text-[#F5E6D3]/40 cursor-not-allowed"
                 >
                   Cambiar
                 </button>
               ) : (
                 <button
                   onClick={() => navigate("/change-plan", { state: { line: currentLine, lineDetails } })}
-                  className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+                  className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-[#A799B7]"
                 >
                   Cambiar
                 </button>
@@ -590,27 +590,27 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-sm text-gray-500">Saldo</span>
-                  <span className="ml-2 text-sm font-bold text-[#A36BFF]">
+                  <span className="ml-2 text-sm font-bold text-[#F5E6D3]">
                     {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                   </span>
                 </div>
                 <div>
                   <span className="text-xs text-gray-500">Cuota mensual</span>
-                  <span className="ml-1 text-xs font-semibold text-[#A36BFF]">
+                  <span className="ml-1 text-xs font-semibold text-[#F5E6D3]">
                     {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/topup")}
-                className="w-full rounded-xl bg-[#A36BFF] px-6 py-2.5 text-sm font-semibold text-[#FFF6E8] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
+                className="w-full rounded-xl bg-[#F5E6D3] px-6 py-2.5 text-sm font-semibold text-[#A799B7] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
               >
                 Recargar
               </button>
             </div>
 
             {lineDetails?.pending_plan?.name ? (
-              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF] flex flex-col items-center gap-1.5">
+              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3] flex flex-col items-center gap-1.5">
                 <span>
                   A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
                   {lineDetails.pending_plan.price != null ? ` — €${fmt(lineDetails.pending_plan.price)}/mes` : ""}
@@ -618,14 +618,14 @@ const HomePage = ({ user }: HomePageProps) => {
                 {!isTomorrowUTC(lineDetails.pending_plan.change_date) && (
                   <button
                     onClick={() => setCancelDialogOpen(true)}
-                    className="rounded-lg border border-[#A36BFF] px-4 py-1 text-xs font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-[#FFF6E8]"
+                    className="rounded-lg border border-[#F5E6D3] px-4 py-1 text-xs font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-[#A799B7]"
                   >
                     Cancelar
                   </button>
                 )}
               </div>
             ) : (
-              <div className="bg-[#FFF6E8] px-5 py-2.5 text-center text-xs font-medium text-[#A36BFF]">
+              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3]">
                 Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDateDot(lineDetails?.next_billing_date)}
               </div>
             )}
@@ -640,7 +640,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Gb disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#A36BFF]">
+              <span className="text-sm font-bold text-[#F5E6D3]">
                 {lineDetails?.remains?.is_unlimited_data
                   ? "Ilimitados"
                   : lineDetails?.remains
@@ -655,7 +655,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   Minutos disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#A36BFF]">
+              <span className="text-sm font-bold text-[#F5E6D3]">
                 {lineDetails?.remains?.is_unlimited_voice
                   ? "Ilimitados"
                   : lineDetails?.remains
@@ -671,8 +671,8 @@ const HomePage = ({ user }: HomePageProps) => {
             className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
-                <Plus className="h-4 w-4 text-[#A36BFF]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/10">
+                <Plus className="h-4 w-4 text-[#F5E6D3]" />
               </div>
               <span className="text-base font-semibold text-[#2F2A33]">
                 Comprar Gb
@@ -688,8 +688,8 @@ const HomePage = ({ user }: HomePageProps) => {
               className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A36BFF]/10">
-                  <Clock className="h-4 w-4 text-[#A36BFF]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5E6D3]/10">
+                  <Clock className="h-4 w-4 text-[#F5E6D3]" />
                 </div>
                 <span className="text-base font-semibold text-[#2F2A33]">
                   Finanzas
@@ -801,7 +801,7 @@ const HomePage = ({ user }: HomePageProps) => {
                               <span
                                 className={cn(
                                   "text-sm font-semibold",
-                                  isIncome ? "text-green-600" : "text-[#A36BFF]"
+                                  isIncome ? "text-green-600" : "text-[#F5E6D3]"
                                 )}
                               >
                                 {isIncome ? "+ " : "- "}
@@ -816,14 +816,14 @@ const HomePage = ({ user }: HomePageProps) => {
                         </div>
                       )}
 
-                      <div className="flex items-stretch bg-[#FFF6E8] text-[#A36BFF]">
+                      <div className="flex items-stretch bg-[#A799B7] text-[#F5E6D3]">
                         <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                           <span className="text-xs font-medium opacity-90">Gastado</span>
                           <span className="text-lg font-bold">
                             {Number(financeData?.cost ?? 0).toFixed(2)}€
                           </span>
                         </div>
-                        <div className="w-px bg-[#A36BFF]/30 my-2" />
+                        <div className="w-px bg-[#F5E6D3]/30 my-2" />
                         <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
                           <span className="text-xs font-medium opacity-90">Recargado</span>
                           <span className="text-lg font-bold">

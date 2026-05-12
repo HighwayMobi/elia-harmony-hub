@@ -53,7 +53,7 @@ const PaymentSuccessPage = () => {
         {isSuccess ? (
           <>
             {status === "processing" ? (
-              <Loader2 className="mx-auto h-16 w-16 text-[#A36BFF] animate-spin" />
+              <Loader2 className="mx-auto h-16 w-16 text-[#F5E6D3] animate-spin" />
             ) : (
               <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500" />
             )}
@@ -70,7 +70,7 @@ const PaymentSuccessPage = () => {
             </p>
             <button
               onClick={() => navigate(returnTo)}
-              className="mt-6 w-full rounded-xl bg-[#A36BFF] py-3 text-sm font-semibold text-[#FFF6E8] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+              className="mt-6 w-full rounded-xl bg-[#F5E6D3] py-3 text-sm font-semibold text-[#A799B7] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
             >
               Volver ahora
             </button>
@@ -86,7 +86,7 @@ const PaymentSuccessPage = () => {
             </p>
             <button
               onClick={() => navigate(returnTo)}
-              className="mt-6 w-full rounded-xl bg-[#A36BFF] py-3 text-sm font-semibold text-[#FFF6E8] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+              className="mt-6 w-full rounded-xl bg-[#F5E6D3] py-3 text-sm font-semibold text-[#A799B7] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
             >
               Volver
             </button>

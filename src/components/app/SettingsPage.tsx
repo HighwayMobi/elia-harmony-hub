@@ -211,17 +211,17 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {profile.status && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33] capitalize">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#F5E6D3]/10 text-[#2F2A33] capitalize">
                       {profile.status}
                     </span>
                   )}
                   {profile.payment_model && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33]">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#F5E6D3]/10 text-[#2F2A33]">
                       {profile.payment_model}
                     </span>
                   )}
                   {profile.type && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-[#A36BFF]/10 text-[#2F2A33] uppercase">
+                    <span className="text-xs px-2 py-1 rounded-full bg-[#F5E6D3]/10 text-[#2F2A33] uppercase">
                       {profile.type}
                     </span>
                   )}
@@ -270,7 +270,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         <Button
           onClick={handleLogout}
           variant="ghost"
-          className="w-full bg-white hover:bg-[#A36BFF]/15 text-[#2F2A33] border-0 h-14 rounded-2xl"
+          className="w-full bg-white hover:bg-[#F5E6D3]/15 text-[#2F2A33] border-0 h-14 rounded-2xl"
         >
           <LogOut className="w-5 h-5 mr-2" />
           Cerrar sesión

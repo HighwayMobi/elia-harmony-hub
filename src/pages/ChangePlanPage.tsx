@@ -398,13 +398,13 @@ const ChangePlanPage = () => {
                   key={plan.id}
                   className={cn(
                     "rounded-2xl bg-white p-4 shadow-md transition-all",
-                    isCurrent && "ring-2 ring-[#A36BFF]"
+                    isCurrent && "ring-2 ring-[#F5E6D3]"
                   )}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#A36BFF]/10 shrink-0">
-                        <TypeIcon className="h-5 w-5 text-[#A36BFF]" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5E6D3]/10 shrink-0">
+                        <TypeIcon className="h-5 w-5 text-[#F5E6D3]" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-base font-bold text-[#2F2A33] truncate">
@@ -418,7 +418,7 @@ const ChangePlanPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-lg font-bold text-[#A36BFF] whitespace-nowrap">
+                      <span className="text-lg font-bold text-[#F5E6D3] whitespace-nowrap">
                         €{fmt(plan.price)}
                         <span className="text-xs font-normal text-gray-500">/mes</span>
                       </span>
@@ -428,7 +428,7 @@ const ChangePlanPage = () => {
                     <button
                       disabled={!!isCurrent}
                       onClick={() => handleSelectPlan(plan)}
-                      className="rounded-xl border border-[#A36BFF] px-5 py-2 text-sm font-semibold text-[#A36BFF] transition-all hover:bg-[#A36BFF] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#A36BFF]"
+                      className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#F5E6D3]"
                     >
                       {isCurrent ? "Actual" : "Seleccionar"}
                     </button>
@@ -487,7 +487,7 @@ const ChangePlanPage = () => {
                     value="now"
                     checked={whenChange === "now"}
                     onChange={() => setWhenChange("now")}
-                    className="mt-1 accent-[#A36BFF]"
+                    className="mt-1 accent-[#F5E6D3]"
                   />
                   <span className="text-sm text-foreground">
                     Pronto ({fmtDateDot(soonDate)})
@@ -500,7 +500,7 @@ const ChangePlanPage = () => {
                     value="later"
                     checked={whenChange === "later"}
                     onChange={() => setWhenChange("later")}
-                    className="mt-1 accent-[#A36BFF]"
+                    className="mt-1 accent-[#F5E6D3]"
                   />
                   <span className="text-sm text-foreground">
                     Al final del periodo pagado{feeDate ? ` (${fmtDateDot(feeDate)})` : ""}

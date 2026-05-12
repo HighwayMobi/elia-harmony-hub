@@ -27,14 +27,14 @@ const TrackingPage = ({ user }: TrackingPageProps) => {
           <TabsList className="w-full bg-white border-0">
             <TabsTrigger
               value="sleep"
-              className="flex-1 text-[#2F2A33]/60 data-[state=active]:bg-[#A36BFF] data-[state=active]:text-[#FFF6E8]"
+              className="flex-1 text-[#2F2A33]/60 data-[state=active]:bg-[#F5E6D3] data-[state=active]:text-[#A799B7]"
             >
               <Moon className="w-4 h-4 mr-2" />
               Sueño
             </TabsTrigger>
             <TabsTrigger
               value="activity"
-              className="flex-1 text-[#2F2A33]/60 data-[state=active]:bg-[#A36BFF] data-[state=active]:text-[#FFF6E8]"
+              className="flex-1 text-[#2F2A33]/60 data-[state=active]:bg-[#F5E6D3] data-[state=active]:text-[#A799B7]"
             >
               <Footprints className="w-4 h-4 mr-2" />
               Actividad
