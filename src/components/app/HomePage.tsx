@@ -579,7 +579,7 @@ const HomePage = ({ user }: HomePageProps) => {
               ) : (
                 <button
                   onClick={() => navigate("/change-plan", { state: { line: currentLine, lineDetails } })}
-                  className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-[#A799B7]"
+                  className="rounded-xl bg-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#A799B7] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
                 >
                   Cambiar
                 </button>
