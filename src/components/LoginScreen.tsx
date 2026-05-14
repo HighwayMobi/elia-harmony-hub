@@ -338,10 +338,13 @@ const LoginScreen = () => {
           upstream?.error ||
           error?.message ||
           "";
-        const message =
-          rawMsg === "subscription not found"
-            ? "Teléfono o email incorrecto"
-            : rawMsg || "No se pudo enviar el código. Intenta de nuevo.";
+        const notFound =
+          rawMsg === "subscription not found" ||
+          rawMsg === "customer not found" ||
+          /not.?found/i.test(rawMsg);
+        const message = notFound
+          ? "Teléfono o email incorrecto"
+          : rawMsg || "No se pudo enviar el código. Intenta de nuevo.";
         toast.error(message);
         return;
       }
