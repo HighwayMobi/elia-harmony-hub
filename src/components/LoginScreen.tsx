@@ -333,11 +333,15 @@ const LoginScreen = () => {
 
       if (error || !data?.ok) {
         const upstream = (data as any)?.data;
-        const message =
+        const rawMsg =
           upstream?.message ||
           upstream?.error ||
           error?.message ||
-          "No se pudo enviar el código. Intenta de nuevo.";
+          "";
+        const message =
+          rawMsg === "subscription not found"
+            ? "Teléfono o email incorrecto"
+            : rawMsg || "No se pudo enviar el código. Intenta de nuevo.";
         toast.error(message);
         return;
       }
