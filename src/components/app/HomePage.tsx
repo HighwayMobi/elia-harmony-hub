@@ -625,7 +625,7 @@ const HomePage = ({ user }: HomePageProps) => {
                 )}
               </div>
             ) : (
-              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3]">
+              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-bold text-white">
                 Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDateDot(lineDetails?.next_billing_date)}
               </div>
             )}
