@@ -514,7 +514,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="mt-0.5 flex max-w-[220px] items-center gap-1 text-left text-sm font-semibold text-[#FF7A1A] transition-opacity hover:opacity-80"
+                      className="mt-0.5 flex max-w-[220px] items-center gap-1 text-left text-sm font-bold text-white transition-opacity hover:opacity-80"
                       aria-label="Seleccionar suscripción"
                     >
                       <span className="truncate">{formatLineTitle(selectedLine)}</span>
