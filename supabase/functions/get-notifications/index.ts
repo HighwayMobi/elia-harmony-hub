@@ -40,6 +40,7 @@ Deno.serve(async (req) => {
     );
 
     const text = await upstream.text();
+    console.log("get-notifications upstream:", upstream.status, "page:", page, "body:", text?.slice(0, 2000));
     let data: any;
     try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
 
