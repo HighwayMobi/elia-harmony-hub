@@ -115,15 +115,28 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
+  const normalizedPhone = formPhone.trim();
+  const phoneDigits = normalizedPhone.replace(/\D/g, "");
+  const phoneValid =
+    normalizedPhone === "" ||
+    (/^\+?[0-9\s\-()]{7,20}$/.test(normalizedPhone) &&
+      phoneDigits.length >= 7 &&
+      phoneDigits.length <= 15);
+
   const isDirty =
     !!profile &&
-    (formLanguage !== (profile.language || "") || formPhone !== (profile.phone || ""));
+    (formLanguage !== (profile.language || "") ||
+      normalizedPhone !== (profile.phone || ""));
 
   const handleSaveProfile = async () => {
     if (!profile || !isDirty) return;
+    if (!phoneValid) {
+      toast.error("Teléfono no válido. Usa formato internacional, p. ej. +34612345678");
+      return;
+    }
     const body: Record<string, string> = {};
     if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
-    if (formPhone !== (profile.phone || "")) body.phone = formPhone.trim();
+    if (normalizedPhone !== (profile.phone || "")) body.phone = normalizedPhone;
     if (Object.keys(body).length === 0) return;
 
     setSaving(true);
