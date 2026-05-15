@@ -78,9 +78,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
 
-  const [editingField, setEditingField] = useState<null | "language" | "phone">(null);
-  const [editLanguage, setEditLanguage] = useState("");
-  const [editPhone, setEditPhone] = useState("");
+  const [formLanguage, setFormLanguage] = useState("");
+  const [formPhone, setFormPhone] = useState("");
   const [saving, setSaving] = useState(false);
 
   const showGoogleFit = isAndroid || isWeb;
@@ -104,6 +103,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         } else {
           const payload = (data.data?.data ?? data.data) as Profile;
           setProfile(payload);
+          setFormLanguage(payload?.language || "es");
+          setFormPhone(payload?.phone || "");
         }
       } catch (e: any) {
         setProfileError(e?.message ?? "Error al cargar el perfil");
@@ -114,35 +115,25 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
-  const startEdit = (field: "language" | "phone") => {
-    setEditingField(field);
-    if (field === "language") setEditLanguage(profile?.language || "es");
-    if (field === "phone") setEditPhone(profile?.phone || "");
-  };
+  const isDirty =
+    !!profile &&
+    (formLanguage !== (profile.language || "") || formPhone !== (profile.phone || ""));
 
-  const cancelEdit = () => {
-    setEditingField(null);
-    setEditLanguage("");
-    setEditPhone("");
-  };
+  const handleSaveProfile = async () => {
+    if (!profile || !isDirty) return;
+    const body: Record<string, string> = {};
+    if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
+    if (formPhone !== (profile.phone || "")) body.phone = formPhone.trim();
+    if (Object.keys(body).length === 0) return;
 
-  const saveField = async (field: "language" | "phone") => {
-    const value = field === "language" ? editLanguage : editPhone;
-    if (!value.trim()) {
-      toast.error(field === "language" ? "Selecciona un idioma" : "Introduce un teléfono");
-      return;
-    }
     setSaving(true);
     try {
-      const body: Record<string, string> = {};
-      body[field] = value.trim();
       const { data } = await ftPost("update-profile", body);
       if (!data?.ok) {
         toast.error(data?.data?.message ?? "No se pudo guardar");
       } else {
-        setProfile((prev) => (prev ? { ...prev, [field]: value.trim() } : prev));
-        toast.success("Guardado correctamente");
-        setEditingField(null);
+        setProfile((prev) => (prev ? { ...prev, ...body } : prev));
+        toast.success("Perfil actualizado");
       }
     } catch (e: any) {
       toast.error(e?.message ?? "Error al guardar");
