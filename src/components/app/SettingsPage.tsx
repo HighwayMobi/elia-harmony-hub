@@ -302,21 +302,39 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 shrink-0 mt-2" />
                 <div className="flex-1">
-                  <Input
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    placeholder="+34612345678"
-                    disabled={saving}
-                    inputMode="tel"
-                    className={`h-9 text-sm ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Select value={formCountry} onValueChange={setFormCountry} disabled={saving}>
+                      <SelectTrigger className="h-9 text-sm w-[110px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {COUNTRIES.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-1">{c.flag}</span>+{c.dial}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      value={formNational}
+                      onChange={(e) => setFormNational(e.target.value.replace(/\D/g, ""))}
+                      placeholder="612345678"
+                      disabled={saving}
+                      inputMode="tel"
+                      className={`h-9 text-sm flex-1 ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                  </div>
                   {!phoneValid && (
                     <p className="text-xs text-red-500 mt-1">
-                      Formato no válido. Usa formato internacional, p. ej. +34612345678 (7–15 dígitos).
+                      Número no válido. Introduce entre 7 y 15 dígitos en total.
                     </p>
+                  )}
+                  {builtPhone && phoneValid && (
+                    <p className="text-xs text-[#2F2A33]/50 mt-1">{builtPhone}</p>
                   )}
                 </div>
               </div>
+
 
               <Button
                 onClick={handleSaveProfile}
