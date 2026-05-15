@@ -39,6 +39,7 @@ Deno.serve(async (req) => {
     );
 
     const text = await upstream.text();
+    console.log("get-notifications-count upstream:", upstream.status, "body:", text?.slice(0, 1500));
     let data: any;
     try { data = text ? JSON.parse(text) : {}; } catch { data = { raw: text }; }
 
