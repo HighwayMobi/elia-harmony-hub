@@ -31,7 +31,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePlatform } from "@/hooks/use-platform";
-import { COUNTRIES, DEFAULT_COUNTRY, parsePhone, buildPhone } from "@/lib/country-codes";
 
 interface SettingsPageProps {
   user: User;
