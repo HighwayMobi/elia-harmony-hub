@@ -27,18 +27,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build update payload with only allowed fields.
-    // Upstream silently ignores unknown keys, so send common aliases for language.
+    // Build update payload with only allowed fields
     const updateBody: Record<string, any> = {};
-    if (typeof body.language === "string") {
-      updateBody.language = body.language;
-      updateBody.locale = body.language;
-      updateBody.lang = body.language;
-      updateBody.preferred_language = body.language;
-    }
+    if (typeof body.language === "string") updateBody.language = body.language;
     if (typeof body.phone === "string") updateBody.phone = body.phone;
-
-    console.log("update-profile request body:", JSON.stringify(updateBody));
 
     const upstream = await fetch(
       "https://platform.factorytele.com/api/v1/pub/account/profile",
