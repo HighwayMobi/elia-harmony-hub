@@ -299,38 +299,27 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 shrink-0 mt-2" />
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <Select value={formCountry} onValueChange={setFormCountry} disabled={saving}>
-                      <SelectTrigger className="h-9 text-sm w-[110px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-72">
-                        {COUNTRIES.map((c) => (
-                          <SelectItem key={c.code} value={c.code}>
-                            <span className="mr-1">{c.flag}</span>+{c.dial}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#2F2A33]/60 pointer-events-none">
+                      +
+                    </span>
                     <Input
-                      value={formNational}
-                      onChange={(e) => setFormNational(e.target.value.replace(/\D/g, ""))}
-                      placeholder="612345678"
+                      value={formPhoneDigits}
+                      onChange={(e) => setFormPhoneDigits(e.target.value.replace(/\D/g, ""))}
+                      placeholder="34612345678"
                       disabled={saving}
                       inputMode="tel"
-                      className={`h-9 text-sm flex-1 ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                      className={`h-9 text-sm pl-6 ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
                     />
                   </div>
                   {!phoneValid && (
                     <p className="text-xs text-red-500 mt-1">
-                      Número no válido. Introduce entre 7 y 15 dígitos en total.
+                      Número no válido. Introduce entre 7 y 15 dígitos.
                     </p>
-                  )}
-                  {builtPhone && phoneValid && (
-                    <p className="text-xs text-[#2F2A33]/50 mt-1">{builtPhone}</p>
                   )}
                 </div>
               </div>
+
 
 
               <Button
