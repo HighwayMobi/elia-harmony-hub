@@ -115,15 +115,28 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
+  const normalizedPhone = formPhone.trim();
+  const phoneDigits = normalizedPhone.replace(/\D/g, "");
+  const phoneValid =
+    normalizedPhone === "" ||
+    (/^\+?[0-9\s\-()]{7,20}$/.test(normalizedPhone) &&
+      phoneDigits.length >= 7 &&
+      phoneDigits.length <= 15);
+
   const isDirty =
     !!profile &&
-    (formLanguage !== (profile.language || "") || formPhone !== (profile.phone || ""));
+    (formLanguage !== (profile.language || "") ||
+      normalizedPhone !== (profile.phone || ""));
 
   const handleSaveProfile = async () => {
     if (!profile || !isDirty) return;
+    if (!phoneValid) {
+      toast.error("Teléfono no válido. Usa formato internacional, p. ej. +34612345678");
+      return;
+    }
     const body: Record<string, string> = {};
     if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
-    if (formPhone !== (profile.phone || "")) body.phone = formPhone.trim();
+    if (normalizedPhone !== (profile.phone || "")) body.phone = normalizedPhone;
     if (Object.keys(body).length === 0) return;
 
     setSaving(true);
@@ -285,20 +298,28 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               </div>
 
               {/* Phone — editable */}
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 shrink-0" />
-                <Input
-                  value={formPhone}
-                  onChange={(e) => setFormPhone(e.target.value)}
-                  placeholder="+34..."
-                  disabled={saving}
-                  className="h-9 text-sm flex-1"
-                />
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 shrink-0 mt-2" />
+                <div className="flex-1">
+                  <Input
+                    value={formPhone}
+                    onChange={(e) => setFormPhone(e.target.value)}
+                    placeholder="+34612345678"
+                    disabled={saving}
+                    inputMode="tel"
+                    className={`h-9 text-sm ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                  {!phoneValid && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Formato no válido. Usa formato internacional, p. ej. +34612345678 (7–15 dígitos).
+                    </p>
+                  )}
+                </div>
               </div>
 
               <Button
                 onClick={handleSaveProfile}
-                disabled={!isDirty || saving}
+                disabled={!isDirty || saving || !phoneValid}
                 className="w-full h-11 rounded-xl bg-[#A799B7] hover:bg-[#A799B7]/90 text-white mt-2"
               >
                 {saving ? (
@@ -310,6 +331,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
                   "Guardar cambios"
                 )}
               </Button>
+
 
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
