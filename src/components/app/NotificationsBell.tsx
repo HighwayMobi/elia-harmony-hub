@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Bell, X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { getFTSession, onFTSessionChange } from "@/lib/ft-auth";
 import {
   Sheet,
   SheetContent,
@@ -59,7 +60,30 @@ const NotificationsBell = () => {
   useEffect(() => {
     fetchCount();
     const id = window.setInterval(fetchCount, POLL_MS);
-    return () => window.clearInterval(id);
+
+    // Refetch on line/session changes
+    let lastLineId = String(getFTSession()?.line_id ?? "");
+    const offSession = onFTSessionChange(() => {
+      const cur = String(getFTSession()?.line_id ?? "");
+      if (cur !== lastLineId) {
+        lastLineId = cur;
+        fetchCount();
+      }
+    });
+
+    // Refetch when tab becomes visible again (page refresh / focus)
+    const onVis = () => {
+      if (document.visibilityState === "visible") fetchCount();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", fetchCount);
+
+    return () => {
+      window.clearInterval(id);
+      offSession();
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", fetchCount);
+    };
   }, [fetchCount]);
 
   useEffect(() => {
