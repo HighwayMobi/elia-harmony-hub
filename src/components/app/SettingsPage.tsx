@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePlatform } from "@/hooks/use-platform";
+import { COUNTRIES, DEFAULT_COUNTRY, parsePhone, buildPhone } from "@/lib/country-codes";
 
 interface SettingsPageProps {
   user: User;
@@ -79,7 +80,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const [profileError, setProfileError] = useState<string | null>(null);
 
   const [formLanguage, setFormLanguage] = useState("");
-  const [formPhone, setFormPhone] = useState("");
+  const [formCountry, setFormCountry] = useState(DEFAULT_COUNTRY);
+  const [formNational, setFormNational] = useState("");
   const [saving, setSaving] = useState(false);
 
   const showGoogleFit = isAndroid || isWeb;
@@ -104,7 +106,9 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           const payload = (data.data?.data ?? data.data) as Profile;
           setProfile(payload);
           setFormLanguage(payload?.language || "es");
-          setFormPhone(payload?.phone || "");
+          const parsed = parsePhone(payload?.phone || "");
+          setFormCountry(parsed.country);
+          setFormNational(parsed.national);
         }
       } catch (e: any) {
         setProfileError(e?.message ?? "Error al cargar el perfil");
@@ -115,28 +119,25 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
-  const normalizedPhone = formPhone.trim();
-  const phoneDigits = normalizedPhone.replace(/\D/g, "");
+  const builtPhone = buildPhone(formCountry, formNational);
+  const totalDigits = builtPhone.replace(/\D/g, "").length;
   const phoneValid =
-    normalizedPhone === "" ||
-    (/^\+?[0-9\s\-()]{7,20}$/.test(normalizedPhone) &&
-      phoneDigits.length >= 7 &&
-      phoneDigits.length <= 15);
+    builtPhone === "" || (totalDigits >= 7 && totalDigits <= 15);
 
   const isDirty =
     !!profile &&
     (formLanguage !== (profile.language || "") ||
-      normalizedPhone !== (profile.phone || ""));
+      builtPhone !== (profile.phone || ""));
 
   const handleSaveProfile = async () => {
     if (!profile || !isDirty) return;
     if (!phoneValid) {
-      toast.error("Teléfono no válido. Usa formato internacional, p. ej. +34612345678");
+      toast.error("Teléfono no válido. Introduce entre 7 y 15 dígitos.");
       return;
     }
     const body: Record<string, string> = {};
     if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
-    if (normalizedPhone !== (profile.phone || "")) body.phone = normalizedPhone;
+    if (builtPhone !== (profile.phone || "")) body.phone = builtPhone;
     if (Object.keys(body).length === 0) return;
 
     setSaving(true);
@@ -301,21 +302,39 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 shrink-0 mt-2" />
                 <div className="flex-1">
-                  <Input
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    placeholder="+34612345678"
-                    disabled={saving}
-                    inputMode="tel"
-                    className={`h-9 text-sm ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Select value={formCountry} onValueChange={setFormCountry} disabled={saving}>
+                      <SelectTrigger className="h-9 text-sm w-[110px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-72">
+                        {COUNTRIES.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            <span className="mr-1">{c.flag}</span>+{c.dial}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      value={formNational}
+                      onChange={(e) => setFormNational(e.target.value.replace(/\D/g, ""))}
+                      placeholder="612345678"
+                      disabled={saving}
+                      inputMode="tel"
+                      className={`h-9 text-sm flex-1 ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    />
+                  </div>
                   {!phoneValid && (
                     <p className="text-xs text-red-500 mt-1">
-                      Formato no válido. Usa formato internacional, p. ej. +34612345678 (7–15 dígitos).
+                      Número no válido. Introduce entre 7 y 15 dígitos en total.
                     </p>
+                  )}
+                  {builtPhone && phoneValid && (
+                    <p className="text-xs text-[#2F2A33]/50 mt-1">{builtPhone}</p>
                   )}
                 </div>
               </div>
+
 
               <Button
                 onClick={handleSaveProfile}
