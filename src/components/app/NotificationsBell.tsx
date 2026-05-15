@@ -108,52 +108,56 @@ const NotificationsBell = () => {
           )}
         </button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col">
-        <SheetHeader className="px-5 py-4 border-b">
-          <SheetTitle>Notificaciones</SheetTitle>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md p-0 flex flex-col border-l-0 text-white [&>button]:text-white"
+        style={{ backgroundColor: '#A799B7' }}
+      >
+        <SheetHeader className="px-5 py-4 border-b border-white/20">
+          <SheetTitle className="text-white">Notificaciones</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto">
           {loading && items.length === 0 ? (
-            <div className="flex items-center justify-center py-16 text-muted-foreground">
+            <div className="flex items-center justify-center py-16 text-white/70">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
           ) : items.length === 0 ? (
-            <div className="px-6 py-16 text-center text-sm text-muted-foreground">
+            <div className="px-6 py-16 text-center text-sm text-white/70">
               No tienes notificaciones
             </div>
           ) : (
-            <ul className="divide-y">
+            <ul className="divide-y divide-white/15">
               {items.map((n) => (
                 <li key={n.id}>
                   <button
                     type="button"
                     onClick={() => markRead(n)}
                     className={cn(
-                      "w-full text-left px-5 py-4 transition-colors hover:bg-muted/60",
-                      !n.is_read && "bg-[#A799B7]/10"
+                      "w-full text-left px-5 py-4 transition-colors hover:bg-white/10",
+                      !n.is_read && "bg-white/15"
                     )}
                   >
                     <div className="flex items-start gap-3">
                       {!n.is_read && (
-                        <span className="mt-2 w-2 h-2 rounded-full bg-[#A799B7] shrink-0" />
+                        <span className="mt-2 w-2 h-2 rounded-full bg-white shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
                           <p
                             className={cn(
-                              "text-sm truncate",
-                              n.is_read ? "font-normal text-foreground/80" : "font-semibold text-foreground"
+                              "text-sm truncate text-white",
+                              n.is_read ? "font-normal text-white/80" : "font-semibold"
                             )}
                           >
                             {n.title || "Notificación"}
                           </p>
-                          <span className="text-xs text-muted-foreground shrink-0">
+                          <span className="text-xs text-white/60 shrink-0">
                             {formatDate(n.created_at)}
                           </span>
                         </div>
                         {n.content && (
-                          <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
+                          <p className="mt-1 text-sm text-white/75 line-clamp-3">
                             {n.content}
                           </p>
                         )}
@@ -167,23 +171,23 @@ const NotificationsBell = () => {
         </div>
 
         {pageCount > 1 && (
-          <div className="flex items-center justify-between gap-2 px-5 py-3 border-t">
+          <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-white/20">
             <button
               type="button"
               disabled={page <= 1 || loading}
               onClick={() => fetchPage(page - 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border disabled:opacity-40"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-white/30 text-white hover:bg-white/10 disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" /> Anterior
             </button>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-white/70">
               Página {page} de {pageCount}
             </span>
             <button
               type="button"
               disabled={page >= pageCount || loading}
               onClick={() => fetchPage(page + 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border disabled:opacity-40"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-white/30 text-white hover:bg-white/10 disabled:opacity-40"
             >
               Siguiente <ChevronRight className="w-4 h-4" />
             </button>
