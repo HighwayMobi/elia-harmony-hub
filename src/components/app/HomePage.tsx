@@ -463,9 +463,34 @@ const HomePage = ({ user }: HomePageProps) => {
 
   return (
     <div className="flex-1 flex flex-col">
-      {/* Header con logo */}
-      <header className="px-6 py-4 flex items-center justify-center">
-        <img src={logo} alt="Elia Balance" className="w-28 h-auto opacity-90" />
+      {/* Header con logo, notificaciones e idioma */}
+      <header className="px-6 py-4 flex items-center justify-between gap-3">
+        <img src={logo} alt="Elia Balance" className="w-24 h-auto opacity-90" />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Notificaciones"
+            className="relative w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+          >
+            <Bell className="w-5 h-5" />
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label="Idioma"
+                className="h-10 px-3 rounded-full bg-white/15 hover:bg-white/25 flex items-center gap-1.5 text-white text-sm font-medium transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+                <span>ES</span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[8rem]">
+              <DropdownMenuItem className="font-medium">ES — Español</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
 
       <motion.main
