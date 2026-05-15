@@ -270,93 +270,46 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               {/* Language — editable */}
               <div className="flex items-center gap-3">
                 <Globe className="w-4 h-4 shrink-0" />
-                {editingField === "language" ? (
-                  <div className="flex-1 flex items-center gap-2">
-                    <Select
-                      value={editLanguage}
-                      onValueChange={setEditLanguage}
-                      disabled={saving}
-                    >
-                      <SelectTrigger className="h-9 text-sm flex-1">
-                        <SelectValue placeholder="Idioma" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LANGUAGES.map((l) => (
-                          <SelectItem key={l.value} value={l.value}>
-                            {l.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <button
-                      onClick={() => saveField("language")}
-                      disabled={saving}
-                      className="p-1.5 rounded-full bg-[#A799B7] text-white hover:bg-[#A799B7]/90 disabled:opacity-50"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={cancelEdit}
-                      disabled={saving}
-                      className="p-1.5 rounded-full bg-[#F5E6D3]/30 text-[#2F2A33] hover:bg-[#F5E6D3]/50 disabled:opacity-50"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-between gap-2">
-                    <span>{langLabel}</span>
-                    <button
-                      onClick={() => startEdit("language")}
-                      className="p-1 rounded-full hover:bg-[#F5E6D3]/30 text-[#2F2A33]/60"
-                      title="Editar idioma"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
+                <Select value={formLanguage} onValueChange={setFormLanguage} disabled={saving}>
+                  <SelectTrigger className="h-9 text-sm flex-1">
+                    <SelectValue placeholder="Idioma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LANGUAGES.map((l) => (
+                      <SelectItem key={l.value} value={l.value}>
+                        {l.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Phone — editable */}
               <div className="flex items-center gap-3">
                 <Phone className="w-4 h-4 shrink-0" />
-                {editingField === "phone" ? (
-                  <div className="flex-1 flex items-center gap-2">
-                    <Input
-                      value={editPhone}
-                      onChange={(e) => setEditPhone(e.target.value)}
-                      placeholder="+34..."
-                      disabled={saving}
-                      className="h-9 text-sm flex-1"
-                    />
-                    <button
-                      onClick={() => saveField("phone")}
-                      disabled={saving}
-                      className="p-1.5 rounded-full bg-[#A799B7] text-white hover:bg-[#A799B7]/90 disabled:opacity-50"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={cancelEdit}
-                      disabled={saving}
-                      className="p-1.5 rounded-full bg-[#F5E6D3]/30 text-[#2F2A33] hover:bg-[#F5E6D3]/50 disabled:opacity-50"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex items-center justify-between gap-2">
-                    <span>{profile.phone || "—"}</span>
-                    <button
-                      onClick={() => startEdit("phone")}
-                      className="p-1 rounded-full hover:bg-[#F5E6D3]/30 text-[#2F2A33]/60"
-                      title="Editar teléfono"
-                    >
-                      <Pencil className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
+                <Input
+                  value={formPhone}
+                  onChange={(e) => setFormPhone(e.target.value)}
+                  placeholder="+34..."
+                  disabled={saving}
+                  className="h-9 text-sm flex-1"
+                />
               </div>
+
+              <Button
+                onClick={handleSaveProfile}
+                disabled={!isDirty || saving}
+                className="w-full h-11 rounded-xl bg-[#A799B7] hover:bg-[#A799B7]/90 text-white mt-2"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Guardar cambios"
+                )}
+              </Button>
 
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
