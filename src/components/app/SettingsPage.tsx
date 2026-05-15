@@ -79,8 +79,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const [profileError, setProfileError] = useState<string | null>(null);
 
   const [formLanguage, setFormLanguage] = useState("");
-  const [formCountry, setFormCountry] = useState(DEFAULT_COUNTRY);
-  const [formNational, setFormNational] = useState("");
+  const [formPhoneDigits, setFormPhoneDigits] = useState("");
   const [saving, setSaving] = useState(false);
 
   const showGoogleFit = isAndroid || isWeb;
@@ -105,9 +104,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           const payload = (data.data?.data ?? data.data) as Profile;
           setProfile(payload);
           setFormLanguage(payload?.language || "es");
-          const parsed = parsePhone(payload?.phone || "");
-          setFormCountry(parsed.country);
-          setFormNational(parsed.national);
+          setFormPhoneDigits((payload?.phone || "").replace(/\D/g, ""));
         }
       } catch (e: any) {
         setProfileError(e?.message ?? "Error al cargar el perfil");
@@ -118,15 +115,16 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
-  const builtPhone = buildPhone(formCountry, formNational);
-  const totalDigits = builtPhone.replace(/\D/g, "").length;
+  const builtPhone = formPhoneDigits ? `+${formPhoneDigits}` : "";
   const phoneValid =
-    builtPhone === "" || (totalDigits >= 7 && totalDigits <= 15);
+    formPhoneDigits === "" ||
+    (formPhoneDigits.length >= 7 && formPhoneDigits.length <= 15);
 
+  const profilePhoneDigits = (profile?.phone || "").replace(/\D/g, "");
   const isDirty =
     !!profile &&
     (formLanguage !== (profile.language || "") ||
-      builtPhone !== (profile.phone || ""));
+      formPhoneDigits !== profilePhoneDigits);
 
   const handleSaveProfile = async () => {
     if (!profile || !isDirty) return;
@@ -136,7 +134,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     }
     const body: Record<string, string> = {};
     if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
-    if (builtPhone !== (profile.phone || "")) body.phone = builtPhone;
+    if (formPhoneDigits !== profilePhoneDigits) body.phone = builtPhone;
     if (Object.keys(body).length === 0) return;
 
     setSaving(true);
