@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
+import NotificationsBell from "./NotificationsBell";
 import logo from "@/assets/logo-elia-balance.svg";
 import {
   AlertDialog,
@@ -469,13 +470,7 @@ const HomePage = ({ user }: HomePageProps) => {
       <header className="px-6 py-4 flex items-center justify-between gap-3">
         <img src={logo} alt="Elia Balance" className="w-24 h-auto opacity-90" />
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            aria-label="Notificaciones"
-            className="relative w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-          </button>
+          <NotificationsBell />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
