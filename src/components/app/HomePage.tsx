@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
+import NotificationsBell from "./NotificationsBell";
 import logo from "@/assets/logo-elia-balance.svg";
 import {
   AlertDialog,
