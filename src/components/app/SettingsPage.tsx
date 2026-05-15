@@ -298,20 +298,28 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               </div>
 
               {/* Phone — editable */}
-              <div className="flex items-center gap-3">
-                <Phone className="w-4 h-4 shrink-0" />
-                <Input
-                  value={formPhone}
-                  onChange={(e) => setFormPhone(e.target.value)}
-                  placeholder="+34..."
-                  disabled={saving}
-                  className="h-9 text-sm flex-1"
-                />
+              <div className="flex items-start gap-3">
+                <Phone className="w-4 h-4 shrink-0 mt-2" />
+                <div className="flex-1">
+                  <Input
+                    value={formPhone}
+                    onChange={(e) => setFormPhone(e.target.value)}
+                    placeholder="+34612345678"
+                    disabled={saving}
+                    inputMode="tel"
+                    className={`h-9 text-sm ${!phoneValid ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                  />
+                  {!phoneValid && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Formato no válido. Usa formato internacional, p. ej. +34612345678 (7–15 dígitos).
+                    </p>
+                  )}
+                </div>
               </div>
 
               <Button
                 onClick={handleSaveProfile}
-                disabled={!isDirty || saving}
+                disabled={!isDirty || saving || !phoneValid}
                 className="w-full h-11 rounded-xl bg-[#A799B7] hover:bg-[#A799B7]/90 text-white mt-2"
               >
                 {saving ? (
@@ -323,6 +331,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
                   "Guardar cambios"
                 )}
               </Button>
+
 
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
