@@ -13,7 +13,8 @@ import {
   UserRound,
   Camera,
   Wifi,
-} from "lucide-react";
+  Bell,
+  Globe,
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
