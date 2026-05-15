@@ -4,9 +4,31 @@ import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { clearFTSession, getFTSession } from "@/lib/ft-auth";
 import { invalidateAll } from "@/lib/api-cache";
+import { ftPost } from "@/lib/api";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { LogOut, User as UserIcon, Mail, Activity, Phone, MapPin, IdCard, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  LogOut,
+  User as UserIcon,
+  Mail,
+  Activity,
+  Phone,
+  MapPin,
+  IdCard,
+  Loader2,
+  Pencil,
+  Check,
+  X,
+  Globe,
+} from "lucide-react";
 import { toast } from "sonner";
 import { usePlatform } from "@/hooks/use-platform";
 
@@ -39,6 +61,12 @@ type Profile = {
   line_avatar_url?: string;
 };
 
+const LANGUAGES = [
+  { value: "es", label: "Español" },
+  { value: "en", label: "English" },
+  { value: "ru", label: "Русский" },
+];
+
 const SettingsPage = ({ user }: SettingsPageProps) => {
   const { isIOS, isAndroid, isWeb } = usePlatform();
   const [googleFitEnabled, setGoogleFitEnabled] = useState(false);
@@ -46,6 +74,11 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
+
+  const [editingField, setEditingField] = useState<null | "language" | "phone">(null);
+  const [editLanguage, setEditLanguage] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const showGoogleFit = isAndroid || isWeb;
   const showAppleHealth = isIOS || isWeb;
@@ -78,6 +111,43 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
+  const startEdit = (field: "language" | "phone") => {
+    setEditingField(field);
+    if (field === "language") setEditLanguage(profile?.language || "es");
+    if (field === "phone") setEditPhone(profile?.phone || "");
+  };
+
+  const cancelEdit = () => {
+    setEditingField(null);
+    setEditLanguage("");
+    setEditPhone("");
+  };
+
+  const saveField = async (field: "language" | "phone") => {
+    const value = field === "language" ? editLanguage : editPhone;
+    if (!value.trim()) {
+      toast.error(field === "language" ? "Selecciona un idioma" : "Introduce un teléfono");
+      return;
+    }
+    setSaving(true);
+    try {
+      const body: Record<string, string> = {};
+      body[field] = value.trim();
+      const { data } = await ftPost("update-profile", body);
+      if (!data?.ok) {
+        toast.error(data?.data?.message ?? "No se pudo guardar");
+      } else {
+        setProfile((prev) => (prev ? { ...prev, [field]: value.trim() } : prev));
+        toast.success("Guardado correctamente");
+        setEditingField(null);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Error al guardar");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleGoogleFitToggle = (enabled: boolean) => {
     setGoogleFitEnabled(enabled);
     toast[enabled ? "success" : "info"](enabled ? "Google Fit conectado" : "Google Fit desconectado");
@@ -105,7 +175,6 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
       toast.error("Error al cerrar sesión");
       return;
     }
-    // Limpiar todo el caché del navegador para volver al splash inicial con gotas
     try {
       localStorage.clear();
       sessionStorage.clear();
@@ -116,7 +185,6 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     } catch (e) {
       console.warn("cache clear error", e);
     }
-    // Recarga completa para garantizar splash limpio
     window.location.replace("/");
   };
 
@@ -132,6 +200,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         .filter(Boolean)
         .join(", ")
     : "";
+
+  const langLabel = LANGUAGES.find((l) => l.value === profile?.language)?.label || profile?.language || "—";
 
   return (
     <motion.div
@@ -187,18 +257,6 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
                   <span className="break-all">{profile.email}</span>
                 </div>
               )}
-              {profile.phone && (
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 shrink-0" />
-                  <span>{profile.phone}</span>
-                </div>
-              )}
-              {address && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>{address}</span>
-                </div>
-              )}
               {profile.id_number && (
                 <div className="flex items-center gap-3">
                   <IdCard className="w-4 h-4 shrink-0" />
@@ -208,6 +266,104 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
                   </span>
                 </div>
               )}
+              {address && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{address}</span>
+                </div>
+              )}
+
+              {/* Language — editable */}
+              <div className="flex items-center gap-3">
+                <Globe className="w-4 h-4 shrink-0" />
+                {editingField === "language" ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Select
+                      value={editLanguage}
+                      onValueChange={setEditLanguage}
+                      disabled={saving}
+                    >
+                      <SelectTrigger className="h-9 text-sm flex-1">
+                        <SelectValue placeholder="Idioma" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {LANGUAGES.map((l) => (
+                          <SelectItem key={l.value} value={l.value}>
+                            {l.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <button
+                      onClick={() => saveField("language")}
+                      disabled={saving}
+                      className="p-1.5 rounded-full bg-[#A799B7] text-white hover:bg-[#A799B7]/90 disabled:opacity-50"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={saving}
+                      className="p-1.5 rounded-full bg-[#F5E6D3]/30 text-[#2F2A33] hover:bg-[#F5E6D3]/50 disabled:opacity-50"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-between gap-2">
+                    <span>{langLabel}</span>
+                    <button
+                      onClick={() => startEdit("language")}
+                      className="p-1 rounded-full hover:bg-[#F5E6D3]/30 text-[#2F2A33]/60"
+                      title="Editar idioma"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Phone — editable */}
+              <div className="flex items-center gap-3">
+                <Phone className="w-4 h-4 shrink-0" />
+                {editingField === "phone" ? (
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder="+34..."
+                      disabled={saving}
+                      className="h-9 text-sm flex-1"
+                    />
+                    <button
+                      onClick={() => saveField("phone")}
+                      disabled={saving}
+                      className="p-1.5 rounded-full bg-[#A799B7] text-white hover:bg-[#A799B7]/90 disabled:opacity-50"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={cancelEdit}
+                      disabled={saving}
+                      className="p-1.5 rounded-full bg-[#F5E6D3]/30 text-[#2F2A33] hover:bg-[#F5E6D3]/50 disabled:opacity-50"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-between gap-2">
+                    <span>{profile.phone || "—"}</span>
+                    <button
+                      onClick={() => startEdit("phone")}
+                      className="p-1 rounded-full hover:bg-[#F5E6D3]/30 text-[#2F2A33]/60"
+                      title="Editar teléfono"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {(profile.payment_model || profile.status) && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {profile.status && (
