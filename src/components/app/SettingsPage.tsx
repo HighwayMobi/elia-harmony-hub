@@ -79,7 +79,8 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
   const [profileError, setProfileError] = useState<string | null>(null);
 
   const [formLanguage, setFormLanguage] = useState("");
-  const [formPhone, setFormPhone] = useState("");
+  const [formCountry, setFormCountry] = useState(DEFAULT_COUNTRY);
+  const [formNational, setFormNational] = useState("");
   const [saving, setSaving] = useState(false);
 
   const showGoogleFit = isAndroid || isWeb;
@@ -104,7 +105,9 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           const payload = (data.data?.data ?? data.data) as Profile;
           setProfile(payload);
           setFormLanguage(payload?.language || "es");
-          setFormPhone(payload?.phone || "");
+          const parsed = parsePhone(payload?.phone || "");
+          setFormCountry(parsed.country);
+          setFormNational(parsed.national);
         }
       } catch (e: any) {
         setProfileError(e?.message ?? "Error al cargar el perfil");
@@ -115,28 +118,25 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
     loadProfile();
   }, []);
 
-  const normalizedPhone = formPhone.trim();
-  const phoneDigits = normalizedPhone.replace(/\D/g, "");
+  const builtPhone = buildPhone(formCountry, formNational);
+  const totalDigits = builtPhone.replace(/\D/g, "").length;
   const phoneValid =
-    normalizedPhone === "" ||
-    (/^\+?[0-9\s\-()]{7,20}$/.test(normalizedPhone) &&
-      phoneDigits.length >= 7 &&
-      phoneDigits.length <= 15);
+    builtPhone === "" || (totalDigits >= 7 && totalDigits <= 15);
 
   const isDirty =
     !!profile &&
     (formLanguage !== (profile.language || "") ||
-      normalizedPhone !== (profile.phone || ""));
+      builtPhone !== (profile.phone || ""));
 
   const handleSaveProfile = async () => {
     if (!profile || !isDirty) return;
     if (!phoneValid) {
-      toast.error("Teléfono no válido. Usa formato internacional, p. ej. +34612345678");
+      toast.error("Teléfono no válido. Introduce entre 7 y 15 dígitos.");
       return;
     }
     const body: Record<string, string> = {};
     if (formLanguage !== (profile.language || "")) body.language = formLanguage.trim();
-    if (normalizedPhone !== (profile.phone || "")) body.phone = normalizedPhone;
+    if (builtPhone !== (profile.phone || "")) body.phone = builtPhone;
     if (Object.keys(body).length === 0) return;
 
     setSaving(true);
