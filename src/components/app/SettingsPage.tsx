@@ -62,9 +62,12 @@ type Profile = {
 };
 
 const LANGUAGES = [
-  { value: "es", label: "Español" },
   { value: "en", label: "English" },
+  { value: "es", label: "Español" },
   { value: "ru", label: "Русский" },
+  { value: "kz", label: "Kazakhstani" },
+  { value: "fr", label: "Français" },
+  { value: "de", label: "Deutsch" },
 ];
 
 const SettingsPage = ({ user }: SettingsPageProps) => {
