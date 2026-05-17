@@ -299,6 +299,11 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
               <div className="flex items-start gap-3">
                 <Phone className="w-4 h-4 shrink-0 mt-2" />
                 <div className="flex-1">
+                  {profile?.phone && (
+                    <p className="text-xs text-[#2F2A33]/40 mb-1">
+                      API: {profile.phone}
+                    </p>
+                  )}
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#2F2A33]/60 pointer-events-none">
                       +
