@@ -437,7 +437,13 @@ const HomePage = ({ user }: HomePageProps) => {
   const selectedLine = currentLine || lines[0] || null;
 
   const formatLineTitle = (line?: FactoryTeleLine | null) => {
-    const msisdn = line?.msisdn || lineDetails?.msisdn;
+    if (line?.type === "fiber" || line?.type === "travel") {
+      const cachedPlan =
+        (line.id && String(line.id) === String(selectedLine?.id) ? lineDetails?.plan?.name : undefined) ||
+        getCachedLineDetails(line.id)?.plan?.name;
+      return line.tariff_plan || cachedPlan || getLineTypeLabel(line.type);
+    }
+    const msisdn = line?.msisdn || (line && String(line.id) === String(selectedLine?.id) ? lineDetails?.msisdn : undefined);
     if (!line && !msisdn) return getFTSession()?.phone || NA;
     if (msisdn) {
       const n = String(msisdn).replace(/^\+?34/, "");
