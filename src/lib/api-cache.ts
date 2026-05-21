@@ -63,8 +63,8 @@ export const fetchProfile = async (force = false): Promise<any> => {
 
     // Derive avatar URL from profile.
     const raw =
-      data?.avatar_url ||
       data?.line_avatar_url ||
+      data?.avatar_url ||
       data?.avatar ||
       data?.photo ||
       data?.image ||
