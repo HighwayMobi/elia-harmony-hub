@@ -200,3 +200,12 @@ export const logoutAndClear = () => {
   invalidateAll();
   clearFTSession();
 };
+
+// Auto-wipe cache when the FactoryTele token changes (login/logout/refresh
+// to a different user). Prevents leaking data from a previous account into
+// the new session.
+if (typeof window !== "undefined") {
+  window.addEventListener(TOKEN_CHANGED_EVENT, () => {
+    invalidateAll();
+  });
+}
