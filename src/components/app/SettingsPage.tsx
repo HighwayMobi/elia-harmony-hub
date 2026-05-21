@@ -235,7 +235,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           ) : profile ? (
             <div className="space-y-3 text-[#2F2A33]/80 text-sm">
               {(() => {
-                const raw = profile.avatar_url || profile.line_avatar_url;
+                const raw = profile.line_avatar_url || profile.avatar_url;
                 if (!raw) return null;
                 const src = /^https?:\/\//i.test(raw)
                   ? raw
