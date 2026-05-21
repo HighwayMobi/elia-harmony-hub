@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     upstreamForm.append("avatar", file, file.name || "avatar.jpg");
 
     const upstream = await fetch(
-      "https://platform.factorytele.com/api/v1/pub/account/avatar",
+      "https://platform.factorytele.com/api/v1/pub/line/avatar",
       {
         method: "POST",
         headers: {
