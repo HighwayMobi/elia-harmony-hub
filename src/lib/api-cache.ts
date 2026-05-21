@@ -4,7 +4,7 @@
 // upload, password change) and on logout.
 
 import { ftPost, ftUpload } from "./api";
-import { clearFTSession } from "./ft-auth";
+import { clearFTSession, TOKEN_CHANGED_EVENT } from "./ft-auth";
 
 type CacheEntry<T> = {
   data: T;
