@@ -4,7 +4,7 @@
 // upload, password change) and on logout.
 
 import { ftPost, ftUpload } from "./api";
-import { clearFTSession } from "./ft-auth";
+import { clearFTSession, TOKEN_CHANGED_EVENT } from "./ft-auth";
 
 type CacheEntry<T> = {
   data: T;
@@ -200,3 +200,12 @@ export const logoutAndClear = () => {
   invalidateAll();
   clearFTSession();
 };
+
+// Auto-wipe cache when the FactoryTele token changes (login/logout/refresh
+// to a different user). Prevents leaking data from a previous account into
+// the new session.
+if (typeof window !== "undefined") {
+  window.addEventListener(TOKEN_CHANGED_EVENT, () => {
+    invalidateAll();
+  });
+}

@@ -62,14 +62,27 @@ export const getFTSession = (): FactoryTeleSession | null => {
   }
 };
 
+export const TOKEN_CHANGED_EVENT = "factorytele-token-changed";
+
 export const setFTSession = (session: FactoryTeleSession) => {
+  let prevToken: string | undefined;
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) prevToken = (JSON.parse(raw) as FactoryTeleSession)?.token;
+  } catch {
+    // ignore
+  }
   localStorage.setItem(KEY, JSON.stringify(session));
   window.dispatchEvent(new Event(EVENT));
+  if (session?.token && session.token !== prevToken) {
+    window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
+  }
 };
 
 export const clearFTSession = () => {
   localStorage.removeItem(KEY);
   window.dispatchEvent(new Event(EVENT));
+  window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
 };
 
 export const onFTSessionChange = (cb: () => void) => {
