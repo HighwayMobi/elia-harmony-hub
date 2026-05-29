@@ -119,7 +119,7 @@ const TopUpPage = () => {
       }
     }).catch(() => {});
 
-    loadPaymentMethods();
+    if (id) loadPaymentMethods(id);
 
     const onFocus = () => loadPaymentMethods();
     const onVisibility = () => {
@@ -132,6 +132,11 @@ const TopUpPage = () => {
       document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
+
+  // Reload cards as soon as we get a lineId
+  useEffect(() => {
+    if (lineId) loadPaymentMethods(lineId);
+  }, [lineId]);
 
   // Re-fetch saved cards whenever we return from the Stripe form
   useEffect(() => {
