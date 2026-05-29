@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
     const token = body?.token;
     const lineId = body?.line_id ?? body?.id;
     const amount = Number(body?.amount);
+    const saveCard = body?.save_card === true;
 
     if (typeof token !== "string" || !token) {
       return new Response(
@@ -53,7 +54,10 @@ Deno.serve(async (req) => {
       Authorization: `Bearer ${maskSensitive(token)}`,
       "X-Partner-Key": maskSensitive(partnerKey),
     });
-    console.log("Body:", { amount, line_id: String(lineId) });
+    console.log("Body:", { amount, line_id: String(lineId), save_card: saveCard });
+
+    const upstreamPayload: any = { amount, line_id: String(lineId) };
+    if (saveCard) upstreamPayload.save_card = true;
 
     const upstream = await fetch(
       `https://platform.factorytele.com/api/v1/pub/billing/topup`,
@@ -64,7 +68,7 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ amount, line_id: String(lineId) }),
+        body: JSON.stringify(upstreamPayload),
       }
     );
 
