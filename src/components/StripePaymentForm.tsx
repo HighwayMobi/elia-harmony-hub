@@ -147,10 +147,11 @@ const StripePaymentForm = ({
           Authorization: `Bearer ${maskSensitive(session?.token)}`,
           "X-Partner-Key": maskSensitive(PARTNER_KEY),
         });
-        console.log("Body:", { amount, line_id: lineId });
+        console.log("Body:", { amount, line_id: lineId, save_card: saveCard });
         const { data: json } = await ftPost<any>("billing-topup", {
           amount,
           line_id: lineId,
+          ...(saveCard ? { save_card: true } : {}),
         });
         const inner = json?.data?.data ?? json?.data;
         if (!json?.ok || inner?.success === false) {
