@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
     const token = body?.token;
     const lineId = body?.line_id ?? body?.id;
     const amount = Number(body?.amount);
+    const saveCard = body?.save_card === true;
 
     if (typeof token !== "string" || !token) {
       return new Response(
