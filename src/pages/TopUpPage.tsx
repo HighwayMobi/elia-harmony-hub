@@ -392,18 +392,37 @@ const TopUpPage = () => {
                 </div>
               </div>
 
+              {payError && (
+                <div className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {payError}
+                </div>
+              )}
               <button
-                disabled={!isValid}
-                onClick={() => setShowPaymentForm(true)}
+                disabled={!isValid || paying}
+                onClick={() => {
+                  if (savedCard) {
+                    handlePayWithSavedCard();
+                  } else {
+                    setShowPaymentForm(true);
+                  }
+                }}
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                  isValid
+                  isValid && !paying
                     ? "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}
               >
-                <CreditCard className="h-4 w-4" />
-                Pagar con tarjeta
+                {paying ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard className="h-4 w-4" />
+                )}
+                {paying
+                  ? "Procesando…"
+                  : savedCard
+                  ? `Pagar con •••• ${savedCard.last4 || ""}`
+                  : "Pagar con tarjeta"}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-3 text-xs text-gray-500">
