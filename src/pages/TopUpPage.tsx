@@ -95,6 +95,30 @@ const TopUpPage = () => {
   };
 
   useEffect(() => {
+    const ft = getFTSession();
+    const cachedProfile = getCachedProfile();
+    const cachedLines = getCachedLines();
+    const line: any = ft?.line || cachedLines?.[0] || null;
+    const id = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token) || null;
+    if (id) setLineId(id);
+    const msisdn = line?.msisdn || ft?.phone || "";
+    if (msisdn) {
+      const clean = String(msisdn).replace(/\D/g, "");
+      setPhone(clean.startsWith("34") ? `+${clean.slice(0, 2)} ${clean.slice(2)}` : `+${clean}`);
+    }
+    setEmail(cachedProfile?.email || ft?.email || "");
+
+    fetchProfile().then((p) => p?.email && setEmail((cur) => cur || p.email!)).catch(() => {});
+    fetchLines().then((arr) => {
+      const first: any = (arr as any[])?.[0];
+      if (first?.id && !id) setLineId(first.id);
+      const m = first?.msisdn;
+      if (m && !msisdn) {
+        const clean = String(m).replace(/\D/g, "");
+        setPhone(clean.startsWith("34") ? `+${clean.slice(0, 2)} ${clean.slice(2)}` : `+${clean}`);
+      }
+    }).catch(() => {});
+
     loadPaymentMethods();
   }, []);
 
