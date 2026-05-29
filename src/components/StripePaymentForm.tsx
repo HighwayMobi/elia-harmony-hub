@@ -16,6 +16,7 @@ interface StripePaymentFormProps {
   amount: number;
   lineId: string | number;
   email?: string;
+  saveCard?: boolean;
   onCancel: () => void;
   returnTo?: string;
 }
