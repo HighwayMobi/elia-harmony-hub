@@ -32,27 +32,14 @@ Deno.serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    if (!lineId) {
+      return new Response(
+        JSON.stringify({ error: "Missing line_id" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-    // Extract subscription_id from JWT (set by upstream during login)
-    let subscriptionId: string | undefined;
-    try {
-      const payloadB64 = token.split(".")[1];
-      if (payloadB64) {
-        const base64 = payloadB64.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
-        const parsed = JSON.parse(atob(padded));
-        if (parsed && typeof parsed === "object" && parsed.subscription_id) {
-          subscriptionId = String(parsed.subscription_id);
-        }
-      }
-    } catch (_e) { /* ignore */ }
-
-    const ctxId = subscriptionId || (lineId ? String(lineId) : "");
-    const params = new URLSearchParams();
-    if (lineId) params.set("line_id", String(lineId));
-    if (ctxId) params.set("subscription_id", ctxId);
-    const qs = params.toString() ? `?${params.toString()}` : "";
-
+    const qs = `?line_id=${encodeURIComponent(String(lineId))}`;
     let url = `${UPSTREAM_BASE}${qs}`;
     let method: "GET" | "DELETE" = "GET";
     if (action === "delete") {
@@ -66,19 +53,16 @@ Deno.serve(async (req) => {
       method = "DELETE";
     }
 
-    const upstreamHeaders: Record<string, string> = {
-      "X-Partner-Key": partnerKey,
-      Authorization: `Bearer ${token}`,
-    };
-    if (ctxId) upstreamHeaders["X-Subscription-Id"] = ctxId;
-    if (lineId) upstreamHeaders["X-Line-Id"] = String(lineId);
-
-    console.log("billing-payment-methods request:", { url, method, subscriptionId, lineId, ctxId });
-
-    const upstream = await fetch(url, { method, headers: upstreamHeaders });
+    const upstream = await fetch(url, {
+      method,
+      headers: {
+        "X-Partner-Key": partnerKey,
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     const text = await upstream.text();
-    console.log("billing-payment-methods:", action, upstream.status, text?.slice(0, 300));
+    console.log("billing-payment-methods:", action, "line_id:", lineId, "status:", upstream.status, "body:", text?.slice(0, 300));
 
     let data: any;
     try {
