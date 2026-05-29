@@ -129,6 +129,7 @@ const StripePaymentForm = ({
   amount,
   lineId,
   email,
+  saveCard,
   onCancel,
   returnTo,
 }: StripePaymentFormProps) => {
