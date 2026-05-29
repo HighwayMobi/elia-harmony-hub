@@ -137,6 +137,29 @@ const TopUpPage = () => {
     }
   };
 
+  const handlePayWithSavedCard = async () => {
+    if (!lineId || !savedCard) return;
+    setPaying(true);
+    setPayError(null);
+    try {
+      const { data: json } = await ftPost<any>("billing-topup", {
+        amount: displayAmount,
+        line_id: lineId,
+      });
+      const inner = json?.data?.data ?? json?.data;
+      if (!json?.ok || inner?.success === false) {
+        throw new Error(inner?.error || inner?.message || "No se pudo procesar el pago");
+      }
+      const params = new URLSearchParams();
+      if (returnTo) params.set("returnTo", returnTo);
+      params.set("redirect_status", "succeeded");
+      navigate(`/payment-success?${params.toString()}`);
+    } catch (e: any) {
+      setPayError(e?.message || "Error de red");
+      setPaying(false);
+    }
+  };
+
   const handlePreset = (v: number) => {
     setSelectedPreset(v);
     setAmount(String(v));
