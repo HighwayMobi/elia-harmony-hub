@@ -169,7 +169,7 @@ const StripePaymentForm = ({
     return () => {
       cancelled = true;
     };
-  }, [amount, lineId]);
+  }, [amount, lineId, saveCard]);
 
   const stripePromise = useMemo(
     () => (publishableKey ? getStripe(publishableKey) : null),
