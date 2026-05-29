@@ -1,10 +1,41 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Shield, Pencil } from "lucide-react";
+import { ArrowLeft, CreditCard, Shield, Pencil, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { fetchProfile, fetchLines, getCachedProfile, getCachedLines } from "@/lib/api-cache";
+import { ftPost } from "@/lib/api";
 import StripePaymentForm from "@/components/StripePaymentForm";
+
+interface SavedCard {
+  id: string;
+  brand?: string;
+  last4?: string;
+  exp_month?: number;
+  exp_year?: number;
+  is_default?: boolean;
+}
+
+const formatExpiry = (m?: number, y?: number) => {
+  if (!m || !y) return "";
+  const mm = String(m).padStart(2, "0");
+  const yy = String(y).slice(-2);
+  return `${mm}/${yy}`;
+};
+
+const brandLabel = (b?: string) => {
+  if (!b) return "Tarjeta";
+  const map: Record<string, string> = {
+    visa: "Visa",
+    mastercard: "Mastercard",
+    amex: "Amex",
+    discover: "Discover",
+    diners: "Diners",
+    jcb: "JCB",
+    unionpay: "UnionPay",
+  };
+  return map[b.toLowerCase()] || b.charAt(0).toUpperCase() + b.slice(1);
+};
 
 const amountPresets = [5, 10, 20, 50];
 
