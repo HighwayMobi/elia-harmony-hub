@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     const ctxId = subscriptionId || (lineId ? String(lineId) : "");
     const params = new URLSearchParams();
     if (lineId) params.set("line_id", String(lineId));
-    if (subscriptionId) params.set("subscription_id", subscriptionId);
+    if (ctxId) params.set("subscription_id", ctxId);
     const qs = params.toString() ? `?${params.toString()}` : "";
 
     let url = `${UPSTREAM_BASE}${qs}`;
