@@ -24,6 +24,7 @@ Deno.serve(async (req) => {
     const token = body?.token;
     const action = body?.action || "list";
     const pmId = body?.pm_id;
+    const lineId = body?.line_id ?? body?.id;
 
     if (typeof token !== "string" || !token) {
       return new Response(
@@ -32,7 +33,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    let url = UPSTREAM_BASE;
+    const qs = lineId ? `?line_id=${encodeURIComponent(String(lineId))}` : "";
+    let url = `${UPSTREAM_BASE}${qs}`;
     let method: "GET" | "DELETE" = "GET";
     if (action === "delete") {
       if (!pmId) {
@@ -41,7 +43,7 @@ Deno.serve(async (req) => {
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      url = `${UPSTREAM_BASE}/${encodeURIComponent(String(pmId))}`;
+      url = `${UPSTREAM_BASE}/${encodeURIComponent(String(pmId))}${qs}`;
       method = "DELETE";
     }
 
