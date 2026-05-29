@@ -111,6 +111,7 @@ const TopUpPage = () => {
                 amount={displayAmount}
                 lineId={lineId}
                 email={email}
+                saveCard={saveCard}
                 onCancel={() => setShowPaymentForm(false)}
                 returnTo={returnTo}
               />
