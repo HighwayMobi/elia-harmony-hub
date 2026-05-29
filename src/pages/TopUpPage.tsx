@@ -1,10 +1,41 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Shield, Pencil } from "lucide-react";
+import { ArrowLeft, CreditCard, Shield, Pencil, Trash2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { fetchProfile, fetchLines, getCachedProfile, getCachedLines } from "@/lib/api-cache";
+import { ftPost } from "@/lib/api";
 import StripePaymentForm from "@/components/StripePaymentForm";
+
+interface SavedCard {
+  id: string;
+  brand?: string;
+  last4?: string;
+  exp_month?: number;
+  exp_year?: number;
+  is_default?: boolean;
+}
+
+const formatExpiry = (m?: number, y?: number) => {
+  if (!m || !y) return "";
+  const mm = String(m).padStart(2, "0");
+  const yy = String(y).slice(-2);
+  return `${mm}/${yy}`;
+};
+
+const brandLabel = (b?: string) => {
+  if (!b) return "Tarjeta";
+  const map: Record<string, string> = {
+    visa: "Visa",
+    mastercard: "Mastercard",
+    amex: "Amex",
+    discover: "Discover",
+    diners: "Diners",
+    jcb: "JCB",
+    unionpay: "UnionPay",
+  };
+  return map[b.toLowerCase()] || b.charAt(0).toUpperCase() + b.slice(1);
+};
 
 const amountPresets = [5, 10, 20, 50];
 
@@ -28,6 +59,42 @@ const TopUpPage = () => {
   });
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [saveCard, setSaveCard] = useState(true);
+  const [savedCard, setSavedCard] = useState<SavedCard | null>(null);
+  const [loadingCards, setLoadingCards] = useState(true);
+  const [deletingCard, setDeletingCard] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+
+  const loadPaymentMethods = async () => {
+    setLoadingCards(true);
+    try {
+      const { data: json } = await ftPost<any>("billing-payment-methods", { action: "list" });
+      const inner = json?.data?.data ?? json?.data;
+      const list: any[] =
+        (Array.isArray(inner) && inner) ||
+        inner?.payment_methods ||
+        inner?.data ||
+        inner?.items ||
+        [];
+      if (Array.isArray(list) && list.length > 0) {
+        const def = list.find((c) => c?.is_default) || list[0];
+        setSavedCard({
+          id: def.id || def.pm_id || def.payment_method_id,
+          brand: def.brand || def.card?.brand,
+          last4: def.last4 || def.card?.last4,
+          exp_month: def.exp_month || def.card?.exp_month,
+          exp_year: def.exp_year || def.card?.exp_year,
+          is_default: def.is_default,
+        });
+      } else {
+        setSavedCard(null);
+      }
+    } catch {
+      setSavedCard(null);
+    } finally {
+      setLoadingCards(false);
+    }
+  };
 
   useEffect(() => {
     const ft = getFTSession();
@@ -53,7 +120,45 @@ const TopUpPage = () => {
         setPhone(clean.startsWith("34") ? `+${clean.slice(0, 2)} ${clean.slice(2)}` : `+${clean}`);
       }
     }).catch(() => {});
+
+    loadPaymentMethods();
   }, []);
+
+  const handleDeleteCard = async () => {
+    if (!savedCard?.id) return;
+    setDeletingCard(true);
+    try {
+      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id });
+      await loadPaymentMethods();
+    } catch {
+      // ignore
+    } finally {
+      setDeletingCard(false);
+    }
+  };
+
+  const handlePayWithSavedCard = async () => {
+    if (!lineId || !savedCard) return;
+    setPaying(true);
+    setPayError(null);
+    try {
+      const { data: json } = await ftPost<any>("billing-topup", {
+        amount: displayAmount,
+        line_id: lineId,
+      });
+      const inner = json?.data?.data ?? json?.data;
+      if (!json?.ok || inner?.success === false) {
+        throw new Error(inner?.error || inner?.message || "No se pudo procesar el pago");
+      }
+      const params = new URLSearchParams();
+      if (returnTo) params.set("returnTo", returnTo);
+      params.set("redirect_status", "succeeded");
+      navigate(`/payment-success?${params.toString()}`);
+    } catch (e: any) {
+      setPayError(e?.message || "Error de red");
+      setPaying(false);
+    }
+  };
 
   const handlePreset = (v: number) => {
     setSelectedPreset(v);
@@ -207,24 +312,64 @@ const TopUpPage = () => {
                 )}
               </div>
 
-              {/* Save card checkbox */}
-              <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
-                <input
-                  id="save-card"
-                  type="checkbox"
-                  checked={saveCard}
-                  onChange={(e) => setSaveCard(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
-                />
-                <div>
-                  <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
-                    Guardar tarjeta para pagos automáticos
-                  </label>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    Tu tarjeta se guardará de forma segura para renovaciones automáticas
-                  </p>
+              {/* Saved card or save-card checkbox */}
+              {loadingCards ? (
+                <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-[#F5F3F7] px-4 py-3 text-xs text-gray-500">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Cargando métodos de pago…
                 </div>
-              </div>
+              ) : savedCard ? (
+                <div className="mb-5 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                  <div className="mb-2 text-xs text-gray-500">Tarjeta guardada</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-12 items-center justify-center rounded bg-white text-[10px] font-bold text-[#2F2A33] shadow-sm">
+                        {brandLabel(savedCard.brand)}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#2F2A33]">
+                          •••• {savedCard.last4 || "----"}
+                        </div>
+                        {formatExpiry(savedCard.exp_month, savedCard.exp_year) && (
+                          <div className="text-xs text-gray-500">
+                            Caduca {formatExpiry(savedCard.exp_month, savedCard.exp_year)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleDeleteCard}
+                      disabled={deletingCard}
+                      className="flex items-center gap-1 text-xs font-medium text-red-500 hover:underline disabled:opacity-50"
+                    >
+                      {deletingCard ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3 w-3" />
+                      )}
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                  <input
+                    id="save-card"
+                    type="checkbox"
+                    checked={saveCard}
+                    onChange={(e) => setSaveCard(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
+                  />
+                  <div>
+                    <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
+                      Guardar tarjeta para pagos automáticos
+                    </label>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Tu tarjeta se guardará de forma segura para renovaciones automáticas
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Summary */}
               <div className="mb-5 rounded-xl bg-[#F5F3F7] p-4">
@@ -246,18 +391,37 @@ const TopUpPage = () => {
                 </div>
               </div>
 
+              {payError && (
+                <div className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {payError}
+                </div>
+              )}
               <button
-                disabled={!isValid}
-                onClick={() => setShowPaymentForm(true)}
+                disabled={!isValid || paying}
+                onClick={() => {
+                  if (savedCard) {
+                    handlePayWithSavedCard();
+                  } else {
+                    setShowPaymentForm(true);
+                  }
+                }}
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
-                  isValid
+                  isValid && !paying
                     ? "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}
               >
-                <CreditCard className="h-4 w-4" />
-                Pagar con tarjeta
+                {paying ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CreditCard className="h-4 w-4" />
+                )}
+                {paying
+                  ? "Procesando…"
+                  : savedCard
+                  ? `Pagar con •••• ${savedCard.last4 || ""}`
+                  : "Pagar con tarjeta"}
               </button>
 
               <div className="mt-4 flex items-center justify-center gap-3 text-xs text-gray-500">
