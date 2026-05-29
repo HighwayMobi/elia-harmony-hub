@@ -69,15 +69,13 @@ const TopUpPage = () => {
     setLoadingCards(true);
     try {
       const { data: json } = await ftPost<any>("billing-payment-methods", { action: "list" });
-      const inner = json?.data?.data ?? json?.data;
-      const list: any[] =
-        (Array.isArray(inner) && inner) ||
-        inner?.payment_methods ||
-        inner?.data ||
-        inner?.items ||
-        [];
-      if (Array.isArray(list) && list.length > 0) {
-        const def = list.find((c) => c?.is_default) || list[0];
+      // The edge function returns { ok, status, data } where data is the upstream array directly.
+      // Also handle json itself being the array (defensive).
+      const list: any[] = Array.isArray(json) ? json
+        : Array.isArray(json?.data) ? json.data
+        : [];
+      if (list.length > 0) {
+        const def = list.find((c) => c?.is_default === true) || list[0];
         setSavedCard({
           id: def.id || def.pm_id || def.payment_method_id,
           brand: def.brand || def.card?.brand,
