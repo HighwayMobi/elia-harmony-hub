@@ -59,32 +59,57 @@ const TopUpPage = () => {
   });
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [saveCard, setSaveCard] = useState(true);
+  const [savedCard, setSavedCard] = useState<SavedCard | null>(null);
+  const [loadingCards, setLoadingCards] = useState(true);
+  const [deletingCard, setDeletingCard] = useState(false);
+
+  const loadPaymentMethods = async () => {
+    setLoadingCards(true);
+    try {
+      const { data: json } = await ftPost<any>("billing-payment-methods", { action: "list" });
+      const inner = json?.data?.data ?? json?.data;
+      const list: any[] =
+        (Array.isArray(inner) && inner) ||
+        inner?.payment_methods ||
+        inner?.data ||
+        inner?.items ||
+        [];
+      if (Array.isArray(list) && list.length > 0) {
+        const def = list.find((c) => c?.is_default) || list[0];
+        setSavedCard({
+          id: def.id || def.pm_id || def.payment_method_id,
+          brand: def.brand || def.card?.brand,
+          last4: def.last4 || def.card?.last4,
+          exp_month: def.exp_month || def.card?.exp_month,
+          exp_year: def.exp_year || def.card?.exp_year,
+          is_default: def.is_default,
+        });
+      } else {
+        setSavedCard(null);
+      }
+    } catch {
+      setSavedCard(null);
+    } finally {
+      setLoadingCards(false);
+    }
+  };
 
   useEffect(() => {
-    const ft = getFTSession();
-    const cachedProfile = getCachedProfile();
-    const cachedLines = getCachedLines();
-    const line: any = ft?.line || cachedLines?.[0] || null;
-    const id = line?.id || ft?.line_id || getSubscriptionIdFromToken(ft?.token) || null;
-    if (id) setLineId(id);
-    const msisdn = line?.msisdn || ft?.phone || "";
-    if (msisdn) {
-      const clean = String(msisdn).replace(/\D/g, "");
-      setPhone(clean.startsWith("34") ? `+${clean.slice(0, 2)} ${clean.slice(2)}` : `+${clean}`);
-    }
-    setEmail(cachedProfile?.email || ft?.email || "");
-
-    fetchProfile().then((p) => p?.email && setEmail((cur) => cur || p.email!)).catch(() => {});
-    fetchLines().then((arr) => {
-      const first: any = (arr as any[])?.[0];
-      if (first?.id && !id) setLineId(first.id);
-      const m = first?.msisdn;
-      if (m && !msisdn) {
-        const clean = String(m).replace(/\D/g, "");
-        setPhone(clean.startsWith("34") ? `+${clean.slice(0, 2)} ${clean.slice(2)}` : `+${clean}`);
-      }
-    }).catch(() => {});
+    loadPaymentMethods();
   }, []);
+
+  const handleDeleteCard = async () => {
+    if (!savedCard?.id) return;
+    setDeletingCard(true);
+    try {
+      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id });
+      await loadPaymentMethods();
+    } catch {
+      // ignore
+    } finally {
+      setDeletingCard(false);
+    }
+  };
 
   const handlePreset = (v: number) => {
     setSelectedPreset(v);
