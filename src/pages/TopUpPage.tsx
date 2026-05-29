@@ -147,8 +147,8 @@ const TopUpPage = () => {
     if (!savedCard?.id) return;
     setDeletingCard(true);
     try {
-      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id });
-      await loadPaymentMethods();
+      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id, line_id: lineId });
+      await loadPaymentMethods(lineId);
     } catch {
       // ignore
     } finally {
