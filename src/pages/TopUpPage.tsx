@@ -65,12 +65,12 @@ const TopUpPage = () => {
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string | null>(null);
 
-  const loadPaymentMethods = async () => {
+  const loadPaymentMethods = async (lid?: string | number | null) => {
+    const id = lid ?? lineId;
+    if (!id) return;
     setLoadingCards(true);
     try {
-      const { data: json } = await ftPost<any>("billing-payment-methods", { action: "list" });
-      // The edge function returns { ok, status, data } where data is the upstream array directly.
-      // Also handle json itself being the array (defensive).
+      const { data: json } = await ftPost<any>("billing-payment-methods", { action: "list", line_id: id });
       const list: any[] = Array.isArray(json) ? json
         : Array.isArray(json?.data) ? json.data
         : [];
@@ -119,7 +119,7 @@ const TopUpPage = () => {
       }
     }).catch(() => {});
 
-    loadPaymentMethods();
+    if (id) loadPaymentMethods(id);
 
     const onFocus = () => loadPaymentMethods();
     const onVisibility = () => {
@@ -133,6 +133,11 @@ const TopUpPage = () => {
     };
   }, []);
 
+  // Reload cards as soon as we get a lineId
+  useEffect(() => {
+    if (lineId) loadPaymentMethods(lineId);
+  }, [lineId]);
+
   // Re-fetch saved cards whenever we return from the Stripe form
   useEffect(() => {
     if (!showPaymentForm) loadPaymentMethods();
@@ -142,8 +147,8 @@ const TopUpPage = () => {
     if (!savedCard?.id) return;
     setDeletingCard(true);
     try {
-      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id });
-      await loadPaymentMethods();
+      await ftPost("billing-payment-methods", { action: "delete", pm_id: savedCard.id, line_id: lineId });
+      await loadPaymentMethods(lineId);
     } catch {
       // ignore
     } finally {
