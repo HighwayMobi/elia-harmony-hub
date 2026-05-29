@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       "X-Partner-Key": partnerKey,
       Authorization: `Bearer ${token}`,
     };
-    if (subscriptionId) upstreamHeaders["X-Subscription-Id"] = subscriptionId;
+    if (ctxId) upstreamHeaders["X-Subscription-Id"] = ctxId;
     if (lineId) upstreamHeaders["X-Line-Id"] = String(lineId);
 
     console.log("billing-payment-methods request:", { url, method, subscriptionId, lineId, ctxId });
