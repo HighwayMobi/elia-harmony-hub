@@ -62,6 +62,8 @@ const TopUpPage = () => {
   const [savedCard, setSavedCard] = useState<SavedCard | null>(null);
   const [loadingCards, setLoadingCards] = useState(true);
   const [deletingCard, setDeletingCard] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
 
   const loadPaymentMethods = async () => {
     setLoadingCards(true);
