@@ -201,10 +201,29 @@ const TopUpPage = () => {
                     )}
                   </>
                 ) : (
-                  <span className="mt-1 block text-sm font-semibold text-[#2F2A33]">
+                <span className="mt-1 block text-sm font-semibold text-[#2F2A33]">
                     {email || "—"}
                   </span>
                 )}
+              </div>
+
+              {/* Save card checkbox */}
+              <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                <input
+                  id="save-card"
+                  type="checkbox"
+                  checked={saveCard}
+                  onChange={(e) => setSaveCard(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
+                />
+                <div>
+                  <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
+                    Guardar tarjeta para pagos automáticos
+                  </label>
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    Tu tarjeta se guardará de forma segura para renovaciones automáticas
+                  </p>
+                </div>
               </div>
 
               {/* Summary */}
