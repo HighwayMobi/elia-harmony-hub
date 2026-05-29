@@ -313,24 +313,64 @@ const TopUpPage = () => {
                 )}
               </div>
 
-              {/* Save card checkbox */}
-              <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
-                <input
-                  id="save-card"
-                  type="checkbox"
-                  checked={saveCard}
-                  onChange={(e) => setSaveCard(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
-                />
-                <div>
-                  <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
-                    Guardar tarjeta para pagos automáticos
-                  </label>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    Tu tarjeta se guardará de forma segura para renovaciones automáticas
-                  </p>
+              {/* Saved card or save-card checkbox */}
+              {loadingCards ? (
+                <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-[#F5F3F7] px-4 py-3 text-xs text-gray-500">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  Cargando métodos de pago…
                 </div>
-              </div>
+              ) : savedCard ? (
+                <div className="mb-5 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                  <div className="mb-2 text-xs text-gray-500">Tarjeta guardada</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-12 items-center justify-center rounded bg-white text-[10px] font-bold text-[#2F2A33] shadow-sm">
+                        {brandLabel(savedCard.brand)}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#2F2A33]">
+                          •••• {savedCard.last4 || "----"}
+                        </div>
+                        {formatExpiry(savedCard.exp_month, savedCard.exp_year) && (
+                          <div className="text-xs text-gray-500">
+                            Caduca {formatExpiry(savedCard.exp_month, savedCard.exp_year)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleDeleteCard}
+                      disabled={deletingCard}
+                      className="flex items-center gap-1 text-xs font-medium text-red-500 hover:underline disabled:opacity-50"
+                    >
+                      {deletingCard ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3 w-3" />
+                      )}
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                  <input
+                    id="save-card"
+                    type="checkbox"
+                    checked={saveCard}
+                    onChange={(e) => setSaveCard(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
+                  />
+                  <div>
+                    <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
+                      Guardar tarjeta para pagos automáticos
+                    </label>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Tu tarjeta se guardará de forma segura para renovaciones automáticas
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Summary */}
               <div className="mb-5 rounded-xl bg-[#F5F3F7] p-4">
