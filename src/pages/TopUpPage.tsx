@@ -27,6 +27,7 @@ const TopUpPage = () => {
     return amountPresets.includes(n) ? n : null;
   });
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [saveCard, setSaveCard] = useState(true);
 
   useEffect(() => {
     const ft = getFTSession();
