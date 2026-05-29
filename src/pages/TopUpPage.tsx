@@ -122,7 +122,23 @@ const TopUpPage = () => {
     }).catch(() => {});
 
     loadPaymentMethods();
+
+    const onFocus = () => loadPaymentMethods();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") loadPaymentMethods();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
+
+  // Re-fetch saved cards whenever we return from the Stripe form
+  useEffect(() => {
+    if (!showPaymentForm) loadPaymentMethods();
+  }, [showPaymentForm]);
 
   const handleDeleteCard = async () => {
     if (!savedCard?.id) return;
