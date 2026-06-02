@@ -169,7 +169,7 @@ const LoginScreen = () => {
             raw: inner,
           };
 
-          if (hasPassword === false) {
+          if (hasPassword === false && !inner.is_service_otp) {
             // Force user to set a password before entering the app
             setPendingToken(token);
             setPendingSession(sessionPayload);
