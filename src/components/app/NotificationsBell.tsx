@@ -21,7 +21,7 @@ interface NotificationItem {
   created_at?: string;
 }
 
-const POLL_MS = 5 * 60_000;
+
 
 const NotificationsBell = () => {
   const [count, setCount] = useState<number>(0);
