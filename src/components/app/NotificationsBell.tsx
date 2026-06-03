@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { Bell, X, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { ftPost } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ interface NotificationItem {
   created_at?: string;
 }
 
-const POLL_MS = 5 * 60_000;
+
 
 const NotificationsBell = () => {
   const [count, setCount] = useState<number>(0);
@@ -29,6 +30,7 @@ const NotificationsBell = () => {
   const [page, setPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
   const [loading, setLoading] = useState(false);
+  const location = useLocation();
 
   const fetchCount = useCallback(async () => {
     try {
@@ -57,23 +59,12 @@ const NotificationsBell = () => {
     }
   }, []);
 
+  // Fetch on mount and on every route change (page navigation)
   useEffect(() => {
     fetchCount();
-    let id: number | undefined;
-    const startPolling = () => {
-      if (id != null) return;
-      id = window.setInterval(() => {
-        if (document.visibilityState === "visible") fetchCount();
-      }, POLL_MS);
-    };
-    const stopPolling = () => {
-      if (id != null) {
-        window.clearInterval(id);
-        id = undefined;
-      }
-    };
-    startPolling();
+  }, [fetchCount, location.pathname]);
 
+  useEffect(() => {
     // Refetch on line/session changes
     let lastLineId = String(getFTSession()?.line_id ?? "");
     const offSession = onFTSessionChange(() => {
@@ -86,18 +77,12 @@ const NotificationsBell = () => {
 
     // Refetch when tab becomes visible again (page refresh / focus)
     const onVis = () => {
-      if (document.visibilityState === "visible") {
-        fetchCount();
-        startPolling();
-      } else {
-        stopPolling();
-      }
+      if (document.visibilityState === "visible") fetchCount();
     };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("focus", fetchCount);
 
     return () => {
-      stopPolling();
       offSession();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("focus", fetchCount);
