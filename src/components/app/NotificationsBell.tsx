@@ -20,7 +20,7 @@ interface NotificationItem {
   created_at?: string;
 }
 
-const POLL_MS = 60_000;
+const POLL_MS = 5 * 60_000;
 
 const NotificationsBell = () => {
   const [count, setCount] = useState<number>(0);
@@ -59,7 +59,20 @@ const NotificationsBell = () => {
 
   useEffect(() => {
     fetchCount();
-    const id = window.setInterval(fetchCount, POLL_MS);
+    let id: number | undefined;
+    const startPolling = () => {
+      if (id != null) return;
+      id = window.setInterval(() => {
+        if (document.visibilityState === "visible") fetchCount();
+      }, POLL_MS);
+    };
+    const stopPolling = () => {
+      if (id != null) {
+        window.clearInterval(id);
+        id = undefined;
+      }
+    };
+    startPolling();
 
     // Refetch on line/session changes
     let lastLineId = String(getFTSession()?.line_id ?? "");
@@ -73,13 +86,18 @@ const NotificationsBell = () => {
 
     // Refetch when tab becomes visible again (page refresh / focus)
     const onVis = () => {
-      if (document.visibilityState === "visible") fetchCount();
+      if (document.visibilityState === "visible") {
+        fetchCount();
+        startPolling();
+      } else {
+        stopPolling();
+      }
     };
     document.addEventListener("visibilitychange", onVis);
     window.addEventListener("focus", fetchCount);
 
     return () => {
-      window.clearInterval(id);
+      stopPolling();
       offSession();
       document.removeEventListener("visibilitychange", onVis);
       window.removeEventListener("focus", fetchCount);
