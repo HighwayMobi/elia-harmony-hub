@@ -63,6 +63,10 @@ const parseDateMaybe = (s?: string): Date | null => {
 const ChangePlanPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/", { replace: true });
+  };
   const routeState = (location.state || {}) as { line?: any; lineDetails?: any };
   const ft = getFTSession();
   const [activeLine, setActiveLine] = useState<any>(() => routeState.line || ft?.line || ft?.lines?.[0] || null);
@@ -307,7 +311,7 @@ const ChangePlanPage = () => {
         // ignore
       }
       setConfirmOpen(false);
-      navigate(-1);
+      goBack();
     } catch (e: any) {
       setError(e?.message || "Error de red");
     } finally {
@@ -337,7 +341,7 @@ const ChangePlanPage = () => {
       >
         <div className="mx-auto w-full max-w-md">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="mb-4 flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
