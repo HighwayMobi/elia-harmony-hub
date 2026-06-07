@@ -307,7 +307,7 @@ const ChangePlanPage = () => {
         // ignore
       }
       setConfirmOpen(false);
-      navigate(-1);
+      goBack();
     } catch (e: any) {
       setError(e?.message || "Error de red");
     } finally {
@@ -337,7 +337,7 @@ const ChangePlanPage = () => {
       >
         <div className="mx-auto w-full max-w-md">
           <button
-            onClick={() => navigate(-1)}
+            onClick={goBack}
             className="mb-4 flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
