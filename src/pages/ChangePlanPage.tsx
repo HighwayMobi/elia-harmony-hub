@@ -293,12 +293,7 @@ const ChangePlanPage = () => {
       }
 
       if (!success) {
-        const msg =
-          inner?.error ||
-          inner?.message ||
-          json?.data?.error ||
-          "No se pudo cambiar la tarifa";
-        setError(String(msg));
+        setError("No se pudo cambiar la tarifa. Inténtalo más tarde o contacta con soporte.");
         setSubmitting(false);
         return;
       }
