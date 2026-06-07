@@ -63,6 +63,10 @@ const parseDateMaybe = (s?: string): Date | null => {
 const ChangePlanPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/", { replace: true });
+  };
   const routeState = (location.state || {}) as { line?: any; lineDetails?: any };
   const ft = getFTSession();
   const [activeLine, setActiveLine] = useState<any>(() => routeState.line || ft?.line || ft?.lines?.[0] || null);
