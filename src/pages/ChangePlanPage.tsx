@@ -307,8 +307,8 @@ const ChangePlanPage = () => {
       }
       setConfirmOpen(false);
       goBack();
-    } catch (e: any) {
-      setError(e?.message || "Error de red");
+    } catch {
+      setError("No se pudo cambiar la tarifa. Inténtalo más tarde o contacta con soporte.");
     } finally {
       setSubmitting(false);
     }
