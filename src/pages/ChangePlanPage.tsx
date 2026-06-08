@@ -325,7 +325,7 @@ const ChangePlanPage = () => {
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#A799B7" }}>
       {error && (
         <div className="pointer-events-none fixed left-4 right-4 top-4 z-[70] flex justify-center">
-          <div className="pointer-events-auto w-full max-w-md rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-red-600 shadow-xl">
+          <div className="w-full max-w-md rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-red-600 shadow-xl">
             {error}
           </div>
         </div>
