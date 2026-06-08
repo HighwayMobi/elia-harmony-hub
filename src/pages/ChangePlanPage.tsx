@@ -64,8 +64,7 @@ const ChangePlanPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const goBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/", { replace: true });
+    navigate("/", { replace: true });
   };
   const routeState = (location.state || {}) as { line?: any; lineDetails?: any };
   const ft = getFTSession();
