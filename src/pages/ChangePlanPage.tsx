@@ -324,6 +324,12 @@ const ChangePlanPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#A799B7" }}>
+      {error && (
+        <div className="fixed left-4 right-4 top-4 z-[70] mx-auto max-w-md rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-red-600 shadow-xl">
+          {error}
+        </div>
+      )}
+
       <header className="px-6 py-4 flex items-center justify-center">
         <img src={logo} alt="Elia Balance" className="w-28 h-auto opacity-90" />
       </header>
@@ -360,12 +366,6 @@ const ChangePlanPage = () => {
           {loading && (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-white" />
-            </div>
-          )}
-
-          {!loading && error && (
-            <div className="rounded-2xl bg-white/95 px-5 py-4 text-sm text-red-600 shadow">
-              {error}
             </div>
           )}
 
