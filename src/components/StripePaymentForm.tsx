@@ -148,6 +148,7 @@ const StripePaymentForm = ({
   saveCard,
   onCancel,
   returnTo,
+  locale,
 }: StripePaymentFormProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
