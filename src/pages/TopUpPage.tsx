@@ -24,19 +24,6 @@ const formatExpiry = (m?: number, y?: number) => {
   return `${mm}/${yy}`;
 };
 
-const brandLabel = (b?: string) => {
-  if (!b) return "Tarjeta";
-  const map: Record<string, string> = {
-    visa: "Visa",
-    mastercard: "Mastercard",
-    amex: "Amex",
-    discover: "Discover",
-    diners: "Diners",
-    jcb: "JCB",
-    unionpay: "UnionPay",
-  };
-  return map[b.toLowerCase()] || b.charAt(0).toUpperCase() + b.slice(1);
-};
 
 const amountPresets = [5, 10, 20, 50];
 
