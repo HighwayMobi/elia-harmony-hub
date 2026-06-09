@@ -192,13 +192,7 @@ const TopUpPage = () => {
               setShowPaymentForm(false);
               return;
             }
-            if (returnTo) {
-              navigate(returnTo);
-            } else if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate("/");
-            }
+            navigate(returnTo || "/");
           }}
           className="flex items-center gap-1 text-sm font-medium text-[#2F2A33] hover:text-[#F5E6D3] transition-colors"
         >
