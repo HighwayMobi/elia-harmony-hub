@@ -30,11 +30,11 @@ const STRIPE_LOCALES = new Set([
 ]);
 
 const resolveStripeLocale = (lang?: string): string => {
-  const raw = (lang || (typeof navigator !== "undefined" ? navigator.language : "") || "auto").toLowerCase();
+  const raw = (lang || "es").toLowerCase();
   if (STRIPE_LOCALES.has(raw)) return raw;
   const base = raw.split("-")[0];
   if (STRIPE_LOCALES.has(base)) return base;
-  return "auto";
+  return "es";
 };
 
 // Cache Stripe instances by publishable key
