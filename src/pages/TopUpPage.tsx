@@ -238,6 +238,7 @@ const TopUpPage = () => {
                 saveCard={saveCard}
                 onCancel={() => setShowPaymentForm(false)}
                 returnTo={returnTo}
+                locale={getCachedProfile()?.language}
               />
             </>
           ) : (

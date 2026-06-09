@@ -19,7 +19,23 @@ interface StripePaymentFormProps {
   saveCard?: boolean;
   onCancel: () => void;
   returnTo?: string;
+  locale?: string;
 }
+
+// Locales soportados por Stripe Elements
+const STRIPE_LOCALES = new Set([
+  "auto","ar","bg","cs","da","de","el","en","en-GB","es","es-419","et","fi","fil","fr","fr-CA",
+  "he","hr","hu","id","it","ja","ko","lt","lv","ms","mt","nb","nl","pl","pt","pt-BR","ro","ru",
+  "sk","sl","sv","th","tr","vi","zh","zh-HK","zh-TW",
+]);
+
+const resolveStripeLocale = (lang?: string): string => {
+  const raw = (lang || (typeof navigator !== "undefined" ? navigator.language : "") || "auto").toLowerCase();
+  if (STRIPE_LOCALES.has(raw)) return raw;
+  const base = raw.split("-")[0];
+  if (STRIPE_LOCALES.has(base)) return base;
+  return "auto";
+};
 
 // Cache Stripe instances by publishable key
 const stripeCache = new Map<string, Promise<Stripe | null>>();
@@ -132,6 +148,7 @@ const StripePaymentForm = ({
   saveCard,
   onCancel,
   returnTo,
+  locale,
 }: StripePaymentFormProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
@@ -206,6 +223,7 @@ const StripePaymentForm = ({
       stripe={stripePromise}
       options={{
         clientSecret,
+        locale: resolveStripeLocale(locale) as any,
         appearance: {
           theme: "stripe",
           variables: {
