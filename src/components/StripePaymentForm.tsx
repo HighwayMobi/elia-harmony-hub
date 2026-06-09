@@ -223,6 +223,7 @@ const StripePaymentForm = ({
       stripe={stripePromise}
       options={{
         clientSecret,
+        locale: resolveStripeLocale(locale) as any,
         appearance: {
           theme: "stripe",
           variables: {
