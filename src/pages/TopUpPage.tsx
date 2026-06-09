@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CreditCard, Shield, Pencil, Trash2, Loader2 } from "lucide-react";
+import CardBrandLogo from "@/components/CardBrandLogo";
 import { cn } from "@/lib/utils";
 import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { fetchProfile, fetchLines, getCachedProfile, getCachedLines } from "@/lib/api-cache";
