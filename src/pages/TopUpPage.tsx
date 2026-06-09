@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CreditCard, Shield, Pencil, Trash2, Loader2 } from "lucide-react";
+import CardBrandLogo from "@/components/CardBrandLogo";
 import { cn } from "@/lib/utils";
 import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { fetchProfile, fetchLines, getCachedProfile, getCachedLines } from "@/lib/api-cache";
@@ -23,19 +24,6 @@ const formatExpiry = (m?: number, y?: number) => {
   return `${mm}/${yy}`;
 };
 
-const brandLabel = (b?: string) => {
-  if (!b) return "Tarjeta";
-  const map: Record<string, string> = {
-    visa: "Visa",
-    mastercard: "Mastercard",
-    amex: "Amex",
-    discover: "Discover",
-    diners: "Diners",
-    jcb: "JCB",
-    unionpay: "UnionPay",
-  };
-  return map[b.toLowerCase()] || b.charAt(0).toUpperCase() + b.slice(1);
-};
 
 const amountPresets = [5, 10, 20, 50];
 
@@ -343,9 +331,7 @@ const TopUpPage = () => {
                   <div className="mb-2 text-xs text-gray-500">Tarjeta guardada</div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-12 items-center justify-center rounded bg-white text-[10px] font-bold text-[#2F2A33] shadow-sm">
-                        {brandLabel(savedCard.brand)}
-                      </div>
+                      <CardBrandLogo brand={savedCard.brand} />
                       <div>
                         <div className="text-sm font-semibold text-[#2F2A33]">
                           •••• {savedCard.last4 || "----"}
