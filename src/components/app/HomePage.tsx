@@ -15,6 +15,7 @@ import {
   Wifi,
   Bell,
   Globe,
+  Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,6 +118,7 @@ const HomePage = ({ user }: HomePageProps) => {
   } | null>(null);
   const [financeLoading, setFinanceLoading] = useState(false);
   const [financeError, setFinanceError] = useState<string | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(() => {
     const p = getCachedProfile();
     if (!p) return null;
@@ -323,6 +325,64 @@ const HomePage = ({ user }: HomePageProps) => {
       cancelled = true;
     };
   }, [financesOpen, currentLine?.id, financeMonth.year, financeMonth.month]);
+
+
+  const handleDownloadInvoice = async () => {
+    if (invoiceLoading) return;
+    const monthStr = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+    setInvoiceLoading(true);
+    try {
+      const ft = getFTSession();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const authToken = sessionData.session?.access_token;
+      const subscriptionId = getSubscriptionIdFromToken(ft?.token);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-invoice`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          },
+          body: JSON.stringify({
+            token: ft?.token,
+            month: monthStr,
+            ...(subscriptionId ? { subscription_id: subscriptionId } : {}),
+          }),
+        }
+      );
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok || !ct.includes("application/pdf")) {
+        let msg = "No se pudo descargar la factura";
+        try {
+          const j = await res.json();
+          if (j?.status === 404) msg = "Factura no disponible para este mes";
+          else if (j?.data?.message) msg = String(j.data.message);
+          else if (j?.error) msg = String(j.error);
+        } catch {}
+        toast({ title: "Error", description: msg, variant: "destructive" });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `factura-${monthStr}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message || "No se pudo descargar la factura",
+        variant: "destructive",
+      });
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
 
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -859,6 +919,24 @@ const HomePage = ({ user }: HomePageProps) => {
                           </span>
                         </div>
                       </div>
+
+                      {(() => {
+                        const now = new Date();
+                        const isCurrentMonth =
+                          financeMonth.year === now.getFullYear() &&
+                          financeMonth.month === now.getMonth();
+                        if (isCurrentMonth) return null;
+                        return (
+                          <button
+                            onClick={handleDownloadInvoice}
+                            disabled={invoiceLoading}
+                            className="flex w-full items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#A799B7] hover:bg-[#A799B7]/5 transition-colors disabled:opacity-50"
+                          >
+                            <Download className="h-4 w-4" />
+                            {invoiceLoading ? "Descargando..." : "Descargar factura (PDF)"}
+                          </button>
+                        );
+                      })()}
                     </>
                   )}
                 </div>
