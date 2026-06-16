@@ -327,6 +327,64 @@ const HomePage = ({ user }: HomePageProps) => {
   }, [financesOpen, currentLine?.id, financeMonth.year, financeMonth.month]);
 
 
+  const handleDownloadInvoice = async () => {
+    if (invoiceLoading) return;
+    const monthStr = `${financeMonth.year}-${String(financeMonth.month + 1).padStart(2, "0")}`;
+    setInvoiceLoading(true);
+    try {
+      const ft = getFTSession();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const authToken = sessionData.session?.access_token;
+      const subscriptionId = getSubscriptionIdFromToken(ft?.token);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/download-invoice`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+          },
+          body: JSON.stringify({
+            token: ft?.token,
+            month: monthStr,
+            ...(subscriptionId ? { subscription_id: subscriptionId } : {}),
+          }),
+        }
+      );
+      const ct = res.headers.get("content-type") || "";
+      if (!res.ok || !ct.includes("application/pdf")) {
+        let msg = "No se pudo descargar la factura";
+        try {
+          const j = await res.json();
+          if (j?.status === 404) msg = "Factura no disponible para este mes";
+          else if (j?.data?.message) msg = String(j.data.message);
+          else if (j?.error) msg = String(j.error);
+        } catch {}
+        toast({ title: "Error", description: msg, variant: "destructive" });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `factura-${monthStr}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e: any) {
+      toast({
+        title: "Error",
+        description: e?.message || "No se pudo descargar la factura",
+        variant: "destructive",
+      });
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
