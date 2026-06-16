@@ -919,6 +919,24 @@ const HomePage = ({ user }: HomePageProps) => {
                           </span>
                         </div>
                       </div>
+
+                      {(() => {
+                        const now = new Date();
+                        const isCurrentMonth =
+                          financeMonth.year === now.getFullYear() &&
+                          financeMonth.month === now.getMonth();
+                        if (isCurrentMonth) return null;
+                        return (
+                          <button
+                            onClick={handleDownloadInvoice}
+                            disabled={invoiceLoading}
+                            className="flex w-full items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#A799B7] hover:bg-[#A799B7]/5 transition-colors disabled:opacity-50"
+                          >
+                            <Download className="h-4 w-4" />
+                            {invoiceLoading ? "Descargando..." : "Descargar factura (PDF)"}
+                          </button>
+                        );
+                      })()}
                     </>
                   )}
                 </div>
