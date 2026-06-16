@@ -118,6 +118,7 @@ const HomePage = ({ user }: HomePageProps) => {
   } | null>(null);
   const [financeLoading, setFinanceLoading] = useState(false);
   const [financeError, setFinanceError] = useState<string | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(() => {
     const p = getCachedProfile();
     if (!p) return null;
