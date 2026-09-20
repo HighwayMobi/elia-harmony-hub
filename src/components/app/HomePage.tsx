@@ -533,7 +533,8 @@ const HomePage = ({ user }: HomePageProps) => {
   return (
     <div className="flex-1 flex flex-col">
       {/* Header con logo, notificaciones e idioma */}
-      <header className="px-6 py-4 flex items-center justify-between gap-3">
+      <header className="px-4 py-4">
+        <div className="w-full max-w-md mx-auto flex items-center justify-between gap-3">
         <img src={logo} alt="Elia Balance" className="w-24 h-auto opacity-90" />
         <div className="flex items-center gap-2">
           <NotificationsBell />
@@ -553,6 +554,7 @@ const HomePage = ({ user }: HomePageProps) => {
               <DropdownMenuItem className="font-medium">ES — Español</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
         </div>
       </header>
 
