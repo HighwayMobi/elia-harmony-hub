@@ -443,8 +443,9 @@ const ChangePlanPage = () => {
                     </button>
                   </div>
                 </div>
-              );
-            })}
+               );
+              });
+            })()}
           </div>
         </div>
       </motion.main>
