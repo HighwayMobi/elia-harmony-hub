@@ -377,7 +377,16 @@ const ChangePlanPage = () => {
           )}
 
           <div className="space-y-3">
-            {plans.map((plan) => {
+            {(() => {
+              const sorted = [...plans];
+              if (currentPlan) {
+                const idx = sorted.findIndex((p) => p.id === currentPlan.id);
+                if (idx !== -1) {
+                  const [cur] = sorted.splice(idx, 1);
+                  sorted.push(cur);
+                }
+              }
+              return sorted.map((plan) => {
               const isCurrent = !!currentPlan && currentPlan.id === plan.id;
               const dataLabel = plan.is_unlimited_data
                 ? "Datos ilimitados"
@@ -434,8 +443,9 @@ const ChangePlanPage = () => {
                     </button>
                   </div>
                 </div>
-              );
-            })}
+               );
+              });
+            })()}
           </div>
         </div>
       </motion.main>
