@@ -555,6 +555,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+        </div>
       </header>
 
       <motion.main
