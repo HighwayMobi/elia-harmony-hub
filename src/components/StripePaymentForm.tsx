@@ -44,7 +44,7 @@ const getStripe = (pk: string) => {
   return stripeCache.get(pk)!;
 };
 
-const PARTNER_KEY = "pk_elia-balance_014228521ed9b9e5";
+const STRIPE_PUBLISHABLE_KEY = "pk_live_51UI2QU3qJq4dq0jX7Ky6LXklp7cI7WHnHgqSKhSaqxYWy7c9t3FqsI8vqBxI10VwLsb8ZvGpWJH4RxU1xol3xjSl00Dza0u8i0";
 
 const maskSensitive = (value?: string) => {
   if (!value) return "";
@@ -160,10 +160,8 @@ const StripePaymentForm = ({
       try {
         const session = getFTSession();
         console.log("Token:", maskSensitive(session?.token));
-        console.log("Headers:", {
-          Authorization: `Bearer ${maskSensitive(session?.token)}`,
-          "X-Partner-Key": maskSensitive(PARTNER_KEY),
-        });
+        console.log("Stripe key:", maskSensitive(STRIPE_PUBLISHABLE_KEY));
+        console.log("Body:", { amount, line_id: lineId, save_card: saveCard });
         console.log("Body:", { amount, line_id: lineId, save_card: saveCard });
         const { data: json } = await ftPost<any>("billing-topup", {
           amount,
@@ -178,7 +176,7 @@ const StripePaymentForm = ({
         }
         if (cancelled) return;
         setClientSecret(inner?.client_secret || null);
-        setPublishableKey(inner?.publishable_key || null);
+        setPublishableKey(inner?.publishable_key || STRIPE_PUBLISHABLE_KEY);
       } catch (e: any) {
         if (!cancelled) setError(e?.message || "Error de red");
       }
