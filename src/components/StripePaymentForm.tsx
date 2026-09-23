@@ -177,8 +177,8 @@ const StripePaymentForm = ({
         if (cancelled) return;
         setClientSecret(inner?.client_secret || null);
         setPublishableKey(inner?.publishable_key || STRIPE_PUBLISHABLE_KEY);
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || "Error de red");
+      } catch {
+        if (!cancelled) setError("No se pudo iniciar el pago. Inténtalo más tarde");
       }
     })();
     return () => {

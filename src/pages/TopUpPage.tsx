@@ -161,8 +161,8 @@ const TopUpPage = () => {
       if (returnTo) params.set("returnTo", returnTo);
       params.set("redirect_status", "succeeded");
       navigate(`/payment-success?${params.toString()}`);
-    } catch (e: any) {
-      setPayError(e?.message || "Error de red");
+    } catch {
+      setPayError("No se pudo iniciar el pago. Inténtalo más tarde");
       setPaying(false);
     }
   };
