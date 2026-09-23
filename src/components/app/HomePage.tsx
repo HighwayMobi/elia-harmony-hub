@@ -623,7 +623,7 @@ const HomePage = ({ user }: HomePageProps) => {
                             isActive && "text-[#FF7A1A]"
                           )}
                         >
-                          <LineTypeIcon type={l.type} boxed size="sm" />
+                          <LineTypeIcon type={l.type} status={l.status} boxed size="sm" />
                           <div className="min-w-0 flex-1">
                             <div className="truncate text-sm font-semibold">{formatLineTitle(l)}</div>
                             <div className="truncate text-xs text-gray-500">{formatLineSubtitle(l)}</div>
@@ -653,7 +653,7 @@ const HomePage = ({ user }: HomePageProps) => {
           <div className="rounded-2xl bg-white shadow-lg overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <LineTypeIcon type={currentLine?.type} boxed size="md" />
+                <LineTypeIcon type={currentLine?.type} status={currentLine?.status} boxed size="md" />
                 <span className="text-base font-semibold text-[#2F2A33]">
                   {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
