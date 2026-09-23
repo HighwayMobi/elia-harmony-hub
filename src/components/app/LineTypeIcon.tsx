@@ -51,12 +51,17 @@ const SIZE_ICON = { sm: "h-3.5 w-3.5", md: "h-4 w-4", lg: "h-5 w-5" } as const;
 
 export const LineTypeIcon = ({
   type,
+  status,
   className,
   boxed = false,
   size = "md",
 }: LineTypeIconProps) => {
   const cfg = CONFIG[String(type || "").toLowerCase()] || CONFIG.mobile;
-  const { Icon, color, bg } = cfg;
+  const statusKey = String(status || "").toLowerCase();
+  const override = STATUS_OVERRIDE[statusKey];
+  const { Icon } = cfg;
+  const color = override?.color || cfg.color;
+  const bg = override?.bg || cfg.bg;
 
   if (boxed) {
     return (
