@@ -5,11 +5,19 @@ export type LineType = "mobile" | "travel" | "fiber" | string | undefined;
 
 interface LineTypeIconProps {
   type: LineType;
+  /** Estado de la línea; si se pasa, sobrescribe el color (activo=verde, suspendido=rojo). */
+  status?: string;
   className?: string;
   /** Si true, renderiza un cuadrado con fondo de color (estilo tarjeta). */
   boxed?: boolean;
   size?: "sm" | "md" | "lg";
 }
+
+// Sobrescribe color/fondo según el estado de la línea.
+const STATUS_OVERRIDE: Record<string, { color: string; bg: string }> = {
+  active: { color: "text-[#2EB872]", bg: "bg-[#DEF4E8]" },
+  suspended: { color: "text-[#E0392E]", bg: "bg-[#FBE3E0]" },
+};
 
 const CONFIG: Record<
   string,
