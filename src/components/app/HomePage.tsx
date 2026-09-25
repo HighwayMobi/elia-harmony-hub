@@ -13,8 +13,6 @@ import {
   UserRound,
   Camera,
   Wifi,
-  Bell,
-  Globe,
   Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +39,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LineTypeIcon, getLineTypeLabel } from "./LineTypeIcon";
 import NotificationsBell from "./NotificationsBell";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import logo from "@/assets/logo-elia-balance.svg";
 import {
   AlertDialog,
@@ -538,22 +537,7 @@ const HomePage = ({ user }: HomePageProps) => {
         <img src={logo} alt="Elia Balance" className="w-24 h-auto opacity-90" />
         <div className="flex items-center gap-2">
           <NotificationsBell />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label="Idioma"
-                className="h-10 px-3 rounded-full bg-white/15 hover:bg-white/25 flex items-center gap-1.5 text-white text-sm font-medium transition-colors"
-              >
-                <Globe className="w-4 h-4" />
-                <span>ES</span>
-                <ChevronDown className="w-3.5 h-3.5 opacity-80" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[8rem]">
-              <DropdownMenuItem className="font-medium">ES — Español</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <LanguageSwitcher />
         </div>
         </div>
       </header>
