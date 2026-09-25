@@ -7,6 +7,7 @@ import { getFTSession, getSubscriptionIdFromToken } from "@/lib/ft-auth";
 import { fetchProfile, fetchLines, getCachedProfile, getCachedLines } from "@/lib/api-cache";
 import { ftPost } from "@/lib/api";
 import StripePaymentForm from "@/components/StripePaymentForm";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface SavedCard {
   id: string;
@@ -31,6 +32,7 @@ const fmtPrice = (n: number) =>
   Number.isFinite(n) ? n.toFixed(2) : "0.00";
 
 const TopUpPage = () => {
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialAmount = searchParams.get("amount") || "";
@@ -214,7 +216,7 @@ const TopUpPage = () => {
                 saveCard={saveCard}
                 onCancel={() => setShowPaymentForm(false)}
                 returnTo={returnTo}
-                locale={getCachedProfile()?.language}
+                locale={language}
               />
             </>
           ) : (

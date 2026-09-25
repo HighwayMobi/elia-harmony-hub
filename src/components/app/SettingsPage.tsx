@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePlatform } from "@/hooks/use-platform";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface SettingsPageProps {
   user: User;
@@ -71,6 +72,7 @@ const LANGUAGES = [
 ];
 
 const SettingsPage = ({ user }: SettingsPageProps) => {
+  const { setLanguage, initializeFromProfile } = useLanguage();
   const { isIOS, isAndroid, isWeb } = usePlatform();
   const [googleFitEnabled, setGoogleFitEnabled] = useState(false);
   const [appleHealthEnabled, setAppleHealthEnabled] = useState(false);
@@ -104,6 +106,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
           const payload = (data.data?.data ?? data.data) as Profile;
           setProfile(payload);
           setFormLanguage(payload?.language || "es");
+          initializeFromProfile(payload?.language);
           setFormPhoneDigits((payload?.phone || "").replace(/\D/g, ""));
         }
       } catch (e: any) {
@@ -144,6 +147,7 @@ const SettingsPage = ({ user }: SettingsPageProps) => {
         toast.error(data?.data?.message ?? "No se pudo guardar");
       } else {
         setProfile((prev) => (prev ? { ...prev, ...body } : prev));
+        if (body.language === "es" || body.language === "en") setLanguage(body.language);
         toast.success("Perfil actualizado");
       }
     } catch (e: any) {

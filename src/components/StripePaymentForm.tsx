@@ -41,7 +41,7 @@ const resolveStripeLocale = (lang?: string): string => {
 const stripeCache = new Map<string, Promise<Stripe | null>>();
 const getStripe = (pk: string) => {
   if (!stripeCache.has(pk)) stripeCache.set(pk, loadStripe(pk));
-  return stripeCache.get(pk)!;
+  return stripeCache.get(pk) ?? loadStripe(pk);
 };
 
 const STRIPE_PUBLISHABLE_KEY = "pk_live_51UI2QU3qJq4dq0jX7Ky6LXklp7cI7WHnHgqSKhSaqxYWy7c9t3FqsI8vqBxI10VwLsb8ZvGpWJH4RxU1xol3xjSl00Dza0u8i0";
@@ -57,11 +57,13 @@ const InnerForm = ({
   email,
   onCancel,
   returnTo,
+  locale,
 }: {
   amount: number;
   email?: string;
   onCancel: () => void;
   returnTo?: string;
+  locale?: string;
 }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -85,7 +87,7 @@ const InnerForm = ({
       redirect: "if_required",
     });
     if (stripeError) {
-      setError(stripeError.message || "Error al procesar el pago");
+      setError(stripeError.message || (locale === "en" ? "Error processing payment" : "Error al procesar el pago"));
       setSubmitting(false);
       return;
     }
@@ -118,19 +120,19 @@ const InnerForm = ({
         )}
       >
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-        {submitting ? "Procesando…" : `Pagar €${amount.toFixed(2)}`}
+        {submitting ? (locale === "en" ? "Processing…" : "Procesando…") : `${locale === "en" ? "Pay" : "Pagar"} €${amount.toFixed(2)}`}
       </button>
       <button
         type="button"
         onClick={onCancel}
         className="w-full text-center text-sm font-medium text-gray-500 hover:text-[#F5E6D3] transition-colors"
       >
-        ← Volver
+        ← {locale === "en" ? "Back" : "Volver"}
       </button>
       <div className="flex items-center justify-center gap-3 text-xs text-gray-500">
         <div className="flex items-center gap-1">
           <Shield className="h-3.5 w-3.5" />
-          Pago seguro
+          {locale === "en" ? "Secure payment" : "Pago seguro"}
         </div>
         <span>•</span>
         <span>Stripe</span>
@@ -178,7 +180,7 @@ const StripePaymentForm = ({
         setClientSecret(inner?.client_secret || null);
         setPublishableKey(inner?.publishable_key || STRIPE_PUBLISHABLE_KEY);
       } catch {
-        if (!cancelled) setError("No se pudo iniciar el pago. Inténtalo más tarde");
+        if (!cancelled) setError(locale === "en" ? "The payment could not be started. Try again later" : "No se pudo iniciar el pago. Inténtalo más tarde");
       }
     })();
     return () => {
@@ -201,7 +203,7 @@ const StripePaymentForm = ({
           onClick={onCancel}
           className="text-sm font-medium text-[#F5E6D3] hover:underline"
         >
-          ← Volver
+          ← {locale === "en" ? "Back" : "Volver"}
         </button>
       </div>
     );
@@ -211,7 +213,7 @@ const StripePaymentForm = ({
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-10 text-sm text-gray-500">
         <Loader2 className="h-5 w-5 animate-spin text-[#F5E6D3]" />
-        Preparando pago seguro…
+        {locale === "en" ? "Preparing secure payment…" : "Preparando pago seguro…"}
       </div>
     );
   }
@@ -238,6 +240,7 @@ const StripePaymentForm = ({
         email={email}
         onCancel={onCancel}
         returnTo={returnTo}
+        locale={locale}
       />
     </Elements>
   );

@@ -9,12 +9,14 @@ import ChangePlanPage from "./pages/ChangePlanPage";
 import TopUpPage from "./pages/TopUpPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import BuyAddonPage from "./pages/BuyAddonPage";
+import { LanguageProvider } from "@/i18n/LanguageProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+    <LanguageProvider>
+      <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -28,7 +30,8 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 

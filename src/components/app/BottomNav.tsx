@@ -1,5 +1,6 @@
 import { Home, Activity, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface BottomNavProps {
   activeTab: "home" | "tracking" | "settings";
@@ -7,10 +8,11 @@ interface BottomNavProps {
 }
 
 const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
+  const { language } = useLanguage();
   const tabs = [
-    { id: "home" as const, icon: Home, label: "Home" },
-    { id: "tracking" as const, icon: Activity, label: "Tracking" },
-    { id: "settings" as const, icon: Settings, label: "Settings" },
+    { id: "home" as const, icon: Home, label: language === "en" ? "Home" : "Inicio" },
+    { id: "tracking" as const, icon: Activity, label: language === "en" ? "Tracking" : "Seguimiento" },
+    { id: "settings" as const, icon: Settings, label: language === "en" ? "Settings" : "Configuración" },
   ];
 
   return (
@@ -20,6 +22,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
           <button
             key={id}
             onClick={() => onTabChange(id)}
+            aria-label={label}
             className={cn(
               "flex flex-col items-center justify-center flex-1 h-full transition-colors",
               activeTab === id

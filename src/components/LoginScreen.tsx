@@ -22,6 +22,7 @@ import {
 import { toast } from "sonner";
 import { LineTypeIcon, getLineTypeLabel } from "@/components/app/LineTypeIcon";
 import logo from "@/assets/logo-elia-balance.svg";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type LoginMethod = "email" | "phone";
 
@@ -366,8 +367,9 @@ const LoginScreen = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="w-full h-full flex flex-col items-center justify-center px-8"
+      className="relative w-full h-full flex flex-col items-center justify-center px-8"
     >
+      <LanguageSwitcher className="absolute right-5 top-5" />
       <motion.img
         src={logo}
         alt="Elia Balance"

@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface NotificationItem {
   id: string;
@@ -24,6 +25,7 @@ interface NotificationItem {
 
 
 const NotificationsBell = () => {
+  const { language } = useLanguage();
   const [count, setCount] = useState<number>(0);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[]>([]);
@@ -108,7 +110,7 @@ const NotificationsBell = () => {
   const formatDate = (s?: string) => {
     if (!s) return "";
     try {
-      return new Date(s).toLocaleString("es-ES", {
+      return new Date(s).toLocaleString(language === "en" ? "en-GB" : "es-ES", {
         day: "2-digit",
         month: "short",
         hour: "2-digit",
