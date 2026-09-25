@@ -41,7 +41,7 @@ const resolveStripeLocale = (lang?: string): string => {
 const stripeCache = new Map<string, Promise<Stripe | null>>();
 const getStripe = (pk: string) => {
   if (!stripeCache.has(pk)) stripeCache.set(pk, loadStripe(pk));
-  return stripeCache.get(pk)!;
+  return stripeCache.get(pk) ?? loadStripe(pk);
 };
 
 const STRIPE_PUBLISHABLE_KEY = "pk_live_51UI2QU3qJq4dq0jX7Ky6LXklp7cI7WHnHgqSKhSaqxYWy7c9t3FqsI8vqBxI10VwLsb8ZvGpWJH4RxU1xol3xjSl00Dza0u8i0";

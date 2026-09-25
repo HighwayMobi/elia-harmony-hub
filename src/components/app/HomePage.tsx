@@ -52,6 +52,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { invalidateLineDetails } from "@/lib/api-cache";
+import { useLanguage } from "@/i18n/LanguageProvider";
 
 interface HomePageProps {
   user: User;
@@ -99,6 +100,7 @@ interface LineDetails {
 }
 
 const HomePage = ({ user }: HomePageProps) => {
+  const { initializeFromProfile } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [financesOpen, setFinancesOpen] = useState(false);
@@ -218,6 +220,7 @@ const HomePage = ({ user }: HomePageProps) => {
     try {
       const apiProfile = await fetchProfile(force);
       if (apiProfile) {
+        initializeFromProfile(apiProfile.language);
         const fullName = [apiProfile.first_name, apiProfile.last_name]
           .filter(Boolean)
           .join(" ") || apiProfile.email || "Usuario";

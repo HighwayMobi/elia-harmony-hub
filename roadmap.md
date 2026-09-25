@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Add shared ES/EN language system and persistence
-- [ ] Translate all user-facing screens
-- [ ] Add language selectors to login and signed-in header
-- [ ] Verify Spanish and English flows
+- [x] Add shared ES/EN language system and persistence
+- [x] Translate all user-facing screens
+- [x] Add language selectors to login and signed-in header
+- [x] Verify Spanish and English flows
