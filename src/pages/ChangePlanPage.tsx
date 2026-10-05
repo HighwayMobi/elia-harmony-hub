@@ -490,19 +490,21 @@ const ChangePlanPage = () => {
                 <p className="text-sm font-semibold text-foreground">
                   ¿Cuándo aplicar la nueva tarifa?
                 </p>
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="whenChange"
-                    value="now"
-                    checked={whenChange === "now"}
-                    onChange={() => setWhenChange("now")}
-                    className="mt-1 accent-[#F5E6D3]"
-                  />
-                  <span className="text-sm text-foreground">
-                    Pronto ({fmtDateDot(soonDate)})
-                  </span>
-                </label>
+                {isUpgrade && (
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="whenChange"
+                      value="now"
+                      checked={whenChange === "now"}
+                      onChange={() => setWhenChange("now")}
+                      className="mt-1 accent-[#F5E6D3]"
+                    />
+                    <span className="text-sm text-foreground">
+                      Pronto ({fmtDateDot(soonDate)})
+                    </span>
+                  </label>
+                )}
                 <label className="flex items-start gap-2 cursor-pointer">
                   <input
                     type="radio"
