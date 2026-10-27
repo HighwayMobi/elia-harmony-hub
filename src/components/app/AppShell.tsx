@@ -22,7 +22,7 @@ const AppShell = ({ user }: AppShellProps) => {
       {/* Noise overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 mix-blend-overlay opacity-40"
+        className="hidden"
         style={{
           backgroundImage: `url("${noiseSvg}")`,
           backgroundRepeat: 'repeat',
