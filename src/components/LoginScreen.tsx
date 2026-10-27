@@ -516,7 +516,7 @@ const LoginScreen = () => {
 
       {/* Forgot Password Dialog */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-        <DialogContent className="sm:max-w-md border-0 rounded-3xl bg-primary text-foreground shadow-2xl [&>button]:text-foreground/70 [&>button]:hover:text-primary">
+        <DialogContent className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:text-foreground/70 [&>button]:hover:text-primary">
           <DialogHeader>
             <DialogTitle className="text-foreground text-xl">
               Recuperar contraseña
@@ -620,7 +620,7 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-primary text-foreground shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
@@ -691,7 +691,7 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-primary text-foreground shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}

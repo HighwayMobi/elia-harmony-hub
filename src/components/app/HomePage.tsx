@@ -606,7 +606,7 @@ const HomePage = ({ user }: HomePageProps) => {
                           key={String(l.id)}
                           onClick={() => switchLine(l)}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-primary",
+                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-lavender-light",
                             isActive && "text-primary"
                           )}
                         >
@@ -687,7 +687,7 @@ const HomePage = ({ user }: HomePageProps) => {
             </div>
 
             {lineDetails?.pending_plan?.name ? (
-              <div className="bg-primary px-5 py-2.5 text-center text-xs font-medium text-primary flex flex-col items-center gap-1.5">
+              <div className="bg-lavender-light px-5 py-2.5 text-center text-xs font-medium text-accent-foreground flex flex-col items-center gap-1.5">
                 <span>
                   A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
                   {lineDetails.pending_plan.price != null ? ` — €${fmt(lineDetails.pending_plan.price)}/mes` : ""}
@@ -893,7 +893,7 @@ const HomePage = ({ user }: HomePageProps) => {
                         </div>
                       )}
 
-                      <div className="flex items-stretch bg-primary text-primary">
+                      <div className="flex items-stretch bg-lavender-light text-accent-foreground">
                         <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                           <span className="text-xs font-medium opacity-90">Gastado</span>
                           <span className="text-lg font-bold">
