@@ -227,8 +227,8 @@ const StripePaymentForm = ({
         appearance: {
           theme: "stripe",
           variables: {
-            colorPrimary: "#F5E6D3",
-            colorText: "#2F2A33",
+            colorPrimary: "#997AB8",
+            colorText: "#26222A",
             borderRadius: "12px",
             fontFamily: "system-ui, -apple-system, sans-serif",
           },

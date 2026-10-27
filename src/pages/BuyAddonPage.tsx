@@ -222,7 +222,7 @@ const BuyAddonPage = () => {
                 {lineLabel}
               </p>
             )}
-            <p className="mt-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary">
+            <p className="mt-2 inline-block rounded-full bg-lavender-light px-3 py-1 text-xs font-semibold text-accent-foreground">
               Saldo: €{fmt(balance)}
             </p>
           </div>

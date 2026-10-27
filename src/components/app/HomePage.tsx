@@ -558,7 +558,7 @@ const HomePage = ({ user }: HomePageProps) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="relative h-14 w-14 rounded-full overflow-hidden bg-white/40 ring-2 ring-white/60 flex items-center justify-center group shrink-0"
+              className="relative h-14 w-14 rounded-full overflow-hidden bg-lavender-light ring-2 ring-border flex items-center justify-center group shrink-0"
               aria-label="Cambiar avatar"
             >
               {avatarUrl ? (

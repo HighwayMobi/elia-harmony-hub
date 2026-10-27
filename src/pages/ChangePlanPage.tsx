@@ -498,7 +498,7 @@ const ChangePlanPage = () => {
                       value="now"
                       checked={whenChange === "now"}
                       onChange={() => setWhenChange("now")}
-                      className="mt-1 accent-[#F5E6D3]"
+                      className="mt-1 accent-primary"
                     />
                     <span className="text-sm text-foreground">
                       Pronto ({fmtDateDot(soonDate)})
@@ -512,7 +512,7 @@ const ChangePlanPage = () => {
                     value="later"
                     checked={whenChange === "later"}
                     onChange={() => setWhenChange("later")}
-                    className="mt-1 accent-[#F5E6D3]"
+                    className="mt-1 accent-primary"
                   />
                   <span className="text-sm text-foreground">
                     Al final del periodo pagado{feeDate ? ` (${fmtDateDot(feeDate)})` : ""}
