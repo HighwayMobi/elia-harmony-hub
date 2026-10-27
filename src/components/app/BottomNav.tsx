@@ -16,7 +16,7 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#A799B7] backdrop-blur-sm safe-area-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-primary backdrop-blur-sm safe-area-bottom">
       <div className="flex items-center justify-around h-16 max-w-md mx-auto">
         {tabs.map(({ id, icon: Icon, label }) => (
           <button
@@ -26,8 +26,8 @@ const BottomNav = ({ activeTab, onTabChange }: BottomNavProps) => {
             className={cn(
               "flex flex-col items-center justify-center flex-1 h-full transition-colors",
               activeTab === id
-                ? "text-[#F5E6D3]"
-                : "text-[#F5E6D3]/50 hover:text-[#F5E6D3]/80"
+                ? "text-primary"
+                : "text-primary/50 hover:text-primary/80"
             )}
           >
             <Icon className="w-6 h-6" />

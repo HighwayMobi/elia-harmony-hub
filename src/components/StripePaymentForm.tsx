@@ -115,8 +115,8 @@ const InnerForm = ({
         className={cn(
           "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
           submitting
-            ? "bg-[#F5E6D3]/70 text-[#A799B7] cursor-wait"
-            : "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
+            ? "bg-primary/70 text-primary-foreground cursor-wait"
+            : "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]"
         )}
       >
         {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -125,7 +125,7 @@ const InnerForm = ({
       <button
         type="button"
         onClick={onCancel}
-        className="w-full text-center text-sm font-medium text-gray-500 hover:text-[#F5E6D3] transition-colors"
+        className="w-full text-center text-sm font-medium text-gray-500 hover:text-primary transition-colors"
       >
         ← {locale === "en" ? "Back" : "Volver"}
       </button>
@@ -201,7 +201,7 @@ const StripePaymentForm = ({
         </div>
         <button
           onClick={onCancel}
-          className="text-sm font-medium text-[#F5E6D3] hover:underline"
+          className="text-sm font-medium text-primary hover:underline"
         >
           ← {locale === "en" ? "Back" : "Volver"}
         </button>
@@ -212,7 +212,7 @@ const StripePaymentForm = ({
   if (!clientSecret || !stripePromise) {
     return (
       <div className="flex flex-col items-center justify-center gap-2 py-10 text-sm text-gray-500">
-        <Loader2 className="h-5 w-5 animate-spin text-[#F5E6D3]" />
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
         {locale === "en" ? "Preparing secure payment…" : "Preparando pago seguro…"}
       </div>
     );

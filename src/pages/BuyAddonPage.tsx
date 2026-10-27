@@ -190,7 +190,7 @@ const BuyAddonPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#A799B7" }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "hsl(var(--background))" }}>
       <header className="px-6 py-4 flex items-center justify-center">
         <img src={logo} alt="Elia Balance" className="w-28 h-auto opacity-90" />
       </header>
@@ -204,32 +204,32 @@ const BuyAddonPage = () => {
         <div className="mx-auto w-full max-w-md">
           <button
             onClick={() => navigate(-1)}
-            className="mb-4 flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
+            className="mb-4 flex items-center gap-2 text-sm font-medium text-foreground/90 hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver
           </button>
 
           <div className="mb-4 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Comprar Gb
             </h1>
-            <p className="mt-1 text-sm text-white/80">
+            <p className="mt-1 text-sm text-foreground/80">
               Elige un paquete de datos para tu línea
             </p>
             {lineLabel && (
-              <p className="mt-1 text-sm font-semibold text-[#FF7A1A]">
+              <p className="mt-1 text-sm font-semibold text-primary">
                 {lineLabel}
               </p>
             )}
-            <p className="mt-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#F5E6D3]">
+            <p className="mt-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-primary">
               Saldo: €{fmt(balance)}
             </p>
           </div>
 
           {loading && (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <Loader2 className="h-8 w-8 animate-spin text-foreground" />
             </div>
           )}
 
@@ -280,11 +280,11 @@ const BuyAddonPage = () => {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5E6D3]/10 shrink-0">
-                        <Icon className="h-5 w-5 text-[#F5E6D3]" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lavender-light shrink-0">
+                        <Icon className="h-5 w-5 text-primary" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-base font-bold text-[#2F2A33] truncate">
+                        <p className="text-base font-bold text-foreground truncate">
                           {addon.name}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
@@ -294,14 +294,14 @@ const BuyAddonPage = () => {
                         </p>
                       </div>
                     </div>
-                    <span className="text-lg font-bold text-[#F5E6D3] whitespace-nowrap">
+                    <span className="text-lg font-bold text-primary whitespace-nowrap">
                       €{fmt(addon.price)}
                     </span>
                   </div>
                   <div className="mt-3 flex justify-end">
                     <button
                       onClick={() => handleSelect(addon)}
-                      className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-white"
+                      className="rounded-xl border border-primary px-5 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white"
                     >
                       Seleccionar
                     </button>
@@ -324,7 +324,7 @@ const BuyAddonPage = () => {
                 {lineLabel && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">para la línea</span>
-                    <span className="font-semibold text-[#FF7A1A]">{lineLabel}</span>
+                    <span className="font-semibold text-primary">{lineLabel}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
@@ -333,7 +333,7 @@ const BuyAddonPage = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Precio</span>
-                  <span className="font-bold text-[#FF7A1A]">€{fmt(selectedAddon.price)}</span>
+                  <span className="font-bold text-primary">€{fmt(selectedAddon.price)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Saldo actual</span>
@@ -369,7 +369,7 @@ const BuyAddonPage = () => {
             <button
               onClick={handleConfirm}
               disabled={submitting}
-              className="flex-1 rounded-xl bg-[#FF7A1A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#FF7A1A]/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+              className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin mx-auto" />

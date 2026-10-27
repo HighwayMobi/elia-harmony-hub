@@ -127,11 +127,11 @@ const NotificationsBell = () => {
         <button
           type="button"
           aria-label="Notificaciones"
-          className="relative w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white transition-colors"
+          className="relative w-10 h-10 rounded-full bg-card border border-border hover:bg-accent flex items-center justify-center text-foreground transition-colors"
         >
           <Bell className="w-5 h-5" />
           {count > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-[#A799B7]">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-primary">
               {count > 99 ? "99+" : count}
             </span>
           )}
@@ -139,20 +139,20 @@ const NotificationsBell = () => {
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md p-0 flex flex-col border-l-0 text-white [&>button]:text-white"
-        style={{ backgroundColor: '#A799B7' }}
+        className="w-full sm:max-w-md p-0 flex flex-col border-l-0 text-foreground [&>button]:text-foreground"
+        style={{ backgroundColor: "hsl(var(--background))" }}
       >
-        <SheetHeader className="px-5 py-4 border-b border-white/20">
-          <SheetTitle className="text-white">Notificaciones</SheetTitle>
+        <SheetHeader className="px-5 py-4 border-b border-border">
+          <SheetTitle className="text-foreground">Notificaciones</SheetTitle>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto">
           {loading && items.length === 0 ? (
-            <div className="flex items-center justify-center py-16 text-white/70">
+            <div className="flex items-center justify-center py-16 text-foreground/70">
               <Loader2 className="w-5 h-5 animate-spin" />
             </div>
           ) : items.length === 0 ? (
-            <div className="px-6 py-16 text-center text-sm text-white/70">
+            <div className="px-6 py-16 text-center text-sm text-foreground/70">
               No tienes notificaciones
             </div>
           ) : (
@@ -163,8 +163,8 @@ const NotificationsBell = () => {
                     type="button"
                     onClick={() => markRead(n)}
                     className={cn(
-                      "w-full text-left px-5 py-4 transition-colors hover:bg-white/10",
-                      !n.is_read && "bg-white/15"
+                      "w-full text-left px-5 py-4 transition-colors hover:bg-accent",
+                      !n.is_read && "bg-card border border-border"
                     )}
                   >
                     <div className="flex items-start gap-3">
@@ -175,18 +175,18 @@ const NotificationsBell = () => {
                         <div className="flex items-center justify-between gap-2">
                           <p
                             className={cn(
-                              "text-sm truncate text-white",
-                              n.is_read ? "font-normal text-white/80" : "font-semibold"
+                              "text-sm truncate text-foreground",
+                              n.is_read ? "font-normal text-foreground/80" : "font-semibold"
                             )}
                           >
                             {n.title || "Notificación"}
                           </p>
-                          <span className="text-xs text-white/60 shrink-0">
+                          <span className="text-xs text-foreground/60 shrink-0">
                             {formatDate(n.created_at)}
                           </span>
                         </div>
                         {n.content && (
-                          <p className="mt-1 text-sm text-white/75 line-clamp-3">
+                          <p className="mt-1 text-sm text-foreground/75 line-clamp-3">
                             {n.content}
                           </p>
                         )}
@@ -200,23 +200,23 @@ const NotificationsBell = () => {
         </div>
 
         {pageCount > 1 && (
-          <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-white/20">
+          <div className="flex items-center justify-between gap-2 px-5 py-3 border-t border-border">
             <button
               type="button"
               disabled={page <= 1 || loading}
               onClick={() => fetchPage(page - 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-white/30 text-white hover:bg-white/10 disabled:opacity-40"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-border text-foreground hover:bg-accent disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" /> Anterior
             </button>
-            <span className="text-xs text-white/70">
+            <span className="text-xs text-foreground/70">
               Página {page} de {pageCount}
             </span>
             <button
               type="button"
               disabled={page >= pageCount || loading}
               onClick={() => fetchPage(page + 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-white/30 text-white hover:bg-white/10 disabled:opacity-40"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-sm border border-border text-foreground hover:bg-accent disabled:opacity-40"
             >
               Siguiente <ChevronRight className="w-4 h-4" />
             </button>
