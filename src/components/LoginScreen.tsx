@@ -385,6 +385,10 @@ const LoginScreen = () => {
         transition={{ delay: 0.3, duration: 0.5 }}
         className="w-full max-w-sm"
       >
+        <a href="https://eliabalance.com" className="mb-3 inline-block text-sm text-primary hover:underline">
+          ← Volver a la web
+        </a>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
         {/* Method tabs */}
         <div className="flex bg-secondary rounded-xl p-1 mb-5">
           <button
@@ -475,7 +479,7 @@ const LoginScreen = () => {
                 setForgotOpen(true);
               }}
               disabled={loading}
-              className="text-sm text-foreground/70 hover:text-primary transition-colors"
+              className="text-sm text-primary hover:underline transition-colors"
             >
               ¿Olvidaste tu contraseña?
             </button>
@@ -507,11 +511,12 @@ const LoginScreen = () => {
             type="button"
             onClick={() => setIsLogin(!isLogin)}
             disabled={loading}
-            className="text-foreground font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             {isLogin ? "Regístrate" : "Inicia sesión"}
           </button>
         </motion.p>
+        </div>
       </motion.div>
 
       {/* Forgot Password Dialog */}

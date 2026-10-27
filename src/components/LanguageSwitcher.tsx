@@ -25,7 +25,7 @@ const LanguageSwitcher = ({ className }: { className?: string }) => {
           variant="ghost"
           aria-label={language === "es" ? "Idioma" : "Language"}
           className={cn(
-            "h-10 rounded-full bg-card border border-border px-3 text-foreground hover:bg-accent hover:text-foreground",
+            "h-10 rounded-full bg-card border border-border px-3 text-primary hover:bg-accent hover:text-primary",
             className
           )}
         >
