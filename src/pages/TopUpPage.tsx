@@ -186,26 +186,26 @@ const TopUpPage = () => {
   const showEmailError = email.length > 0 && !isEmailValid;
 
   return (
-    <div className="min-h-screen bg-[#F5F3F7]">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-md px-4 pt-4 pb-10">
         <button
           onClick={() => navigate(returnTo || "/")}
-          className="flex items-center gap-1 text-sm font-medium text-[#2F2A33] hover:text-[#F5E6D3] transition-colors"
+          className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Atrás
         </button>
 
-        <h1 className="mt-3 text-center text-2xl font-bold text-[#2F2A33]">
+        <h1 className="mt-3 text-center text-2xl font-bold text-foreground">
           Recargar saldo
         </h1>
 
         <div className="mt-5 rounded-2xl bg-white p-5 shadow-lg">
           {showPaymentForm && lineId ? (
             <>
-              <div className="mb-4 rounded-xl bg-[#F5F3F7] px-4 py-3">
+              <div className="mb-4 rounded-xl bg-background px-4 py-3">
                 <span className="text-xs text-gray-500">Total a pagar</span>
-                <span className="mt-1 block text-lg font-bold text-[#2F2A33]">
+                <span className="mt-1 block text-lg font-bold text-foreground">
                   €{fmtPrice(displayAmount)}
                 </span>
               </div>
@@ -222,16 +222,16 @@ const TopUpPage = () => {
           ) : (
             <>
               {/* Phone (readonly) */}
-              <div className="mb-5 rounded-xl bg-[#F5F3F7] px-4 py-3">
+              <div className="mb-5 rounded-xl bg-background px-4 py-3">
                 <span className="text-xs text-gray-500">Número de teléfono</span>
-                <span className="mt-1 block text-sm font-semibold text-[#2F2A33]">
+                <span className="mt-1 block text-sm font-semibold text-foreground">
                   {phone || "—"}
                 </span>
               </div>
 
               {/* Amount */}
               <div className="mb-5">
-                <label className="mb-2 block text-sm font-medium text-[#2F2A33]">
+                <label className="mb-2 block text-sm font-medium text-foreground">
                   Importe
                 </label>
                 <div className="mb-3 grid grid-cols-4 gap-2">
@@ -242,8 +242,8 @@ const TopUpPage = () => {
                       className={cn(
                         "rounded-xl border py-2.5 text-sm font-semibold transition-all",
                         selectedPreset === p
-                          ? "border-[#F5E6D3] bg-[#F5E6D3] text-[#A799B7] shadow-md shadow-[#F5E6D3]/25"
-                          : "border-gray-200 bg-white text-[#2F2A33] hover:border-[#F5E6D3]/40 hover:bg-[#F5E6D3]/5"
+                          ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                          : "border-gray-200 bg-white text-foreground hover:border-primary/40 hover:bg-primary/5"
                       )}
                     >
                       €{p}
@@ -260,26 +260,26 @@ const TopUpPage = () => {
                     placeholder="Otro importe (min. €3)"
                     value={amount}
                     onChange={(e) => handleAmountChange(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-8 pr-4 text-sm text-[#2F2A33] placeholder:text-gray-400 focus:border-[#F5E6D3] focus:outline-none focus:ring-2 focus:ring-[#F5E6D3]/20 transition-all"
+                    className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-8 pr-4 text-sm text-foreground placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
               </div>
 
               {/* Email */}
-              <div className="mb-6 rounded-xl bg-[#F5F3F7] px-4 py-3">
+              <div className="mb-6 rounded-xl bg-background px-4 py-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">Email para el recibo</span>
                   {editingEmail ? (
                     <button
                       onClick={() => setEditingEmail(false)}
-                      className="text-xs font-medium text-[#F5E6D3] hover:underline"
+                      className="text-xs font-medium text-primary hover:underline"
                     >
                       OK
                     </button>
                   ) : (
                     <button
                       onClick={() => setEditingEmail(true)}
-                      className="flex items-center gap-1 text-xs font-medium text-[#F5E6D3] hover:underline"
+                      className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                     >
                       <Pencil className="h-3 w-3" />
                     </button>
@@ -293,10 +293,10 @@ const TopUpPage = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="email@ejemplo.com"
                       className={cn(
-                        "mt-2 w-full rounded-lg border bg-white px-3 py-2 text-sm text-[#2F2A33] focus:outline-none focus:ring-2 transition-all",
+                        "mt-2 w-full rounded-lg border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 transition-all",
                         showEmailError
                           ? "border-red-400 focus:border-red-400 focus:ring-red-200"
-                          : "border-gray-200 focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/20"
+                          : "border-gray-200 focus:border-primary focus:ring-primary/20"
                       )}
                     />
                     {showEmailError && (
@@ -304,7 +304,7 @@ const TopUpPage = () => {
                     )}
                   </>
                 ) : (
-                <span className="mt-1 block text-sm font-semibold text-[#2F2A33]">
+                <span className="mt-1 block text-sm font-semibold text-foreground">
                     {email || "—"}
                   </span>
                 )}
@@ -312,18 +312,18 @@ const TopUpPage = () => {
 
               {/* Saved card or save-card checkbox */}
               {loadingCards ? (
-                <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-[#F5F3F7] px-4 py-3 text-xs text-gray-500">
+                <div className="mb-5 flex items-center justify-center gap-2 rounded-xl bg-background px-4 py-3 text-xs text-gray-500">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Cargando métodos de pago…
                 </div>
               ) : savedCard ? (
-                <div className="mb-5 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                <div className="mb-5 rounded-xl bg-background px-4 py-3">
                   <div className="mb-2 text-xs text-gray-500">Tarjeta guardada</div>
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <CardBrandLogo brand={savedCard.brand} />
                       <div>
-                        <div className="text-sm font-semibold text-[#2F2A33]">
+                        <div className="text-sm font-semibold text-foreground">
                           •••• {savedCard.last4 || "----"}
                         </div>
                         {formatExpiry(savedCard.exp_month, savedCard.exp_year) && (
@@ -348,16 +348,16 @@ const TopUpPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="mb-5 flex items-start gap-3 rounded-xl bg-[#F5F3F7] px-4 py-3">
+                <div className="mb-5 flex items-start gap-3 rounded-xl bg-background px-4 py-3">
                   <input
                     id="save-card"
                     type="checkbox"
                     checked={saveCard}
                     onChange={(e) => setSaveCard(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-[#F5E6D3] focus:ring-[#F5E6D3]"
+                    className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                   />
                   <div>
-                    <label htmlFor="save-card" className="block text-sm font-medium text-[#2F2A33]">
+                    <label htmlFor="save-card" className="block text-sm font-medium text-foreground">
                       Guardar tarjeta para pagos automáticos
                     </label>
                     <p className="mt-0.5 text-xs text-gray-500">
@@ -368,10 +368,10 @@ const TopUpPage = () => {
               )}
 
               {/* Summary */}
-              <div className="mb-5 rounded-xl bg-[#F5F3F7] p-4">
+              <div className="mb-5 rounded-xl bg-background p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">Importe a recargar</span>
-                  <span className="font-mono text-lg font-bold text-[#2F2A33]">
+                  <span className="font-mono text-lg font-bold text-foreground">
                     €{fmtPrice(displayAmount)}
                   </span>
                 </div>
@@ -380,8 +380,8 @@ const TopUpPage = () => {
                   <span className="text-sm font-semibold text-emerald-600">Gratis</span>
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t border-gray-200 pt-3">
-                  <span className="text-sm font-semibold text-[#2F2A33]">Total</span>
-                  <span className="font-mono text-xl font-bold text-[#2F2A33]">
+                  <span className="text-sm font-semibold text-foreground">Total</span>
+                  <span className="font-mono text-xl font-bold text-foreground">
                     €{fmtPrice(displayAmount)}
                   </span>
                 </div>
@@ -404,7 +404,7 @@ const TopUpPage = () => {
                 className={cn(
                   "flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-semibold transition-all",
                   isValid && !paying
-                    ? "bg-[#F5E6D3] text-[#A799B7] shadow-lg shadow-[#F5E6D3]/30 hover:brightness-110 active:scale-[0.98]"
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:brightness-110 active:scale-[0.98]"
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 )}
               >

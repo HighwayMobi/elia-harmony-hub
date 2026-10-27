@@ -23,7 +23,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
   return (
     <div 
       className="min-h-screen flex flex-col"
-      style={{ backgroundColor: '#FFF6E8' }}
+      style={{ backgroundColor: "hsl(var(--background))" }}
     >
       {/* Header */}
       <motion.header
@@ -37,7 +37,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
           variant="ghost"
           size="icon"
           onClick={handleLogout}
-          className="text-white/70 hover:text-white hover:bg-white/10"
+          className="text-foreground/70 hover:text-foreground hover:bg-accent"
         >
           <LogOut className="w-5 h-5" />
         </Button>
@@ -55,7 +55,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-2xl md:text-3xl font-light text-white mb-4"
+            className="text-2xl md:text-3xl font-light text-foreground mb-4"
           >
             ¡Bienvenido!
           </motion.h1>
@@ -64,7 +64,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="text-white/70 text-sm mb-8"
+            className="text-foreground/70 text-sm mb-8"
           >
             {user.email}
           </motion.p>
@@ -75,7 +75,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
             transition={{ delay: 0.5, duration: 0.5 }}
             className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-sm mx-auto"
           >
-            <p className="text-white/80 text-center">
+            <p className="text-foreground/80 text-center">
               Tu espacio de bienestar está listo. Pronto tendrás acceso a todas las funciones de Elia Balance.
             </p>
           </motion.div>
@@ -89,7 +89,7 @@ const HomeScreen = ({ user }: HomeScreenProps) => {
         transition={{ delay: 0.6, duration: 0.5 }}
         className="py-6 text-center"
       >
-        <p className="text-white/40 text-xs">
+        <p className="text-foreground/40 text-xs">
           © 2024 Elia Balance
         </p>
       </motion.footer>

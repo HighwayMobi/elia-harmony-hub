@@ -17,12 +17,12 @@ const AppShell = ({ user }: AppShellProps) => {
   return (
     <div
       className="relative min-h-screen flex flex-col"
-      style={{ backgroundColor: '#A799B7' }}
+      style={{ backgroundColor: "hsl(var(--background))" }}
     >
       {/* Noise overlay */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 mix-blend-overlay opacity-40"
+        className="hidden"
         style={{
           backgroundImage: `url("${noiseSvg}")`,
           backgroundRepeat: 'repeat',

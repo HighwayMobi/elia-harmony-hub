@@ -339,7 +339,7 @@ const Index = () => {
     return (
       <div 
         className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: '#A799B7' }}
+        style={{ backgroundColor: "hsl(var(--background))" }}
       >
         <motion.img
           src={logo}
@@ -368,7 +368,7 @@ const Index = () => {
   return (
     <div 
       className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ backgroundColor: '#A799B7' }}
+      style={{ backgroundColor: "hsl(var(--background))" }}
     >
       <AnimatePresence mode="wait">
         {!showLogin ? (
@@ -445,9 +445,9 @@ const Index = () => {
                     }}
                     className="flex items-center gap-2"
                   >
-                    <ChevronLeft className="w-5 h-5 text-white/50" />
-                    <Pointer className="w-8 h-8 text-white/70" />
-                    <ChevronRight className="w-5 h-5 text-white/50" />
+                    <ChevronLeft className="w-5 h-5 text-foreground/50" />
+                    <Pointer className="w-8 h-8 text-foreground/70" />
+                    <ChevronRight className="w-5 h-5 text-foreground/50" />
                   </motion.div>
                 </motion.div>
               )}

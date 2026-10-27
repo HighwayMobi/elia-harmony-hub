@@ -558,20 +558,20 @@ const HomePage = ({ user }: HomePageProps) => {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="relative h-14 w-14 rounded-full overflow-hidden bg-white/40 ring-2 ring-white/60 flex items-center justify-center group shrink-0"
+              className="relative h-14 w-14 rounded-full overflow-hidden bg-lavender-light ring-2 ring-border flex items-center justify-center group shrink-0"
               aria-label="Cambiar avatar"
             >
               {avatarUrl ? (
                 <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
               ) : (
-                <UserRound className="h-7 w-7 text-[#F5E6D3]" />
+                <UserRound className="h-7 w-7 text-primary" />
               )}
               <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera className="h-5 w-5 text-white" />
+                <Camera className="h-5 w-5 text-foreground" />
               </span>
               {uploading && (
                 <span className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                  <RefreshCw className="h-5 w-5 text-white animate-spin" />
+                  <RefreshCw className="h-5 w-5 text-foreground animate-spin" />
                 </span>
               )}
             </button>
@@ -583,7 +583,7 @@ const HomePage = ({ user }: HomePageProps) => {
               onChange={handleAvatarChange}
             />
             <div className="min-w-0">
-              <h1 className="text-base font-bold text-[#F5E6D3] tracking-wide truncate">
+              <h1 className="text-base font-bold text-primary tracking-wide truncate">
                 {profile?.name || NA}
               </h1>
               {showLineSelector ? (
@@ -591,7 +591,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="mt-0.5 flex max-w-[220px] items-center gap-1 text-left text-sm font-bold text-white transition-opacity hover:opacity-80"
+                      className="mt-0.5 flex max-w-[220px] items-center gap-1 text-left text-sm font-bold text-foreground transition-opacity hover:opacity-80"
                       aria-label="Seleccionar suscripción"
                     >
                       <span className="truncate">{formatLineTitle(selectedLine)}</span>
@@ -606,8 +606,8 @@ const HomePage = ({ user }: HomePageProps) => {
                           key={String(l.id)}
                           onClick={() => switchLine(l)}
                           className={cn(
-                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-[#A799B7]",
-                            isActive && "text-[#FF7A1A]"
+                            "flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2 focus:bg-lavender-light",
+                            isActive && "text-primary"
                           )}
                         >
                           <LineTypeIcon type={l.type} status={l.status} boxed size="sm" />
@@ -621,7 +621,7 @@ const HomePage = ({ user }: HomePageProps) => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <p className="text-sm text-[#F5E6D3]/80">
+                <p className="text-sm text-primary/80">
                   {formatLineTitle(selectedLine)}
                 </p>
               )}
@@ -629,7 +629,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="ml-auto p-2 rounded-xl text-[#F5E6D3]/80 hover:text-[#F5E6D3] hover:bg-[#A799B7]/10 transition-colors disabled:opacity-50"
+              className="ml-auto p-2 rounded-xl text-primary/80 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
               aria-label="Actualizar"
             >
               <RefreshCw className={cn("h-5 w-5", refreshing && "animate-spin")} />
@@ -641,7 +641,7 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <LineTypeIcon type={currentLine?.type} status={currentLine?.status} boxed size="md" />
-                <span className="text-base font-semibold text-[#2F2A33]">
+                <span className="text-base font-semibold text-foreground">
                   {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
@@ -649,14 +649,14 @@ const HomePage = ({ user }: HomePageProps) => {
                 <button
                   title="Ya se ha solicitado un cambio de tarifa"
                   disabled
-                  className="rounded-xl border border-[#F5E6D3]/40 px-5 py-2 text-sm font-semibold text-[#F5E6D3]/40 cursor-not-allowed"
+                  className="rounded-xl border border-primary/40 px-5 py-2 text-sm font-semibold text-primary/40 cursor-not-allowed"
                 >
                   Cambiar
                 </button>
               ) : (
                 <button
                   onClick={() => navigate("/change-plan", { state: { line: currentLine, lineDetails } })}
-                  className="rounded-xl bg-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#A799B7] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
+                  className="rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
                 >
                   Cambiar
                 </button>
@@ -667,27 +667,27 @@ const HomePage = ({ user }: HomePageProps) => {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-sm text-gray-500">Saldo</span>
-                  <span className="ml-2 text-sm font-bold text-[#2F2A33]">
+                  <span className="ml-2 text-sm font-bold text-foreground">
                     {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                   </span>
                 </div>
                 <div>
                   <span className="text-xs text-gray-500">Cuota mensual</span>
-                  <span className="ml-1 text-xs font-semibold text-[#2F2A33]">
+                  <span className="ml-1 text-xs font-semibold text-foreground">
                     {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/topup")}
-                className="w-full rounded-xl bg-[#F5E6D3] px-6 py-2.5 text-sm font-semibold text-[#A799B7] shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
+                className="w-full rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-md transition-all hover:brightness-110 active:scale-[0.98]"
               >
                 Recargar
               </button>
             </div>
 
             {lineDetails?.pending_plan?.name ? (
-              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-medium text-[#F5E6D3] flex flex-col items-center gap-1.5">
+              <div className="bg-lavender-light px-5 py-2.5 text-center text-xs font-medium text-accent-foreground flex flex-col items-center gap-1.5">
                 <span>
                   A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
                   {lineDetails.pending_plan.price != null ? ` — €${fmt(lineDetails.pending_plan.price)}/mes` : ""}
@@ -695,14 +695,14 @@ const HomePage = ({ user }: HomePageProps) => {
                 {!isTomorrowUTC(lineDetails.pending_plan.change_date) && (
                   <button
                     onClick={() => setCancelDialogOpen(true)}
-                    className="rounded-lg border border-[#F5E6D3] px-4 py-1 text-xs font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-[#A799B7]"
+                    className="rounded-lg border border-primary px-4 py-1 text-xs font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground"
                   >
                     Cancelar
                   </button>
                 )}
               </div>
             ) : (
-              <div className="bg-[#A799B7] px-5 py-2.5 text-center text-xs font-bold text-white">
+              <div className="bg-primary px-5 py-2.5 text-center text-xs font-bold text-white">
                 Cuota mensual {lineDetails?.plan?.price != null ? `€${fmt(lineDetails.plan.price)}` : NA} del plan actual se cobrará el {fmtDateDot(lineDetails?.next_billing_date)}
               </div>
             )}
@@ -713,11 +713,11 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Wifi className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-[#2F2A33]">
+                <span className="text-sm font-medium text-foreground">
                   Gb disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#2F2A33]">
+              <span className="text-sm font-bold text-foreground">
                 {lineDetails?.remains?.is_unlimited_data
                   ? "Ilimitados"
                   : lineDetails?.remains
@@ -728,11 +728,11 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="border-t border-gray-100 px-5 py-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PhoneIcon className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-[#2F2A33]">
+                <span className="text-sm font-medium text-foreground">
                   Minutos disponibles
                 </span>
               </div>
-              <span className="text-sm font-bold text-[#2F2A33]">
+              <span className="text-sm font-bold text-foreground">
                 {lineDetails?.remains?.is_unlimited_voice
                   ? "Ilimitados"
                   : lineDetails?.remains
@@ -748,10 +748,10 @@ const HomePage = ({ user }: HomePageProps) => {
             className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/10">
-                <Plus className="h-4 w-4 text-[#A799B7]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                <Plus className="h-4 w-4 text-primary" />
               </div>
-              <span className="text-base font-semibold text-[#2F2A33]">
+              <span className="text-base font-semibold text-foreground">
                 Comprar Gb
               </span>
             </div>
@@ -765,10 +765,10 @@ const HomePage = ({ user }: HomePageProps) => {
               className="flex w-full items-center justify-between px-5 py-4 transition-colors hover:bg-gray-50"
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#A799B7]/10">
-                  <Clock className="h-4 w-4 text-[#A799B7]" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <Clock className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-base font-semibold text-[#2F2A33]">
+                <span className="text-base font-semibold text-foreground">
                   Finanzas
                 </span>
               </div>
@@ -814,7 +814,7 @@ const HomePage = ({ user }: HomePageProps) => {
                         </button>
                       );
                     })()}
-                    <span className="text-sm font-semibold text-[#2F2A33]">
+                    <span className="text-sm font-semibold text-foreground">
                       {MONTHS_ES[financeMonth.month]} {financeMonth.year}
                     </span>
                     <button
@@ -859,7 +859,7 @@ const HomePage = ({ user }: HomePageProps) => {
                               className="px-5 py-3 flex items-center justify-between border-b border-gray-100"
                             >
                               <div className="flex flex-col">
-                                <span className="text-sm text-[#2F2A33]">
+                                <span className="text-sm text-foreground">
                                   {(() => {
                                     const raw = (it.description || it.event_type || it.type || "").toString().toLowerCase();
                                     const map: Record<string, string> = {
@@ -878,7 +878,7 @@ const HomePage = ({ user }: HomePageProps) => {
                               <span
                                 className={cn(
                                   "text-sm font-semibold",
-                                  isIncome ? "text-green-600" : "text-[#F5E6D3]"
+                                  isIncome ? "text-green-600" : "text-primary"
                                 )}
                               >
                                 {isIncome ? "+ " : "- "}
@@ -893,14 +893,14 @@ const HomePage = ({ user }: HomePageProps) => {
                         </div>
                       )}
 
-                      <div className="flex items-stretch bg-[#A799B7] text-[#F5E6D3]">
+                      <div className="flex items-stretch bg-lavender-light text-accent-foreground">
                         <div className="flex-1 px-5 py-3 flex flex-col items-start justify-center">
                           <span className="text-xs font-medium opacity-90">Gastado</span>
                           <span className="text-lg font-bold">
                             {Number(financeData?.cost ?? 0).toFixed(2)}€
                           </span>
                         </div>
-                        <div className="w-px bg-[#F5E6D3]/30 my-2" />
+                        <div className="w-px bg-primary/30 my-2" />
                         <div className="flex-1 px-5 py-3 flex flex-col items-end justify-center">
                           <span className="text-xs font-medium opacity-90">Recargado</span>
                           <span className="text-lg font-bold">
@@ -919,7 +919,7 @@ const HomePage = ({ user }: HomePageProps) => {
                           <button
                             onClick={handleDownloadInvoice}
                             disabled={invoiceLoading}
-                            className="flex w-full items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#A799B7] hover:bg-[#A799B7]/5 transition-colors disabled:opacity-50"
+                            className="flex w-full items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
                           >
                             <Download className="h-4 w-4" />
                             {invoiceLoading ? "Descargando..." : "Descargar factura (PDF)"}

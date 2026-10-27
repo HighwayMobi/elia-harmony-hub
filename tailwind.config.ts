@@ -13,7 +13,19 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Outfit", "system-ui", "sans-serif"],
+        heading: ["Graphik", "Helvetica Neue", "Arial", "sans-serif"],
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        card: "var(--shadow-card)",
+        elevated: "var(--shadow-elevated)",
+      },
       colors: {
+        lavender: { DEFAULT: "hsl(var(--lavender))", light: "hsl(var(--lavender-light))" },
+        "lavender-light": "hsl(var(--lavender-light))",
+        gold: { DEFAULT: "hsl(var(--gold))", light: "hsl(var(--gold-light))" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

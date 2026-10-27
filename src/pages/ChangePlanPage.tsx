@@ -322,7 +322,7 @@ const ChangePlanPage = () => {
     isUpgrade && whenChange === "now" ? soonDate : feeDate || "—";
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#A799B7" }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "hsl(var(--background))" }}>
       {error && (
         <div className="pointer-events-none fixed left-4 right-4 top-4 z-[70] flex justify-center">
           <div className="w-full max-w-md rounded-2xl bg-white px-5 py-4 text-sm font-semibold text-red-600 shadow-xl">
@@ -344,21 +344,21 @@ const ChangePlanPage = () => {
         <div className="mx-auto w-full max-w-md">
           <button
             onClick={goBack}
-            className="mb-4 flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
+            className="mb-4 flex items-center gap-2 text-sm font-medium text-foreground/90 hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver
           </button>
 
           <div className="mb-4 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
               Cambiar tarifa
             </h1>
-            <p className="mt-1 text-sm text-white/80">
+            <p className="mt-1 text-sm text-foreground/80">
               Elige una nueva tarifa para tu línea
             </p>
             {lineLabel && (
-              <p className="mt-1 text-sm font-semibold text-[#FF7A1A]">
+              <p className="mt-1 text-sm font-semibold text-primary">
                 {lineLabel}
               </p>
             )}
@@ -366,7 +366,7 @@ const ChangePlanPage = () => {
 
           {loading && (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <Loader2 className="h-8 w-8 animate-spin text-foreground" />
             </div>
           )}
 
@@ -407,16 +407,16 @@ const ChangePlanPage = () => {
                   key={plan.id}
                   className={cn(
                     "rounded-2xl bg-white p-4 shadow-md transition-all",
-                    isCurrent && "ring-2 ring-[#F5E6D3]"
+                    isCurrent && "ring-2 ring-primary"
                   )}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5E6D3]/10 shrink-0">
-                        <TypeIcon className="h-5 w-5 text-[#F5E6D3]" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-lavender-light shrink-0">
+                        <TypeIcon className="h-5 w-5 text-primary" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-base font-bold text-[#2F2A33] truncate">
+                        <p className="text-base font-bold text-foreground truncate">
                           {plan.name}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
@@ -427,7 +427,7 @@ const ChangePlanPage = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-lg font-bold text-[#F5E6D3] whitespace-nowrap">
+                      <span className="text-lg font-bold text-primary whitespace-nowrap">
                         €{fmt(plan.price)}
                         <span className="text-xs font-normal text-gray-500">/mes</span>
                       </span>
@@ -437,7 +437,7 @@ const ChangePlanPage = () => {
                     <button
                       disabled={!!isCurrent}
                       onClick={() => handleSelectPlan(plan)}
-                      className="rounded-xl border border-[#F5E6D3] px-5 py-2 text-sm font-semibold text-[#F5E6D3] transition-all hover:bg-[#F5E6D3] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#F5E6D3]"
+                      className="rounded-xl border border-primary px-5 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary"
                     >
                       {isCurrent ? "Actual" : "Seleccionar"}
                     </button>
@@ -461,7 +461,7 @@ const ChangePlanPage = () => {
                 {lineLabel && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">para la línea</span>
-                    <span className="font-semibold text-[#FF7A1A]">{lineLabel}</span>
+                    <span className="font-semibold text-primary">{lineLabel}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
@@ -480,7 +480,7 @@ const ChangePlanPage = () => {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Cuota mensual</span>
-                  <span className="font-bold text-[#FF7A1A]">
+                  <span className="font-bold text-primary">
                     €{fmt(selectedPlan.price)}
                   </span>
                 </div>
@@ -498,7 +498,7 @@ const ChangePlanPage = () => {
                       value="now"
                       checked={whenChange === "now"}
                       onChange={() => setWhenChange("now")}
-                      className="mt-1 accent-[#F5E6D3]"
+                      className="mt-1 accent-primary"
                     />
                     <span className="text-sm text-foreground">
                       Pronto ({fmtDateDot(soonDate)})
@@ -512,7 +512,7 @@ const ChangePlanPage = () => {
                     value="later"
                     checked={whenChange === "later"}
                     onChange={() => setWhenChange("later")}
-                    className="mt-1 accent-[#F5E6D3]"
+                    className="mt-1 accent-primary"
                   />
                   <span className="text-sm text-foreground">
                     Al final del periodo pagado{feeDate ? ` (${fmtDateDot(feeDate)})` : ""}
@@ -546,7 +546,7 @@ const ChangePlanPage = () => {
             <button
               onClick={handleConfirm}
               disabled={submitting}
-              className="flex-1 rounded-xl bg-[#FF7A1A] px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#FF7A1A]/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+              className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin mx-auto" />

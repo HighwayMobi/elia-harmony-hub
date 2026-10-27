@@ -188,6 +188,7 @@ const ES_TO_EN: Record<string, string> = {
   "Atrás": "Back",
   "Volver ahora": "Return now",
   "Volver": "Back",
+  "← Volver a la web": "← Back to website",
   "Total a pagar": "Total to pay",
   "Número de teléfono": "Phone number",
   "Importe": "Amount",

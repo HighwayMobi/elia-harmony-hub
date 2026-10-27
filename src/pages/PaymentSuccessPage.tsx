@@ -48,16 +48,16 @@ const PaymentSuccessPage = () => {
   }, [isSuccess, navigate, returnTo]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F3F7] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg text-center">
         {isSuccess ? (
           <>
             {status === "processing" ? (
-              <Loader2 className="mx-auto h-16 w-16 text-[#F5E6D3] animate-spin" />
+              <Loader2 className="mx-auto h-16 w-16 text-primary animate-spin" />
             ) : (
               <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500" />
             )}
-            <h1 className="mt-4 text-2xl font-bold text-[#2F2A33]">
+            <h1 className="mt-4 text-2xl font-bold text-foreground">
               {status === "processing" ? "Procesando pago…" : "¡Pago realizado!"}
             </h1>
             <p className="mt-2 text-sm text-gray-500">
@@ -70,7 +70,7 @@ const PaymentSuccessPage = () => {
             </p>
             <button
               onClick={() => navigate(returnTo)}
-              className="mt-6 w-full rounded-xl bg-[#F5E6D3] py-3 text-sm font-semibold text-[#A799B7] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+              className="mt-6 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
             >
               Volver ahora
             </button>
@@ -78,7 +78,7 @@ const PaymentSuccessPage = () => {
         ) : (
           <>
             <XCircle className="mx-auto h-16 w-16 text-red-500" />
-            <h1 className="mt-4 text-2xl font-bold text-[#2F2A33]">
+            <h1 className="mt-4 text-2xl font-bold text-foreground">
               Pago no completado
             </h1>
             <p className="mt-2 text-sm text-gray-500">
@@ -86,7 +86,7 @@ const PaymentSuccessPage = () => {
             </p>
             <button
               onClick={() => navigate(returnTo)}
-              className="mt-6 w-full rounded-xl bg-[#F5E6D3] py-3 text-sm font-semibold text-[#A799B7] shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
+              className="mt-6 w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
             >
               Volver
             </button>

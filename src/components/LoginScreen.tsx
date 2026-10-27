@@ -385,15 +385,19 @@ const LoginScreen = () => {
         transition={{ delay: 0.3, duration: 0.5 }}
         className="w-full max-w-sm"
       >
+        <a href="https://eliabalance.com" className="mb-3 inline-block text-sm text-primary hover:underline">
+          ← Volver a la web
+        </a>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
         {/* Method tabs */}
-        <div className="flex bg-[#F5E6D3]/10 rounded-xl p-1 mb-5">
+        <div className="flex bg-secondary rounded-xl p-1 mb-5">
           <button
             type="button"
             onClick={() => setMethod("email")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "email"
-                ? "bg-[#F5E6D3] text-[#A799B7]"
-                : "text-[#2F2A33]/80 hover:text-[#F5E6D3]"
+                ? "bg-card text-primary shadow-sm"
+                : "text-foreground/80 hover:text-primary"
             }`}
           >
             <Mail className="w-4 h-4" />
@@ -404,8 +408,8 @@ const LoginScreen = () => {
             onClick={() => setMethod("phone")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 ${
               method === "phone"
-                ? "bg-[#F5E6D3] text-[#A799B7]"
-                : "text-[#2F2A33]/80 hover:text-[#F5E6D3]"
+                ? "bg-card text-primary shadow-sm"
+                : "text-foreground/80 hover:text-primary"
             }`}
           >
             <Phone className="w-4 h-4" />
@@ -422,11 +426,11 @@ const LoginScreen = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 rounded-xl focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30"
+                className="h-12 bg-white border-primary/30 text-foreground placeholder:text-foreground/40 rounded-xl focus:border-primary focus:ring-primary/30"
               />
             ) : (
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#2F2A33]/80 font-medium pointer-events-none select-none">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/80 font-medium pointer-events-none select-none">
                   +34
                 </span>
                 <Input
@@ -437,7 +441,7 @@ const LoginScreen = () => {
                   onChange={(e) => setPhone(sanitizePhone(e.target.value))}
                   disabled={loading}
                   maxLength={11}
-                  className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 rounded-xl focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30 pl-14 tracking-wide"
+                  className="h-12 bg-white border-primary/30 text-foreground placeholder:text-foreground/40 rounded-xl focus:border-primary focus:ring-primary/30 pl-14 tracking-wide"
                 />
               </div>
             )}
@@ -449,12 +453,12 @@ const LoginScreen = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 rounded-xl focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30 pr-12"
+                className="h-12 bg-white border-primary/30 text-foreground placeholder:text-foreground/40 rounded-xl focus:border-primary focus:ring-primary/30 pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2F2A33]/60 hover:text-[#2F2A33] transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -475,7 +479,7 @@ const LoginScreen = () => {
                 setForgotOpen(true);
               }}
               disabled={loading}
-              className="text-sm text-[#2F2A33]/70 hover:text-[#F5E6D3] transition-colors"
+              className="text-sm text-primary hover:underline transition-colors"
             >
               ¿Olvidaste tu contraseña?
             </button>
@@ -484,7 +488,7 @@ const LoginScreen = () => {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl transition-all disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -500,28 +504,29 @@ const LoginScreen = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
-          className="text-center mt-6 text-[#2F2A33]/70"
+          className="text-center mt-6 text-foreground/70"
         >
           {isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}{" "}
           <button
             type="button"
             onClick={() => setIsLogin(!isLogin)}
             disabled={loading}
-            className="text-[#2F2A33] font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             {isLogin ? "Regístrate" : "Inicia sesión"}
           </button>
         </motion.p>
+        </div>
       </motion.div>
 
       {/* Forgot Password Dialog */}
       <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-        <DialogContent className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-[#2F2A33] shadow-2xl [&>button]:text-[#2F2A33]/70 [&>button]:hover:text-[#F5E6D3]">
+        <DialogContent className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:text-foreground/70 [&>button]:hover:text-primary">
           <DialogHeader>
-            <DialogTitle className="text-[#2F2A33] text-xl">
+            <DialogTitle className="text-foreground text-xl">
               Recuperar contraseña
             </DialogTitle>
-            <DialogDescription className="text-[#2F2A33]/70">
+            <DialogDescription className="text-foreground/70">
               Elige cómo quieres recibir las instrucciones para restablecer tu
               contraseña.
             </DialogDescription>
@@ -529,14 +534,14 @@ const LoginScreen = () => {
 
           <div className="space-y-4 pt-2">
             {/* Tabs */}
-            <div className="flex rounded-xl bg-[#F5E6D3]/10 p-1">
+            <div className="flex rounded-xl bg-secondary p-1">
               <button
                 type="button"
                 onClick={() => setForgotTab("email")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "email"
-                    ? "bg-[#F5E6D3] text-[#A799B7] shadow-sm"
-                    : "text-[#2F2A33]/80 hover:text-[#F5E6D3]"
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-foreground/80 hover:text-primary"
                 }`}
               >
                 <Mail className="h-4 w-4" />
@@ -547,8 +552,8 @@ const LoginScreen = () => {
                 onClick={() => setForgotTab("phone")}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-all ${
                   forgotTab === "phone"
-                    ? "bg-[#F5E6D3] text-[#A799B7] shadow-sm"
-                    : "text-[#2F2A33]/80 hover:text-[#F5E6D3]"
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-foreground/80 hover:text-primary"
                 }`}
               >
                 <Phone className="h-4 w-4" />
@@ -556,7 +561,7 @@ const LoginScreen = () => {
               </button>
             </div>
 
-            <p className="text-sm text-[#2F2A33]/70">
+            <p className="text-sm text-foreground/70">
               {forgotTab === "email"
                 ? "Te enviaremos un enlace al correo para restablecer la contraseña."
                 : "Te enviaremos un código por SMS para acceder y cambiar tu contraseña."}
@@ -564,19 +569,19 @@ const LoginScreen = () => {
 
             {forgotTab === "email" ? (
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#2F2A33]/60 z-10" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/60 z-10" />
                 <Input
                   type="email"
                   placeholder="mail@ejemplo.com"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   disabled={forgotLoading}
-                  className="pl-10 h-12 rounded-xl bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30"
+                  className="pl-10 h-12 rounded-xl bg-white border-primary/30 text-foreground placeholder:text-foreground/40 focus:border-primary focus:ring-primary/30"
                 />
               </div>
             ) : (
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#2F2A33]/80 font-medium pointer-events-none select-none">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/80 font-medium pointer-events-none select-none">
                   +34
                 </span>
                 <Input
@@ -589,7 +594,7 @@ const LoginScreen = () => {
                   }
                   disabled={forgotLoading}
                   maxLength={11}
-                  className="h-12 rounded-xl bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30 pl-14 tracking-wide"
+                  className="h-12 rounded-xl bg-white border-primary/30 text-foreground placeholder:text-foreground/40 focus:border-primary focus:ring-primary/30 pl-14 tracking-wide"
                 />
               </div>
             )}
@@ -598,7 +603,7 @@ const LoginScreen = () => {
               type="button"
               onClick={handleForgotSubmit}
               disabled={forgotLoading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl transition-all disabled:opacity-50"
             >
               {forgotLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -620,16 +625,16 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-[#2F2A33] shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className="text-[#2F2A33] text-xl">
+            <DialogTitle className="text-foreground text-xl">
               Establece una contraseña
             </DialogTitle>
-            <DialogDescription className="text-[#2F2A33]/70">
+            <DialogDescription className="text-foreground/70">
               Para continuar, crea una contraseña segura para tu cuenta.
             </DialogDescription>
           </DialogHeader>
@@ -642,12 +647,12 @@ const LoginScreen = () => {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 disabled={setPwdLoading}
-                className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 rounded-xl focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30 pr-12"
+                className="h-12 bg-white border-primary/30 text-foreground placeholder:text-foreground/40 rounded-xl focus:border-primary focus:ring-primary/30 pr-12"
               />
               <button
                 type="button"
                 onClick={() => setShowNewPassword((v) => !v)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2F2A33]/60 hover:text-[#2F2A33] transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/60 hover:text-foreground transition-colors"
               >
                 {showNewPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -663,14 +668,14 @@ const LoginScreen = () => {
               value={newPasswordConfirm}
               onChange={(e) => setNewPasswordConfirm(e.target.value)}
               disabled={setPwdLoading}
-              className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] placeholder:text-[#2F2A33]/40 rounded-xl focus:border-[#F5E6D3] focus:ring-[#F5E6D3]/30"
+              className="h-12 bg-white border-primary/30 text-foreground placeholder:text-foreground/40 rounded-xl focus:border-primary focus:ring-primary/30"
             />
 
             <Button
               type="button"
               onClick={handleSetPasswordSubmit}
               disabled={setPwdLoading}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all disabled:opacity-50"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl transition-all disabled:opacity-50"
             >
               {setPwdLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -691,23 +696,23 @@ const LoginScreen = () => {
         }}
       >
         <DialogContent
-          className="sm:max-w-md border-0 rounded-3xl bg-[#A799B7] text-[#2F2A33] shadow-2xl [&>button]:hidden"
+          className="sm:max-w-md border-0 rounded-2xl border border-border bg-card text-foreground shadow-card [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle className="text-[#2F2A33] text-xl">
+            <DialogTitle className="text-foreground text-xl">
               Selecciona una línea
             </DialogTitle>
-            <DialogDescription className="text-[#2F2A33]/70">
+            <DialogDescription className="text-foreground/70">
               Tu cuenta tiene varias líneas asociadas. Elige con cuál continuar.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-3 pt-2">
             <Select value={selectedLineId} onValueChange={setSelectedLineId}>
-              <SelectTrigger className="h-12 bg-white border-[#F5E6D3]/30 text-[#2F2A33] rounded-xl">
+              <SelectTrigger className="h-12 bg-white border-primary/30 text-foreground rounded-xl">
                 <SelectValue placeholder="Selecciona una línea" />
               </SelectTrigger>
               <SelectContent>
@@ -752,7 +757,7 @@ const LoginScreen = () => {
                 setLineOpen(false);
                 toast.success("¡Bienvenido!");
               }}
-              className="w-full h-12 bg-[#F5E6D3] hover:bg-[#efe0cc] text-[#A799B7] font-medium rounded-xl transition-all"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl transition-all"
             >
               CONTINUAR
             </Button>
