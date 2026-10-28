@@ -137,6 +137,8 @@ const HomePage = ({ user }: HomePageProps) => {
     () => getCachedLineDetails(getFTSession()?.line?.id) || null
   );
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const isSuspended =
+    String(lineDetails?.status || currentLine?.status || "").toUpperCase() === "SUSPENDED";
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancellingPlanChange, setCancellingPlanChange] = useState(false);
 
@@ -645,7 +647,15 @@ const HomePage = ({ user }: HomePageProps) => {
                   {lineDetails?.plan?.name || currentLine?.tariff_plan || NA}
                 </span>
               </div>
-              {lineDetails?.pending_plan?.name ? (
+              {isSuspended ? (
+                <button
+                  title="Línea suspendida"
+                  disabled
+                  className="rounded-xl border border-primary/40 px-5 py-2 text-sm font-semibold text-primary/40 cursor-not-allowed"
+                >
+                  Cambiar
+                </button>
+              ) : lineDetails?.pending_plan?.name ? (
                 <button
                   title="Ya se ha solicitado un cambio de tarifa"
                   disabled
@@ -686,7 +696,12 @@ const HomePage = ({ user }: HomePageProps) => {
               </button>
             </div>
 
-            {lineDetails?.pending_plan?.name ? (
+            {isSuspended ? (
+              <div className="bg-amber-100 px-5 py-2.5 text-center text-xs text-amber-900">
+                <p className="font-bold">Línea suspendida</p>
+                <p className="mt-0.5">Puedes recargar saldo, pero los datos y minutos no están disponibles.</p>
+              </div>
+            ) : lineDetails?.pending_plan?.name ? (
               <div className="bg-lavender-light px-5 py-2.5 text-center text-xs font-medium text-accent-foreground flex flex-col items-center gap-1.5">
                 <span>
                   A partir del {fmtDateDot(lineDetails.pending_plan.change_date)} el plan cambia a "{lineDetails.pending_plan.name}"
@@ -718,7 +733,9 @@ const HomePage = ({ user }: HomePageProps) => {
                 </span>
               </div>
               <span className="text-sm font-bold text-foreground">
-                {lineDetails?.remains?.is_unlimited_data
+                {isSuspended
+                  ? NA
+                  : lineDetails?.remains?.is_unlimited_data
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${((lineDetails.remains.data_gb_total ?? 0) - (lineDetails.remains.data_gb_used ?? 0)).toFixed(1)} Gb de ${(lineDetails.remains.data_gb_total ?? 0).toFixed(1)} Gb`
@@ -733,7 +750,9 @@ const HomePage = ({ user }: HomePageProps) => {
                 </span>
               </div>
               <span className="text-sm font-bold text-foreground">
-                {lineDetails?.remains?.is_unlimited_voice
+                {isSuspended
+                  ? NA
+                  : lineDetails?.remains?.is_unlimited_voice
                   ? "Ilimitados"
                   : lineDetails?.remains
                   ? `${(lineDetails.remains.minutes_total ?? 0) - (lineDetails.remains.minutes_used ?? 0)} de ${lineDetails.remains.minutes_total ?? 0}`
@@ -744,8 +763,13 @@ const HomePage = ({ user }: HomePageProps) => {
 
           {/* Buy GB */}
           <button
-            onClick={() => navigate("/buy-addon", { state: { line: currentLine, lineDetails } })}
-            className="w-full rounded-2xl bg-white shadow-lg px-5 py-4 flex items-center justify-between transition-colors hover:bg-gray-50"
+            onClick={() => !isSuspended && navigate("/buy-addon", { state: { line: currentLine, lineDetails } })}
+            disabled={isSuspended}
+            title={isSuspended ? "Línea suspendida" : undefined}
+            className={cn(
+              "w-full rounded-2xl shadow-lg px-5 py-4 flex items-center justify-between transition-colors",
+              isSuspended ? "bg-gray-200 opacity-60 cursor-not-allowed" : "bg-white hover:bg-gray-50"
+            )}
           >
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">

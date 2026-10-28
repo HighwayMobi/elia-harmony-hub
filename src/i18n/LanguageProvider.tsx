@@ -138,6 +138,8 @@ const ES_TO_EN: Record<string, string> = {
   "SMS ilimitados": "Unlimited SMS",
   "Ilimitados": "Unlimited",
   "Comprar Gb": "Buy GB",
+  "Línea suspendida": "Line suspended",
+  "Puedes recargar saldo, pero los datos y minutos no están disponibles.": "You can top up your balance, but data and minutes are not available.",
   "Finanzas": "Finances",
   "Cargando perfil...": "Loading profile...",
   "Cargando...": "Loading...",
