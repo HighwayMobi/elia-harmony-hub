@@ -442,6 +442,7 @@ const HomePage = ({ user }: HomePageProps) => {
   };
 
   const fmt = (n: number) => n.toFixed(2);
+  const balanceNegative = lineDetails?.balance != null && Number(lineDetails.balance) < 0;
   const fmtDate = (iso?: string) => {
     if (!iso) return NA;
     const d = new Date(iso);
