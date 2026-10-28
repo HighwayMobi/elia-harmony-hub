@@ -676,8 +676,8 @@ const HomePage = ({ user }: HomePageProps) => {
             <div className="border-t border-gray-100 px-5 py-3 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-sm text-gray-500">Saldo</span>
-                  <span className="ml-2 text-sm font-bold text-foreground">
+                  <span className={`text-sm ${balanceNegative ? "text-red-600" : "text-gray-500"}`}>Saldo</span>
+                  <span className={`ml-2 text-sm font-bold ${balanceNegative ? "text-red-600" : "text-foreground"}`}>
                     {lineDetails?.balance != null ? `€${fmt(lineDetails.balance)}` : NA}
                   </span>
                 </div>
