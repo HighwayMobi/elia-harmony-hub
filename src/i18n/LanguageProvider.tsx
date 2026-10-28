@@ -223,18 +223,67 @@ const ES_TO_EN: Record<string, string> = {
   "Return to Home": "Return to Home"
 };
 
+// Longest keys first so a full phrase always wins over a shorter key inside it.
 const pairs = Object.entries(ES_TO_EN).sort((a, b) => b[0].length - a[0].length);
 
-const replaceAll = (value: string, from: string, to: string) => value.split(from).join(to);
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// One pass over the text: a key only matches as a whole word, so short keys such
+// as "de" can never break English words like "suspended".
+const EN_PATTERN = new RegExp(
+  `(?<![\\p{L}\\p{N}])(${pairs.map(([es]) => escapeRegex(es)).join("|")})(?![\\p{L}\\p{N}])`,
+  "gu"
+);
 
 const translate = (value: string, language: AppLanguage) => {
-  let result = value;
-  if (language === "en") {
-    for (const [es, en] of pairs) result = replaceAll(result, es, en);
-  } else {
-    for (const [es, en] of pairs) result = replaceAll(result, en, es);
+  if (language === "es") return value;
+  return value.replace(EN_PATTERN, (match) => ES_TO_EN[match] ?? match);
+};
+
+// Spanish is the source language: every node remembers the text the app itself
+// wrote, and each language switch is rebuilt from that source. Translating twice
+// (ES -> EN -> ES) can no longer leave half-translated text behind.
+const textSources = new WeakMap<Node, string>();
+const textOutputs = new WeakMap<Node, string>();
+const attrSources = new WeakMap<Element, Record<string, string>>();
+const attrOutputs = new WeakMap<Element, Record<string, string>>();
+
+const TRANSLATED_ATTRS = ["placeholder", "title", "aria-label"];
+
+const translateNode = (node: Node, language: AppLanguage) => {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const current = node.textContent || "";
+    let source = textSources.get(node);
+    if (source === undefined || current !== textOutputs.get(node)) {
+      source = current;
+      textSources.set(node, source);
+    }
+    const next = translate(source, language);
+    textOutputs.set(node, next);
+    if (current !== next) node.textContent = next;
+    return;
   }
-  return result;
+  if (!(node instanceof Element)) return;
+  const sources = attrSources.get(node) || {};
+  const outputs = attrOutputs.get(node) || {};
+  for (const attr of TRANSLATED_ATTRS) {
+    const current = node.getAttribute(attr);
+    if (current === null) {
+      if (sources[attr] !== undefined) delete sources[attr];
+      continue;
+    }
+    let source = sources[attr];
+    if (source === undefined || current !== outputs[attr]) {
+      source = current;
+      sources[attr] = source;
+    }
+    const next = translate(source, language);
+    outputs[attr] = next;
+    if (current !== next) node.setAttribute(attr, next);
+  }
+  attrSources.set(node, sources);
+  attrOutputs.set(node, outputs);
+  node.childNodes.forEach((child) => translateNode(child, language));
 };
 
 type LanguageContextValue = {
@@ -244,23 +293,6 @@ type LanguageContextValue = {
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
-
-const translateNode = (node: Node, language: AppLanguage) => {
-  if (node.nodeType === Node.TEXT_NODE) {
-    const current = node.textContent || "";
-    const next = translate(current, language);
-    if (next !== current) node.textContent = next;
-    return;
-  }
-  if (!(node instanceof HTMLElement)) return;
-  for (const attr of ["placeholder", "title", "aria-label"]) {
-    const current = node.getAttribute(attr);
-    if (!current) continue;
-    const next = translate(current, language);
-    if (next !== current) node.setAttribute(attr, next);
-  }
-  node.childNodes.forEach((child) => translateNode(child, language));
-};
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
   const [language, updateLanguage] = useState<AppLanguage>(() => {
