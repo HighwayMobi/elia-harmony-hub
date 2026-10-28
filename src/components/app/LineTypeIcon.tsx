@@ -17,6 +17,7 @@ interface LineTypeIconProps {
 const STATUS_OVERRIDE: Record<string, { color: string; bg: string }> = {
   active: { color: "text-[#2EB872]", bg: "bg-[#DEF4E8]" },
   suspended: { color: "text-[#E0392E]", bg: "bg-[#FBE3E0]" },
+  blocked: { color: "text-[#E0392E]", bg: "bg-[#FBE3E0]" },
 };
 
 const CONFIG: Record<
