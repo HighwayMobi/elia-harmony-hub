@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useLanguage } from "@/i18n/LanguageProvider";
+import { notificationText } from "@/lib/notification-text";
 
 interface NotificationItem {
   id: string;
@@ -179,15 +180,15 @@ const NotificationsBell = () => {
                               n.is_read ? "font-normal text-foreground/80" : "font-semibold"
                             )}
                           >
-                            {n.title || "Notificación"}
+                            {notificationText(n.title) || "Notificación"}
                           </p>
                           <span className="text-xs text-foreground/60 shrink-0">
                             {formatDate(n.created_at)}
                           </span>
                         </div>
                         {n.content && (
-                          <p className="mt-1 text-sm text-foreground/75 line-clamp-3">
-                            {n.content}
+                          <p className="mt-1 text-sm text-foreground/75 line-clamp-3 whitespace-pre-line break-words">
+                            {notificationText(n.content)}
                           </p>
                         )}
                       </div>
